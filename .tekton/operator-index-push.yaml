@@ -190,7 +190,7 @@ spec:
         value: $(tasks.clone-repository.results.commit)
       - name: BUILD_ARGS
         value:
-        - openshift_version: v4.12
+        - openshift_version=v4.12
       runAfter:
       - clone-repository
       taskRef:
