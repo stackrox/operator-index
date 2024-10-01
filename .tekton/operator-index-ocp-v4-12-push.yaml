@@ -24,10 +24,6 @@ spec:
     value: v4.12
   - name: output-image
     value: quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-12-{{revision}}-fast
-  - name: path-context
-    value: common
-  - name: dockerfile
-    value: Containerfile.catalog
 
   workspaces:
     - name: git-auth

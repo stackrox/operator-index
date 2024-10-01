@@ -28,10 +28,6 @@ spec:
     value: quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-12-{{revision}}-fast
   - name: image-expires-after
     value: 5d
-  - name: path-context
-    value: common
-  - name: dockerfile
-    value: Containerfile.catalog
 
   workspaces:
   - name: git-auth
