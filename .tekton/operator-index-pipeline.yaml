@@ -65,8 +65,8 @@ spec:
         path-context
       name: dockerfile
       type: string
-    - description: Version of OpenShift to use for the base image, in vX.YY format.
-      name: openshift-version
+    - description: Pull spec to use for the base image.
+      name: base-image
       type: string
     - default: "false"
       description: Force rebuild image
@@ -178,7 +178,7 @@ spec:
           value: $(tasks.clone-repository.results.commit)
         - name: BUILD_ARGS
           value:
-            - openshift_version=$(params.openshift-version)
+            - base_image=$(params.base-image)
       runAfter:
         - clone-repository
       taskRef:

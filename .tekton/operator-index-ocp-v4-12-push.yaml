@@ -20,8 +20,8 @@ spec:
     value: '{{source_url}}'
   - name: revision
     value: '{{revision}}'
-  - name: openshift-version
-    value: v4.12
+  - name: base-image
+    value: registry.redhat.io/openshift4/ose-operator-registry:v4.12
   - name: output-image
     value: quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-12-{{revision}}-fast
 

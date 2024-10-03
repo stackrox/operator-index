@@ -1,5 +1,5 @@
-ARG openshift_version
-FROM registry.redhat.io/openshift4/ose-operator-registry:${openshift_version}
+ARG base_image
+FROM ${base_image}
 
 ENTRYPOINT ["/bin/opm"]
 CMD ["serve", "/configs", "--cache-dir=/tmp/cache"]
