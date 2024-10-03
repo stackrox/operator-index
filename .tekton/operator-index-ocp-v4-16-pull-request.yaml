@@ -27,6 +27,7 @@ spec:
   - name: output-image
     value: quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-16-{{revision}}-fast
   - name: image-expires-after
+    # TODO(ROX-24530): set expiration consistently
     value: 5d
 
   workspaces:
