@@ -55,6 +55,10 @@ spec:
     - description: Fully Qualified Output Image
       name: output-image
       type: string
+    - default: quay.io/rhacs-eng/stackrox-operator-index
+      description: Output Image Repository
+      name: output-image-repo
+      type: string
     - default: common
       description: Path to the source code of an application's component from where
         to build image.
@@ -95,6 +99,10 @@ spec:
       description: Add built image into an OCI image index
       name: build-image-index
       type: string
+    - default: "1d"
+      description: This sets the expiration time for intermediate OCI artifacts produced and used during builds after which they can be garbage collected.
+      name: oci-artifact-expires-after
+      type: string
   results:
     - description: ""
       name: IMAGE_URL
@@ -110,7 +118,6 @@ spec:
       value: $(tasks.clone-repository.results.commit)
 
   workspaces:
-    - name: workspace
     - name: git-auth
       optional: true
     - name: netrc
@@ -140,14 +147,18 @@ spec:
           value: $(params.git-url)
         - name: revision
           value: $(params.revision)
+        - name: ociStorage
+          value: $(params.output-image-repo):konflux-$(params.revision).git
+        - name: ociArtifactExpiresAfter
+          value: $(params.oci-artifact-expires-after)
       runAfter:
         - init
       taskRef:
         params:
           - name: name
-            value: git-clone
+            value: git-clone-oci-ta
           - name: bundle
-            value: quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:2cccdf8729ad4d5adf65e8b66464f8efa1e1c87ba16d343b4a6c621a2a40f7e1
+            value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:8e1e861d9564caea3f9ce8d1c62789f5622b5a7051209decc9ecf10b6f54aa71
           - name: kind
             value: task
         resolver: bundles
@@ -157,8 +168,6 @@ spec:
           values:
             - "true"
       workspaces:
-        - name: output
-          workspace: workspace
         - name: basic-auth
           workspace: git-auth
     - name: build-container
@@ -178,14 +187,16 @@ spec:
         - name: BUILD_ARGS
           value:
             - base_image=$(params.base-image)
+        - name: SOURCE_ARTIFACT
+          value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
       runAfter:
         - clone-repository
       taskRef:
         params:
           - name: name
-            value: buildah
+            value: buildah-oci-ta
           - name: bundle
-            value: quay.io/konflux-ci/tekton-catalog/task-buildah:0.2@sha256:e107cfdf4ee68741ad366b2768cd33e2d5f99569b639f95f50df8b9835c2d144
+            value: quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.2@sha256:2aca1d8561aeb3a03d14e0d89d95e5de9fbb1e6e9df822c6f6f580bbb106fb11
           - name: kind
             value: task
         resolver: bundles
@@ -194,9 +205,6 @@ spec:
           operator: in
           values:
             - "true"
-      workspaces:
-        - name: source
-          workspace: workspace
     - name: build-image-index
       params:
         - name: IMAGE
