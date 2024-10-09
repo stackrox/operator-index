@@ -24,6 +24,9 @@ spec:
     value: registry.redhat.io/openshift4/ose-operator-registry:v4.12
   - name: output-image
     value: quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-12-{{revision}}-fast
+  - name: image-expires-after
+    # TODO(ROX-24530): set expiration consistently
+    value: 52w
 
   workspaces:
   - name: git-auth
