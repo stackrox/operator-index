@@ -29,7 +29,7 @@ spec:
         - name: git-url
           value: $(tasks.clone-repository.results.url)?rev=$(tasks.clone-repository.results.commit)
         - name: image-url
-          value: $(params.output-image)
+          value: $(params.output-image-repo):$(params.output-image-tag)
         - name: build-task-status
           value: $(tasks.build-image-index.status)
       taskRef:
@@ -52,8 +52,8 @@ spec:
       description: Revision of the Source Repository
       name: revision
       type: string
-    - description: Fully Qualified Output Image
-      name: output-image
+    - description: Output Image Tag. Will be qualified with output-image-repo.
+      name: output-image-tag
       type: string
     - default: quay.io/rhacs-eng/stackrox-operator-index
       description: Output Image Repository
@@ -127,7 +127,7 @@ spec:
     - name: init
       params:
         - name: image-url
-          value: $(params.output-image)
+          value: $(params.output-image-repo):$(params.output-image-tag)
         - name: rebuild
           value: $(params.rebuild)
         - name: skip-checks
@@ -171,7 +171,7 @@ spec:
     - name: build-container
       params:
         - name: IMAGE
-          value: $(params.output-image)
+          value: $(params.output-image-repo):$(params.output-image-tag)
         - name: DOCKERFILE
           value: $(params.dockerfile)
         - name: CONTEXT
@@ -204,7 +204,7 @@ spec:
     - name: build-image-index
       params:
         - name: IMAGE
-          value: $(params.output-image)
+          value: $(params.output-image-repo):$(params.output-image-tag)
         - name: COMMIT_SHA
           value: $(tasks.clone-repository.results.commit)
         - name: IMAGE_EXPIRES_AFTER
