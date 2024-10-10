@@ -165,10 +165,10 @@ spec:
       workspaces:
         - name: basic-auth
           workspace: git-auth
-    - name: build-container
+    - name: build-container-amd64
       params:
         - name: IMAGE
-          value: $(params.output-image-repo):$(params.output-image-tag)
+          value: $(params.output-image-repo):$(params.output-image-tag)-amd64
         - name: DOCKERFILE
           value: $(params.dockerfile)
         - name: CONTEXT
@@ -210,7 +210,7 @@ spec:
           value: $(params.build-image-index)
         - name: IMAGES
           value:
-            - $(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)
+            - $(tasks.build-container-amd64.results.IMAGE_URL)@$(tasks.build-container-amd64.results.IMAGE_DIGEST)
       taskRef:
         params:
           - name: name
