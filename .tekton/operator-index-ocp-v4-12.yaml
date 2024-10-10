@@ -7,12 +7,12 @@ metadata:
     build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "500"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch == "master"
+    pipelinesascode.tekton.dev/on-cel-expression: event in ["push", "pull_request"] && target_branch == "master"
   labels:
-    appstudio.openshift.io/application: acs-operator-index-ocp-v4-16
-    appstudio.openshift.io/component: operator-index-ocp-v4-16
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
+    appstudio.openshift.io/component: operator-index-ocp-v4-12
     pipelines.appstudio.openshift.io/type: build
-  name: operator-index-ocp-v4-16-on-pull-request
+  name: operator-index-ocp-v4-12
   namespace: rh-acs-tenant
 spec:
   params:
@@ -21,9 +21,9 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: base-image
-    value: registry.redhat.io/openshift4/ose-operator-registry-rhel9:v4.16
+    value: registry.redhat.io/openshift4/ose-operator-registry:v4.12
   - name: output-image-tag
-    value: ocp-v4-16-{{revision}}-fast
+    value: ocp-v4-12-{{revision}}-fast
   - name: image-expires-after
     # TODO(ROX-24530): set expiration consistently
     value: 52w
