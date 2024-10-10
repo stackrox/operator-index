@@ -151,8 +151,6 @@ spec:
           value: $(params.output-image-repo):konflux-$(params.revision).git
         - name: ociArtifactExpiresAfter
           value: $(params.oci-artifact-expires-after)
-      runAfter:
-        - init
       taskRef:
         params:
           - name: name
@@ -189,8 +187,6 @@ spec:
             - base_image=$(params.base-image)
         - name: SOURCE_ARTIFACT
           value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
-      runAfter:
-        - clone-repository
       taskRef:
         params:
           - name: name
@@ -218,8 +214,6 @@ spec:
         - name: IMAGES
           value:
             - $(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)
-      runAfter:
-        - build-container
       taskRef:
         params:
           - name: name
@@ -240,8 +234,6 @@ spec:
           value: $(tasks.build-image-index.results.IMAGE_URL)
         - name: IMAGE_DIGEST
           value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-      runAfter:
-        - build-image-index
       taskRef:
         params:
           - name: name
@@ -260,8 +252,6 @@ spec:
       params:
         - name: IMAGE
           value: $(tasks.build-image-index.results.IMAGE_URL)
-      runAfter:
-        - build-image-index
       taskRef:
         params:
           - name: name
@@ -277,8 +267,6 @@ spec:
           value: $(tasks.build-image-index.results.IMAGE_URL)
         - name: IMAGE_DIGEST
           value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-      runAfter:
-        - build-image-index
       taskRef:
         params:
           - name: name
@@ -304,8 +292,6 @@ spec:
           value: $(tasks.build-image-index.results.IMAGE_DIGEST)
         - name: BASE_IMAGE
           value: $(tasks.inspect-image.results.BASE_IMAGE)
-      runAfter:
-        - inspect-image
       taskRef:
         params:
           - name: name
