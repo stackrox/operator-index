@@ -7,9 +7,7 @@ metadata:
     build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "500"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
-      == "master" && ( "common/***".pathChanged() || ".tekton/operator-index-ocp-v4-12-pull-request.yaml".pathChanged()
-      )
+    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch == "master"
   labels:
     appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
     appstudio.openshift.io/component: operator-index-ocp-v4-12
@@ -24,8 +22,8 @@ spec:
     value: '{{revision}}'
   - name: base-image
     value: registry.redhat.io/openshift4/ose-operator-registry:v4.12
-  - name: output-image
-    value: quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-12-{{revision}}-fast
+  - name: output-image-tag
+    value: ocp-v4-12-{{revision}}-fast
   - name: image-expires-after
     # TODO(ROX-24530): set expiration consistently
     value: 52w
