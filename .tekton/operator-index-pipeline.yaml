@@ -66,13 +66,11 @@ spec:
       name: output-image-repo
       type: string
     - default: common
-      description: Path to the source code of an application's component from where
-        to build image.
+      description: Path to the source code of an application's component from where to build image.
       name: path-context
       type: string
     - default: Containerfile.catalog
-      description: Path to the Dockerfile inside the context specified by parameter
-        path-context
+      description: Path to the Dockerfile inside the context specified by parameter path-context.
       name: dockerfile
       type: string
     - description: Pull spec to use for the base image.
@@ -94,8 +92,8 @@ spec:
       description: Build dependencies to be prefetched by Cachi2
       name: prefetch-input
       type: string
-    - description: Image tag expiration time, time values could be something like
-        1h, 2d, 3w for hours, days, and weeks, respectively.
+    - description: Image tag expiration time, time values could be something like 1h, 2d, 3w for hours, days, and
+        weeks, respectively.
       name: image-expires-after
     - default: "false"
       description: Build a source image.
@@ -106,7 +104,8 @@ spec:
       name: build-image-index
       type: string
     - default: "1d"
-      description: This sets the expiration time for intermediate OCI artifacts produced and used during builds after which they can be garbage collected.
+      description: This sets the expiration time for intermediate OCI artifacts produced and used during builds after
+        which they can be garbage collected.
       name: oci-artifact-expires-after
       type: string
 
