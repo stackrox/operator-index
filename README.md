@@ -2,7 +2,7 @@
 
 This repository is for building the ACS (downstream) operator indexes on Konflux.
 
-**Note: opm v1.46.0 or newer is required to manipulate the files here.**
+**Note: [opm](https://github.com/operator-framework/operator-registry/releases) v1.46.0 or newer is required to manipulate the files here.**
 
 ## Initialization
 
