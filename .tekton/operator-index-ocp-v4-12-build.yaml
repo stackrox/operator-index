@@ -18,30 +18,30 @@ metadata:
 spec:
 
   params:
-    - name: git-url
-      value: '{{source_url}}'
-    - name: revision
-      value: '{{revision}}'
-    - name: base-image
-      value: registry.redhat.io/openshift4/ose-operator-registry:v4.12
-    - name: output-image-tag
-      value: ocp-v4-12-{{revision}}-fast
-    - name: image-expires-after
-      # TODO(ROX-24530): set expiration consistently
-      value: 52w
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: base-image
+    value: registry.redhat.io/openshift4/ose-operator-registry:v4.12
+  - name: output-image-tag
+    value: ocp-v4-12-{{revision}}-fast
+  - name: image-expires-after
+    # TODO(ROX-24530): set expiration consistently
+    value: 52w
 
   workspaces:
-    - name: git-auth
-      secret:
-        secretName: '{{ git_auth_secret }}'
-    - name: workspace
-      volumeClaimTemplate:
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
+  - name: git-auth
+    secret:
+      secretName: '{{ git_auth_secret }}'
+  - name: workspace
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 
   pipelineRef:
     name: operator-index-pipeline
