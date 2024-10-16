@@ -14,7 +14,9 @@ metadata:
     pipelines.appstudio.openshift.io/type: build
   name: operator-index-ocp-v4-16-build
   namespace: rh-acs-tenant
+
 spec:
+
   params:
   - name: git-url
     value: '{{source_url}}'
@@ -40,5 +42,6 @@ spec:
         resources:
           requests:
             storage: 1Gi
+
   pipelineRef:
     name: operator-index-pipeline
