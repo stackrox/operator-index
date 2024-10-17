@@ -1,6 +1,6 @@
 ARG base_image
-ARG catalog_dir
 FROM ${base_image}
+ARG catalog_dir
 
 ENTRYPOINT ["/bin/opm"]
 CMD ["serve", "/configs", "--cache-dir=/tmp/cache"]
