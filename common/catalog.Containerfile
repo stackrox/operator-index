@@ -1,10 +1,11 @@
 ARG base_image
+ARG catalog_dir
 FROM ${base_image}
 
 ENTRYPOINT ["/bin/opm"]
 CMD ["serve", "/configs", "--cache-dir=/tmp/cache"]
 
-COPY catalog/ /configs
+COPY ${catalog_dir}/ /configs
 LABEL operators.operatorframework.io.index.configs.v1=/configs
 
 # Build the cache such that we can use this image as the target for a standalone CatalogSource.

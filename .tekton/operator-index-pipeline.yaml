@@ -76,6 +76,10 @@ spec:
   - description: Pull spec to use for the base image.
     name: base-image
     type: string
+  - default: "catalog"
+    description: Catalog dir to use for building image.
+    name: catalog-dir
+    type: string
   - default: "false"
     description: Force rebuild image
     name: rebuild
@@ -190,6 +194,7 @@ spec:
     - name: BUILD_ARGS
       value:
       - base_image=$(params.base-image)
+      - catalog_dir=$(params.catalog-dir)
     - name: SOURCE_ARTIFACT
       value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
     taskRef:
@@ -223,6 +228,7 @@ spec:
     - name: BUILD_ARGS
       value:
       - base_image=$(params.base-image)
+      - catalog_dir=$(params.catalog-dir)
     - name: SOURCE_ARTIFACT
       value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
     - name: PLATFORM
@@ -258,6 +264,7 @@ spec:
     - name: BUILD_ARGS
       value:
       - base_image=$(params.base-image)
+      - catalog_dir=$(params.catalog-dir)
     - name: SOURCE_ARTIFACT
       value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
     - name: PLATFORM
@@ -293,6 +300,7 @@ spec:
     - name: BUILD_ARGS
       value:
       - base_image=$(params.base-image)
+      - catalog_dir=$(params.catalog-dir)
     - name: SOURCE_ARTIFACT
       value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
     - name: PLATFORM
