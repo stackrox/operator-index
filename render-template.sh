@@ -33,5 +33,5 @@ jq --slurpfile channel channel-4.6.json '.entries += $channel
    else .
    end)
 ' common/catalog-template.json > "$tmp_template"
-echo "Running template rendering, this can take a few minutes..."
-opm alpha render-template basic "${tmp_template}" > common/catalog/rhacs-operator/catalog.json
+echo >&2 "Running template rendering, this can take a few minutes..."
+opm alpha render-template basic "$@" "${tmp_template}"
