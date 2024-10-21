@@ -330,10 +330,10 @@ spec:
       value: $(params.build-image-index)
     - name: IMAGES
       value:
-      - $(tasks.build-container-amd64.results.IMAGE_URL)@$(tasks.build-container-amd64.results.IMAGE_DIGEST)
-      - $(tasks.build-container-arm64.results.IMAGE_URL)@$(tasks.build-container-arm64.results.IMAGE_DIGEST)
-      - $(tasks.build-container-ppc64le.results.IMAGE_URL)@$(tasks.build-container-ppc64le.results.IMAGE_DIGEST)
-      - $(tasks.build-container-s390x.results.IMAGE_URL)@$(tasks.build-container-s390x.results.IMAGE_DIGEST)
+      - $(tasks.build-container-amd64.results.IMAGE_REF)
+      - $(tasks.build-container-arm64.results.IMAGE_REF)
+      - $(tasks.build-container-ppc64le.results.IMAGE_REF)
+      - $(tasks.build-container-s390x.results.IMAGE_REF)
     taskRef:
       params:
       - name: name
