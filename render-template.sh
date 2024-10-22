@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # The version-controled catalog template in common/catalog-template.json is
 # currently auto-generated from the production catalog (in turn built by
 # CPaaS/IIB). This makes it hard to modify (because a refresh would wipe manual
