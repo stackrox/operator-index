@@ -1310,6 +1310,14 @@
                     "skips": [
                         "rhacs-operator.v4.1.0"
                     ]
+                },
+                {
+                    "name": "rhacs-operator.v4.5.4",
+                    "replaces": "rhacs-operator.v4.5.3",
+                    "skipRange": "\u003e= 4.4.0 \u003c 4.5.4",
+                    "skips": [
+                        "rhacs-operator.v4.1.0"
+                    ]
                 }
             ],
             "name": "rhacs-4.5",
@@ -1403,6 +1411,14 @@
                     "name": "rhacs-operator.v4.5.3",
                     "replaces": "rhacs-operator.v4.5.2",
                     "skipRange": "\u003e= 4.4.0 \u003c 4.5.3",
+                    "skips": [
+                        "rhacs-operator.v4.1.0"
+                    ]
+                },
+                {
+                    "name": "rhacs-operator.v4.5.4",
+                    "replaces": "rhacs-operator.v4.5.3",
+                    "skipRange": "\u003e= 4.4.0 \u003c 4.5.4",
                     "skips": [
                         "rhacs-operator.v4.1.0"
                     ]
@@ -1747,6 +1763,10 @@
         {
             "schema": "olm.bundle",
             "image": "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:8bca9a8388de978872eb2834ea7563baacf3a851e1bbaf11acd507d5acce9999"
+        },
+        {
+            "schema": "olm.bundle",
+            "image": "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:8cc0088423509c0fe8413cdf1b85f66269a6e62f3a59708a25fa91acac94a44c"
         }
     ]
 }
