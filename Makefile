@@ -19,7 +19,7 @@ common/catalog-csv-metadata/rhacs-operator/catalog.json: common/catalog-template
 	mkdir -p "$$(dirname "$@")"
 	./render-template.sh --migrate-level bundle-object-to-csv-metadata > $@
 
-# This is broken due to concurrency if invoked together with other targets (`make import-legacy valid-catalogs`).
+# This is broken due to concurrency if invoked together with other targets (e.g. `make import-legacy valid-catalogs` - don't do this).
 # Instead invoke `make import-legacy && make valid-catalogs`.
 # TODO: fix it. Otherwise this target will disappear once konflux index builds replace the CPaaS-based ones.
 import-legacy:
