@@ -111,6 +111,15 @@ spec:
       which they can be garbage collected.
     name: oci-artifact-expires-after
     type: string
+  - default:
+    - linux/amd64
+    - linux/arm64
+    - linux/ppc64le
+    - linux/s390x
+    description: List of platforms to build the container images on. The available
+      set of values is determined by the configuration of the multi-platform-controller.
+    name: build-platforms
+    type: array
 
   results:
   - description: ""
@@ -176,44 +185,15 @@ spec:
     - name: basic-auth
       workspace: git-auth
 
-  - name: build-container-amd64
-    params:
-    - name: IMAGE
-      value: $(params.output-image-repo):$(params.output-image-tag)-amd64
-    - name: DOCKERFILE
-      value: $(params.dockerfile)
-    - name: CONTEXT
-      value: $(params.path-context)
-    - name: HERMETIC
-      value: $(params.hermetic)
-    - name: IMAGE_EXPIRES_AFTER
-      value: $(params.image-expires-after)
-    - name: COMMIT_SHA
-      value: $(tasks.clone-repository.results.commit)
-    - name: BUILD_ARGS
-      value:
-      - base_image=$(params.base-image)
-      - catalog_dir=$(params.catalog-dir)
-    - name: SOURCE_ARTIFACT
-      value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
-    taskRef:
+  - matrix:
       params:
-      - name: name
-        value: buildah-oci-ta
-      - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.2@sha256:43aecf28e07b3cdf74f85524354b665ea584f2282a1f40ec32f64c6a9b036cd3
-      - name: kind
-        value: task
-      resolver: bundles
-    when:
-    - input: $(tasks.init.results.build)
-      operator: in
-      values: [ "true" ]
-
-  - name: build-container-arm64
+      - name: PLATFORM
+        value:
+        - $(params.build-platforms)
+    name: build-container
     params:
     - name: IMAGE
-      value: $(params.output-image-repo):$(params.output-image-tag)-arm64
+      value: $(params.output-image-repo):$(params.output-image-tag)
     - name: DOCKERFILE
       value: $(params.dockerfile)
     - name: CONTEXT
@@ -230,80 +210,8 @@ spec:
       - catalog_dir=$(params.catalog-dir)
     - name: SOURCE_ARTIFACT
       value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
-    - name: PLATFORM
-      value: linux/arm64
-    taskRef:
-      params:
-      - name: name
-        value: buildah-remote-oci-ta
-      - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:bd704cf7eb042f1fd48bfbd872a3f5a3632697a117602e242653ed323e6db52e
-      - name: kind
-        value: task
-      resolver: bundles
-    when:
-    - input: $(tasks.init.results.build)
-      operator: in
-      values: [ "true" ]
-
-  - name: build-container-ppc64le
-    params:
-    - name: IMAGE
-      value: $(params.output-image-repo):$(params.output-image-tag)-ppc64le
-    - name: DOCKERFILE
-      value: $(params.dockerfile)
-    - name: CONTEXT
-      value: $(params.path-context)
-    - name: HERMETIC
-      value: $(params.hermetic)
-    - name: IMAGE_EXPIRES_AFTER
-      value: $(params.image-expires-after)
-    - name: COMMIT_SHA
-      value: $(tasks.clone-repository.results.commit)
-    - name: BUILD_ARGS
-      value:
-      - base_image=$(params.base-image)
-      - catalog_dir=$(params.catalog-dir)
-    - name: SOURCE_ARTIFACT
-      value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
-    - name: PLATFORM
-      value: linux/ppc64le
-    taskRef:
-      params:
-      - name: name
-        value: buildah-remote-oci-ta
-      - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:bd704cf7eb042f1fd48bfbd872a3f5a3632697a117602e242653ed323e6db52e
-      - name: kind
-        value: task
-      resolver: bundles
-    when:
-    - input: $(tasks.init.results.build)
-      operator: in
-      values: [ "true" ]
-
-  - name: build-container-s390x
-    params:
-    - name: IMAGE
-      value: $(params.output-image-repo):$(params.output-image-tag)-s390x
-    - name: DOCKERFILE
-      value: $(params.dockerfile)
-    - name: CONTEXT
-      value: $(params.path-context)
-    - name: HERMETIC
-      value: $(params.hermetic)
-    - name: IMAGE_EXPIRES_AFTER
-      value: $(params.image-expires-after)
-    - name: COMMIT_SHA
-      value: $(tasks.clone-repository.results.commit)
-    - name: BUILD_ARGS
-      value:
-      - base_image=$(params.base-image)
-      - catalog_dir=$(params.catalog-dir)
-    - name: SOURCE_ARTIFACT
-      value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
-    - name: PLATFORM
-      value: linux/s390x
+    - name: IMAGE_APPEND_PLATFORM
+      value: "true"
     taskRef:
       params:
       - name: name
@@ -330,10 +238,7 @@ spec:
       value: $(params.build-image-index)
     - name: IMAGES
       value:
-      - $(tasks.build-container-amd64.results.IMAGE_REF)
-      - $(tasks.build-container-arm64.results.IMAGE_REF)
-      - $(tasks.build-container-ppc64le.results.IMAGE_REF)
-      - $(tasks.build-container-s390x.results.IMAGE_REF)
+      - $(tasks.build-container.results.IMAGE_REF[*])
     taskRef:
       params:
       - name: name
