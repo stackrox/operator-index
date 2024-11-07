@@ -116,7 +116,7 @@ spec:
     - linux/arm64
     - linux/ppc64le
     - linux/s390x
-    description: List of platforms to build the container images on. The available
+    description: List of platforms to build the container images for. The available
       set of values is determined by the configuration of the multi-platform-controller.
     name: build-platforms
     type: array
@@ -185,12 +185,12 @@ spec:
     - name: basic-auth
       workspace: git-auth
 
-  - matrix:
+  - name: build-container
+    matrix:
       params:
       - name: PLATFORM
         value:
         - $(params.build-platforms)
-    name: build-container
     params:
     - name: IMAGE
       value: $(params.output-image-repo):$(params.output-image-tag)
