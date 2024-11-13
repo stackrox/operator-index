@@ -1,5 +1,5 @@
 #!/bin/bash
-# The version-controled catalog template in common/catalog-template.json is
+# The version-controled catalog template in catalog-template.json is
 # currently auto-generated from the production catalog (in turn built by
 # CPaaS/IIB). This makes it hard to modify (because a refresh would wipe manual
 # modifications).
@@ -29,7 +29,7 @@ version="v4.6.0-812-gf3f0d00320-fast"
 digest="sha256:bb0c4104de9bb3670f5d7ec02339c5ff35095ebae23617c29018867934cdcb69"
 
 # This
-latest_legacy_version="$(jq -r '.entries[]|select(.schema=="olm.channel" and .name == "stable") | .entries|.[-1] | .name' < common/catalog-template.json)"
+latest_legacy_version="$(jq -r '.entries[]|select(.schema=="olm.channel" and .name == "stable") | .entries|.[-1] | .name' < catalog-template.json)"
 
 tmp_template="$(mktemp)"
 trap 'rm -f $tmp_template' EXIT
@@ -45,6 +45,6 @@ jq --slurpfile channel channel-4.6.json '.entries += $channel
    then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "rhacs-operator.v4.5.0", "skipRange": ">= 4.5.0 < 4.6.0"}]
    else .
    end)
-' common/catalog-template.json > "$tmp_template"
+' catalog-template.json > "$tmp_template"
 echo >&2 "Running template rendering, this can take a few minutes..."
 opm alpha render-template basic "$@" "${tmp_template}"
