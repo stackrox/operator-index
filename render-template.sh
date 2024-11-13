@@ -34,7 +34,7 @@ latest_legacy_version="$(jq -r '.entries[]|select(.schema=="olm.channel" and .na
 tmp_template="$(mktemp)"
 trap 'rm -f $tmp_template' EXIT
 jq --slurpfile channel channel-4.6.json '.entries += $channel
- | .entries += [{"schema": "olm.bundle", "image": "quay.io/rhacs-eng/stackrox-operator-bundle@'${digest}'"}]
+ | .entries += [{"schema": "olm.bundle", "image": "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@'${digest}'"}]
  | .entries |= map(
    if .schema == "olm.channel" and .name == "stable"
    then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "'"${latest_legacy_version}"'", "skipRange": ">= 4.5.0 < 4.6.0"}]
