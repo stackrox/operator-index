@@ -17,7 +17,7 @@ set -euo pipefail
 
 # A recent (more or less) successful konflux build.
 # To find this value:
-# - look in https://github.com/stackrox/stackrox/commits/master for a commit with a successful "Red Hat Konflux / operator-bundle-build" status,
+# - look in https://github.com/stackrox/stackrox/commits/master for a commit with a successful "Red Hat Konflux / operator-bundle-on-push" status,
 # - go to "Details" next to it,
 # - go to "build-container" under "Task Statuses",
 # - go to the "Details" tab in the main pane,
