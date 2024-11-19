@@ -47,4 +47,17 @@ jq --slurpfile channel channel-4.6.json '.entries += $channel
    end)
 ' catalog-template.json > "$tmp_template"
 echo >&2 "Running template rendering, this can take a few minutes..."
-opm alpha render-template basic "$@" "${tmp_template}" | jq .
+
+# Render catalog and post-process result by rewriting the image repository:
+#
+#     quay.io/rhacs-eng/stackrox-operator-bundle
+#  -> registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle
+opm alpha render-template basic "$@" "${tmp_template}" \
+  | jq 'walk(
+      if type == "string" and startswith("quay.io/rhacs-eng/stackrox-operator-bundle@")
+      then
+          "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@" + (. | ltrimstr("quay.io/rhacs-eng/stackrox-operator-bundle@"))
+      else
+          .
+      end
+    )'
