@@ -47,4 +47,4 @@ jq --slurpfile channel channel-4.6.json '.entries += $channel
    end)
 ' catalog-template.json > "$tmp_template"
 echo >&2 "Running template rendering, this can take a few minutes..."
-opm alpha render-template basic "$@" "${tmp_template}"
+opm alpha render-template basic "$@" "${tmp_template}" | jq .
