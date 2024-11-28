@@ -52,7 +52,7 @@ echo >&2 "Running template rendering, this can take a few minutes..."
 #
 #     quay.io/rhacs-eng/stackrox-operator-bundle
 #  -> registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle
-opm alpha render-template basic "$@" "${tmp_template}" \
+${OPM:-opm} alpha render-template basic "$@" "${tmp_template}" \
   | jq 'walk(
       if type == "string" and startswith("quay.io/rhacs-eng/stackrox-operator-bundle@")
       then
