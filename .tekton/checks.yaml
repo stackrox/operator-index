@@ -1,0 +1,85 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/max-keep-runs: "500"
+    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" || (event == "push" && target_branch == "master")
+  labels:
+    # Arbitrarily chosen application. It just needs to exist, see https://redhat-internal.slack.com/archives/C04PZ7H0VA8/p1731696009187979
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+  name: checks
+  namespace: rh-acs-tenant
+
+spec:
+
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+
+  workspaces:
+  - name: git-auth
+    secret:
+      secretName: '{{ git_auth_secret }}'
+
+  pipelineSpec:
+    description: |
+      This pipeline performs checks not specific to any OCP version.
+
+    params:
+    - description: Source Repository URL
+      name: git-url
+      type: string
+    - description: Revision of the Source Repository
+      name: revision
+      type: string
+    - default: quay.io/rhacs-eng/stackrox-operator-index
+      description: Intermediate Image Repository
+      name: oci-repo
+      type: string
+    - default: "1d"
+      description: This sets the expiration time for intermediate OCI artifacts produced and used during builds after
+        which they can be garbage collected.
+      name: oci-artifact-expires-after
+      type: string
+
+    workspaces:
+    - name: git-auth
+
+    tasks:
+
+    - name: clone-repository
+      params:
+      - name: url
+        value: $(params.git-url)
+      - name: revision
+        value: $(params.revision)
+      - name: ociStorage
+        value: $(params.oci-repo):konflux-checks-$(params.revision).git
+      - name: ociArtifactExpiresAfter
+        value: $(params.oci-artifact-expires-after)
+      taskRef:
+        params:
+        - name: name
+          value: git-clone-oci-ta
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:d1e63ec00bed1c9f0f571fa76b4da570be49a7c255c610544a461495230ba1b1
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+      - name: basic-auth
+        workspace: git-auth
+
+    - name: check-generated-files-up-to-date
+      params:
+      - name: SOURCE_ARTIFACT
+        value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
+      taskRef:
+        name: check-generated-files-up-to-date
+
