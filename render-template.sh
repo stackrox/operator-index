@@ -25,8 +25,8 @@ set -euo pipefail
 # - take the tag from the "IMAGE_URL row"
 # - take the whole value from the "IMAGE_DIGEST" row,
 # - save and run make.
-version="v4.6.0-812-gf3f0d00320-fast"
-digest="sha256:bb0c4104de9bb3670f5d7ec02339c5ff35095ebae23617c29018867934cdcb69"
+version="v4.7.0-163-g8f9cf23be2-fast"
+digest="sha256:e05042a079ef49d3198297a5203420d165f44f23f7baf9c5f1bfb6c345771418"
 
 # This
 latest_legacy_version="$(jq -r '.entries[]|select(.schema=="olm.channel" and .name == "stable") | .entries|.[-1] | .name' < catalog-template.json)"
@@ -47,4 +47,17 @@ jq --slurpfile channel channel-4.6.json '.entries += $channel
    end)
 ' catalog-template.json > "$tmp_template"
 echo >&2 "Running template rendering, this can take a few minutes..."
-opm alpha render-template basic "$@" "${tmp_template}" | jq .
+
+# Render catalog and post-process result by rewriting the image repository:
+#
+#     quay.io/rhacs-eng/stackrox-operator-bundle
+#  -> registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle
+opm alpha render-template basic "$@" "${tmp_template}" \
+  | jq 'walk(
+      if type == "string" and startswith("quay.io/rhacs-eng/stackrox-operator-bundle@")
+      then
+          "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@" + (. | ltrimstr("quay.io/rhacs-eng/stackrox-operator-bundle@"))
+      else
+          .
+      end
+    )'
