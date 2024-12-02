@@ -25,8 +25,8 @@ set -euo pipefail
 # - take the tag from the "IMAGE_URL row"
 # - take the whole value from the "IMAGE_DIGEST" row,
 # - save and run make.
-version="v4.7.0-144-g47a1e8355d-fast"
-digest="sha256:93eda380085bbf022b9df8aaab5012876b581b87c114931171eb30ccb8cf8e1b"
+version="v4.7.0-163-g8f9cf23be2-fast"
+digest="sha256:e05042a079ef49d3198297a5203420d165f44f23f7baf9c5f1bfb6c345771418"
 
 # This
 latest_legacy_version="$(jq -r '.entries[]|select(.schema=="olm.channel" and .name == "stable") | .entries|.[-1] | .name' < catalog-template.json)"
