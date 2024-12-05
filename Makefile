@@ -28,9 +28,10 @@ $(OPM):
 	os_name="$$(uname | tr '[:upper:]' '[:lower:]')"; \
 	arch="$$(go env GOARCH 2>/dev/null || echo amd64)"; \
 	for attempt in $$(seq 5); do \
-		if curl --silent --fail --location --output $@ "https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/$${os_name}-$${arch}-opm"; then break; fi; \
+		if curl --silent --fail --location --output $@.tmp "https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/$${os_name}-$${arch}-opm"; then break; fi; \
 	done
-	chmod +x $@
+	chmod +x $@.tmp
+	mv $@.tmp $@
 
 # This is broken due to concurrency if invoked together with other targets (e.g. `make import-legacy valid-catalogs` - don't do this).
 # Instead invoke `make import-legacy && make valid-catalogs`.
