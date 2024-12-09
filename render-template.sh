@@ -1,16 +1,16 @@
 #!/bin/bash
-# The version-controled catalog template in catalog-template.json is
+# The version-controlled catalog template in catalog-template.json is
 # currently auto-generated from the production catalog (in turn built by
 # CPaaS/IIB). This makes it hard to modify (because a refresh would wipe manual
 # modifications).
 #
 # This script:
-# 1. creates a temporary catalog template from the version controled template
+# 1. creates a temporary catalog template from the version controlled template
 # by injecting a bundle for a Konflux build, together with a rhacs-4.6 channel
-# 2. renders this template into a version-controled catalog.
+# 2. renders this template into a version-controlled catalog.
 #
 # TODO: Once we stop building operator indexes using CPaaS/IIB, the entries for
-# the Konflux build can be moved into the version-controled template and the
+# the Konflux build can be moved into the version-controlled template and the
 # script can be removed in favor of the render-template command.
 
 set -euo pipefail
