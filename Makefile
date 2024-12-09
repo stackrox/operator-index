@@ -18,11 +18,11 @@ clean:
 
 catalog-bundle-object/rhacs-operator/catalog.json: catalog-template.json render-template.sh $(OPM)
 	mkdir -p "$$(dirname "$@")"
-	OPM=$(OPM) ./render-template.sh --migrate-level none > $@
+	./render-template.sh $(OPM) --migrate-level none > $@
 
 catalog-csv-metadata/rhacs-operator/catalog.json: catalog-template.json render-template.sh $(OPM)
 	mkdir -p "$$(dirname "$@")"
-	OPM=$(OPM) ./render-template.sh --migrate-level bundle-object-to-csv-metadata > $@
+	./render-template.sh $(OPM) --migrate-level bundle-object-to-csv-metadata > $@
 
 $(OPM):
 	mkdir -p "$$(dirname $@)"

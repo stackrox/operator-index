@@ -15,6 +15,9 @@
 
 set -euo pipefail
 
+OPM="$1"
+shift
+
 # A recent (more or less) successful konflux build.
 # To find this value:
 # - look in https://github.com/stackrox/stackrox/commits/master for a commit with a successful "Red Hat Konflux / operator-bundle-on-push" status,
@@ -52,7 +55,7 @@ echo >&2 "Running template rendering, this can take a few minutes..."
 #
 #     quay.io/rhacs-eng/stackrox-operator-bundle
 #  -> registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle
-${OPM:-opm} alpha render-template basic "$@" "${tmp_template}" \
+${OPM} alpha render-template basic "$@" "${tmp_template}" \
   | jq 'walk(
       if type == "string" and startswith("quay.io/rhacs-eng/stackrox-operator-bundle@")
       then
