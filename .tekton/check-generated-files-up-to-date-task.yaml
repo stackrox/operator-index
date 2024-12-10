@@ -20,8 +20,6 @@ spec:
     volumeMounts:
     - mountPath: /var/workdir
       name: workdir
-    - mountPath: /var/deps
-      name: deps
   steps:
   - name: use-trusted-artifact
     image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:81c4864dae6bb11595f657be887e205262e70086a05ed16ada827fd6391926ac
@@ -35,24 +33,11 @@ spec:
       #!/usr/bin/env bash
       set -euo pipefail
       set -x
-      OPM_VERSION="1.48.0"
-      os_name=linux
-      arch=amd64
 
       time dnf -y upgrade --nobest
       # TODO: find an image with these preinstalled to reduce flakiness
       time dnf -y install git make jq curl
 
-      cd /var/deps
-      for attempt in $(seq 5); do
-        if time curl --silent --fail --location --output opm "https://github.com/operator-framework/operator-registry/releases/download/v${OPM_VERSION}/${os_name}-${arch}-opm"; then
-          break
-        fi
-      done
-      chmod +x opm
-      export PATH="$PATH:$(pwd)"
-      cd -
-      
       time make clean
       cmd="make valid-catalogs"
       time $cmd
