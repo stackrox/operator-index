@@ -51,15 +51,21 @@ jq --slurpfile channel channel-4.6.json '.entries += $channel
 ' catalog-template.json > "$tmp_template"
 echo >&2 "Running template rendering, this can take a few minutes..."
 
-# Render catalog and post-process result by rewriting the image repository:
+# Render catalog and post-process result by rewriting the image repository from either of
 #
 #     quay.io/rhacs-eng/stackrox-operator-bundle
-#  -> registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle
+#     registry-proxy.engineering.redhat.com/rh-osbs/rhacs-operator-bundle
+#     brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle
+#
+#  to registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle
 "${OPM}" alpha render-template basic "$@" "${tmp_template}" \
   | jq 'walk(
-      if type == "string" and startswith("quay.io/rhacs-eng/stackrox-operator-bundle@")
+      if type == "string" and (sub("@.*"; "") | in(
+          {"quay.io/rhacs-eng/stackrox-operator-bundle": true,
+           "registry-proxy.engineering.redhat.com/rh-osbs/rhacs-operator-bundle": true,
+           "brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle": true}))
       then
-          "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@" + (. | ltrimstr("quay.io/rhacs-eng/stackrox-operator-bundle@"))
+          "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@" + (. | sub("^[^@]*@"; ""))
       else
           .
       end
