@@ -70,3 +70,4 @@ echo >&2 "Running template rendering, this can take a few minutes..."
           .
       end
     )'
+
