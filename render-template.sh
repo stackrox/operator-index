@@ -28,8 +28,8 @@ shift
 # - take the tag from the "IMAGE_URL row"
 # - take the whole value from the "IMAGE_DIGEST" row,
 # - save and run make.
-version="v4.7.0-163-g8f9cf23be2-fast"
-digest="sha256:e05042a079ef49d3198297a5203420d165f44f23f7baf9c5f1bfb6c345771418"
+version="v4.7.0-463-gadf88ce951-fast"
+digest="sha256:44985ca2b53560a4bf5b2ddd9c256d8b69406f92404c5daf3ce6ee0afe814faf"
 
 # This
 latest_legacy_version="$(jq -r '.entries[]|select(.schema=="olm.channel" and .name == "stable") | .entries|.[-1] | .name' < catalog-template.json)"
