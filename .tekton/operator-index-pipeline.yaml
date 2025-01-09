@@ -275,7 +275,7 @@ spec:
       - name: name
         value: validate-fbc
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-validate-fbc:0.1@sha256:1f5e199042025b4a7c0f9e49e09c5b62d2e20c5e1b1457dde9ae2ded77774be4
+        value: quay.io/konflux-ci/tekton-catalog/task-validate-fbc:0.1@sha256:4348a28a109daeab3af9515120e6332eb3c2af2020b96a54afc2365b6c7703ed
       - name: kind
         value: task
       resolver: bundles
