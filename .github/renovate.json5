@@ -29,7 +29,6 @@
   "tekton": {
     "includePaths": [
       ".tekton/**",
-      "tasks/**",
     ],
     "schedule": [
       // For some reason, Konflux config defines custom schedule on each type of dependency manager and that takes
