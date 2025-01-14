@@ -222,7 +222,7 @@ spec:
     - input: $(tasks.init.results.build)
       operator: in
       values: [ "true" ]
-    retries: 3
+    retries: 1
 
   - name: build-image-index
     params:
