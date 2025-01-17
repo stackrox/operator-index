@@ -7,7 +7,11 @@ metadata:
     build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "500"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" || (event == "push" && target_branch == "master")
+    # The on-push filter includes konflux/* branches which are created by Mintmaker so that CI runs for commits pushed
+    # onto these branches even without PRs and so that Mintmaker/Renovate can automerge its updates without PRs.
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request")
   labels:
     # Arbitrarily chosen application. It just needs to exist, see https://redhat-internal.slack.com/archives/C04PZ7H0VA8/p1731696009187979
     appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
@@ -68,7 +72,7 @@ spec:
         - name: name
           value: git-clone-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:d1e63ec00bed1c9f0f571fa76b4da570be49a7c255c610544a461495230ba1b1
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:f72fcca6732516339d55ac5f01660e287968e64e857a40a8608db27e298b5126
         - name: kind
           value: task
         resolver: bundles
@@ -84,4 +88,3 @@ spec:
       retries: 3
       taskRef:
         name: check-generated-files-up-to-date
-
