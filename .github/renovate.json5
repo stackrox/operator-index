@@ -23,6 +23,7 @@
     // hours from Germany to US West Coast. This way, after we merge a PR, a new one does not pop up immediately after
     // that.
     // "after 3am and before 7am",
+    // Running at all times to allow Mintmaker to run more than once per day to catch up with rebases, etc.
     "at any time",
   ],
   // Tell Renovate not to update PRs when outside of schedule.
@@ -35,6 +36,7 @@
       // For some reason, Konflux config defines custom schedule on each type of dependency manager and that takes
       // precedence over the global/default schedule. We want our own schedule and hence need to make this override.
       // "after 3am and before 7am",
+      // Running at all times to allow Mintmaker to run more than once per day to catch up with rebases, etc.
       "at any time",
     ],
     "automerge": true,
