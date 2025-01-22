@@ -27,7 +27,7 @@
     "at any time",
   ],
   // Tell Renovate not to update PRs when outside of schedule.
-  "updateNotScheduled": false,
+  "updateNotScheduled": true,
   "tekton": {
     "includePaths": [
       ".tekton/**",
