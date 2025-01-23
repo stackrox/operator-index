@@ -26,8 +26,8 @@
     // Running at all times to allow Mintmaker to run more than once per day to catch up with rebases, etc.
     "at any time",
   ],
-  // Tell Renovate not to update PRs when outside of schedule.
-  "updateNotScheduled": false,
+  // Tell Renovate to update PRs when outside of schedule.
+  "updateNotScheduled": true,
   "tekton": {
     "includePaths": [
       ".tekton/**",
