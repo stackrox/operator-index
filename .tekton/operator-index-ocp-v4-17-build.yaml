@@ -33,7 +33,7 @@ spec:
   - name: catalog-dir
     value: catalog-csv-metadata
   - name: image-expires-after
-    value: 13w
+    value: ''
 
   workspaces:
   - name: git-auth
