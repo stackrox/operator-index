@@ -2,18 +2,21 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 3 ]; then
-    echo "USAGE: ./generate-releases.sh <OPERATOR_INDEX_COMMIT> <ENVIRONMENT> <RELEASE_NAME_SUFFIX>"
+if [[ "$#" -lt 2 || "$#" -gt 3 ]]; then
+    echo "USAGE: ./generate-releases.sh <ENVIRONMENT> <RELEASE_NAME_SUFFIX> [<OPERATOR_INDEX_COMMIT>]"
+    echo ""
+    echo "ENVIRONMENT - allowed values: staging|prod"
+    echo "OPERATOR_INDEX_COMMIT - default: currently checked out commit"
     exit 1
 fi
 
-OPERATOR_INDEX_COMMIT="$1"
-ENVIRONMENT="$2"
-RELEASE_NAME_SUFFIX="$3"
+ENVIRONMENT="$1"
+RELEASE_NAME_SUFFIX="$2"
+OPERATOR_INDEX_COMMIT="${3:-$(git rev-parse HEAD)}"
 
 validate_input() {
     if [ "$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${OPERATOR_INDEX_COMMIT}" --no-headers | wc -l)" -eq 0 ]; then
-        echo "ERROR: Could not find any Snapshots for the commit '${OPERATOR_INDEX_COMMIT}'. This must a 40 character-long commit SHA."
+        echo "ERROR: Could not find any Snapshots for the commit '${OPERATOR_INDEX_COMMIT}'. This must a 40 character-long commit SHA. Default: currently checked out commit."
         exit 1
     fi
     if [[ "${ENVIRONMENT}" != "staging" && "${ENVIRONMENT}" != "prod" ]]; then
