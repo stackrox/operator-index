@@ -16,13 +16,13 @@ clean:
 	rm -f $(CATALOGS)
 	rm -rf catalog-migrate $$(dirname $(OPM))
 
-catalog-bundle-object/rhacs-operator/catalog.json: catalog-template.json render-template.sh $(OPM)
+catalog-bundle-object/rhacs-operator/catalog.json: catalog-template.json scripts/render-template.sh $(OPM)
 	mkdir -p "$$(dirname "$@")"
-	./render-template.sh $(OPM) --migrate-level none > $@
+	./scripts/render-template.sh $(OPM) --migrate-level none > $@
 
-catalog-csv-metadata/rhacs-operator/catalog.json: catalog-template.json render-template.sh $(OPM)
+catalog-csv-metadata/rhacs-operator/catalog.json: catalog-template.json scripts/render-template.sh $(OPM)
 	mkdir -p "$$(dirname "$@")"
-	./render-template.sh $(OPM) --migrate-level bundle-object-to-csv-metadata > $@
+	./scripts/render-template.sh $(OPM) --migrate-level bundle-object-to-csv-metadata > $@
 
 $(OPM):
 	mkdir -p "$$(dirname $@)"

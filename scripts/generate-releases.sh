@@ -13,7 +13,7 @@ RELEASE_NAME_SUFFIX="$3"
 
 validate_input() {
     if [ "$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${OPERATOR_INDEX_COMMIT}" --no-headers | wc -l)" -eq 0 ]; then
-        echo "ERROR: Could not find any snapshots for the commit '${OPERATOR_INDEX_COMMIT}'."
+        echo "ERROR: Could not find any Snapshots for the commit '${OPERATOR_INDEX_COMMIT}'. This must a 40 character-long commit SHA."
         exit 1
     fi
     if [[ "${ENVIRONMENT}" != "staging" && "${ENVIRONMENT}" != "prod" ]]; then
