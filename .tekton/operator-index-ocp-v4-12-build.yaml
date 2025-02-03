@@ -33,7 +33,11 @@ spec:
   - name: catalog-dir
     value: catalog-bundle-object
   - name: image-expires-after
-    value: 13w
+    value: "12w"
+    filter: pac.event_type == "push" && pac.target_branch.matches("^(master|tm/spike-image-expires-after)$")
+  - name: image-expires-after
+    value: ""
+    filter: pac.event_type == "pull_request" || !pac.target_branch.matches("^(master)$")
 
   workspaces:
   - name: git-auth
