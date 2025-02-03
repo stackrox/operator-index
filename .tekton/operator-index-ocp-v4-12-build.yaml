@@ -10,7 +10,7 @@ metadata:
     # The on-push filter includes konflux/* branches which are created by Mintmaker so that CI runs for commits pushed
     # onto these branches even without PRs and so that Mintmaker/Renovate can automerge its updates without PRs.
     pipelinesascode.tekton.dev/on-cel-expression: |
-      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "push" && target_branch.matches("^(master|tm/spike-image-expires-after|konflux/references/master|konflux/mintmaker/.*)$")) ||
       (event == "pull_request")
   labels:
     appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
