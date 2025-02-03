@@ -6,7 +6,10 @@ if [[ "$#" -lt 2 || "$#" -gt 3 ]]; then
     echo "USAGE: ./generate-releases.sh <ENVIRONMENT> <RELEASE_NAME_SUFFIX> [<OPERATOR_INDEX_COMMIT>]"
     echo ""
     echo "ENVIRONMENT - allowed values: staging|prod"
+    echo "RELEASE_NAME_SUFFIX - for production, use something like acs-4-6-x-1; for staging acs-4-6-x-staging-1"
     echo "OPERATOR_INDEX_COMMIT - default: currently checked out commit"
+    echo ""
+    echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonflux/RHTAPforRHACS-GettingocCLItoworkwithKonflux."
     exit 1
 fi
 
@@ -16,7 +19,7 @@ OPERATOR_INDEX_COMMIT="${3:-$(git rev-parse HEAD)}"
 
 validate_input() {
     if [ "$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${OPERATOR_INDEX_COMMIT}" --no-headers | wc -l)" -eq 0 ]; then
-        echo "ERROR: Could not find any Snapshots for the commit '${OPERATOR_INDEX_COMMIT}'. This must a 40 character-long commit SHA. Default: currently checked out commit."
+        echo "ERROR: Could not find any Snapshots for the commit '${OPERATOR_INDEX_COMMIT}'. This must be a 40 character-long commit SHA. Default: currently checked out commit."
         exit 1
     fi
     if [[ "${ENVIRONMENT}" != "staging" && "${ENVIRONMENT}" != "prod" ]]; then
