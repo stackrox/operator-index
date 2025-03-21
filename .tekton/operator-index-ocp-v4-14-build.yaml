@@ -32,8 +32,6 @@ spec:
     value: ocp-v4-14-{{revision}}-fast
   - name: catalog-dir
     value: catalog-bundle-object
-  - name: image-expires-after
-    value: 13w
 
   workspaces:
   - name: git-auth
