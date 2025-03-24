@@ -95,6 +95,10 @@ spec:
   - description: Image tag expiration time, time values could be something like 1h, 2d, 3w for hours, days, and
       weeks, respectively.
     name: image-expires-after
+    # Image expiry disabled because it sets quay.expires-after label on the image which fails Conforma at release time.
+    # A downside is that FBC images will stay in our Quay forever while certainly they become unneeded as time passes.
+    # TODO(ROX-27836): find a way to garbage-collect FBC images.
+    default: ''
   - default: "false"
     description: Build a source image.
     name: build-source-image
