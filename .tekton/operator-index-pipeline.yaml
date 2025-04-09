@@ -13,6 +13,27 @@ spec:
 
   finally:
 
+  - name: slack-notification
+    params:
+    - name: message
+      value: ':x: `{{event_type}}` pipeline for <https://console.redhat.com/application-pipeline/ns/$(context.pipelineRun.namespace)/pipelinerun/$(context.pipelineRun.name)|$(context.pipelineRun.name)> (`$(params.output-image-repo)`, revision <$(params.git-url)/commit/$(params.revision)|$(params.revision)>) has failed.'
+    - name: key-name
+      value: 'acs-konflux-notifications'
+    when:
+    # Run when any task has Failed
+    - input: $(tasks.status)
+      operator: in
+      values: ["Failed"]
+    taskRef:
+      params:
+      - name: name
+        value: slack-webhook-notification
+      - name: bundle
+        value: quay.io/konflux-ci/tekton-catalog/task-slack-webhook-notification:0.1@sha256:dc17b70633363d78414b8c06dc1660d25742935f106a6116995638e1210c2730
+      - name: kind
+        value: task
+      resolver: bundles
+
   - name: show-sbom
     params:
     - name: IMAGE_URL
@@ -43,6 +64,20 @@ spec:
         value: summary
       - name: bundle
         value: quay.io/konflux-ci/tekton-catalog/task-summary:0.2@sha256:870d9a04d9784840a90b7bf6817cd0d0c4edfcda04b1ba1868cae625a3c3bfcc
+      - name: kind
+        value: task
+      resolver: bundles
+
+  - name: post-metric-end
+    params:
+    - name: AGGREGATE_TASKS_STATUS
+      value: $(tasks.status)
+    taskRef: &post-bigquery-metrics-ref
+      params:
+      - name: name
+        value: post-bigquery-metrics
+      - name: bundle
+        value: quay.io/rhacs-eng/konflux-tasks:latest@sha256:d14158ccb8c613fb2bb1bebf86f29bbdde3418b27eb3b52352228da124d4b65f
       - name: kind
         value: task
       resolver: bundles
@@ -140,6 +175,9 @@ spec:
   - name: git-auth
 
   tasks:
+
+  - name: post-metric-start
+    taskRef: *post-bigquery-metrics-ref
 
   - name: init
     params:
