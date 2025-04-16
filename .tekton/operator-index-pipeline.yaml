@@ -83,6 +83,10 @@ spec:
       resolver: bundles
 
   params:
+  - description: Testing
+    name: my-skip-init
+    type: string
+    default: ""
   - description: Source Repository URL
     name: git-url
     type: string
@@ -196,6 +200,10 @@ spec:
       - name: kind
         value: task
       resolver: bundles
+    when:
+    - input: $(params.my-skip-init)
+      operator: notin
+      values: [ "yes-skip-it" ]
 
   - name: clone-repository
     params:
