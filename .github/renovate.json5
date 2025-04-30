@@ -36,6 +36,15 @@
       // precedence over the global/default schedule. We want our own schedule and hence need to make this override.
       "after 3am and before 7am",
     ],
+    "packageRules": [
+      // Note: the packageRules from the Konflux config (find URL in comments above) get merged with these.
+      {
+        "groupName": "StackRox custom Konflux Tasks",
+        "matchPackageNames": [
+          "/^quay.io/rhacs-eng/konflux-tasks/",
+        ],
+      },
+    ],
     "automerge": true,
     // PRs can't be actually automerged because we require approval from CODEOWNERS which Renovate can't bypass,
     // therefore, we set automerge type to branch.
