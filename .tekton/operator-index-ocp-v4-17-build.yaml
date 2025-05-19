@@ -33,6 +33,9 @@ spec:
   - name: catalog-dir
     value: catalog-csv-metadata
 
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-acs-operator-index-ocp-v4-17
+
   workspaces:
   - name: git-auth
     secret:
