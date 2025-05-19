@@ -26,9 +26,6 @@ spec:
   - name: revision
     value: '{{revision}}'
 
-  taskRunTemplate:
-    serviceAccountName: build-pipeline-acs-operator-index-checks
-
   workspaces:
   - name: git-auth
     secret:

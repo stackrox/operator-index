@@ -34,7 +34,7 @@ spec:
     value: catalog-bundle-object
 
   taskRunTemplate:
-    serviceAccountName: build-pipeline-acs-operator-index-ocp-v4-16
+    serviceAccountName: build-pipeline-operator-index-ocp-v4-16
 
   workspaces:
   - name: git-auth
