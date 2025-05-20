@@ -26,6 +26,9 @@ spec:
   - name: revision
     value: '{{revision}}'
 
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-operator-index-ocp-v4-17
+
   workspaces:
   - name: git-auth
     secret:
