@@ -357,19 +357,16 @@ spec:
       value: registry.redhat.io/redhat/redhat-operator-index
     - name: RENDERED_CATALOG_DIGEST
       value: $(tasks.validate-fbc.results.RENDERED_CATALOG_DIGEST)
-    runAfter:
-    - validate-fbc
     taskRef:
       params:
       - name: name
         value: fbc-target-index-pruning-check
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-fbc-target-index-pruning-check:0.1@sha256:a4d0bedb2aeed06d060b5a38f3dc020625e1c11665fc1a0317765c1f90edb485
+        value: quay.io/konflux-ci/tekton-catalog/task-fbc-target-index-pruning-check:0.1@sha256:016d0fa117dd2aa36420ebe74f938dda6cacb28d193d71775f6141dbab976cc6
       - name: kind
         value: task
       resolver: bundles
     when:
     - input: $(params.skip-checks)
       operator: in
-      values:
-      - "false"
+      values: [ "false" ]
