@@ -250,7 +250,7 @@ spec:
     - name: SOURCE_ARTIFACT
       value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
     - name: IMAGE_APPEND_PLATFORM
-      value: "true"
+      value: "false"
     taskRef:
       params:
       - name: name
