@@ -17,6 +17,10 @@ spec:
         - quay.io/rhacs-eng/collector
       source: registry.redhat.io/advanced-cluster-security/rhacs-collector-rhel8
     - mirrors:
+        - quay.io/rhacs-eng/collector
+        - quay.io/rhacs-eng/collector-slim
+      source: registry.redhat.io/advanced-cluster-security/rhacs-collector-slim-rhel8
+    - mirrors:
         - quay.io/rhacs-eng/main
       source: registry.redhat.io/advanced-cluster-security/rhacs-main-rhel8
     - mirrors:
