@@ -64,9 +64,25 @@
       "skips": [
         "rhacs-operator.v4.1.0"
       ]
+    },
+    {
+      "name": "rhacs-operator.v4.6.0",
+      "replaces": "rhacs-operator.v4.5.0",
+      "skipRange": ">= 4.4.0 < 4.6.0",
+      "skips": [
+        "rhacs-operator.v4.1.0"
+      ]
+    },
+    {
+      "name": "rhacs-operator.v4.7.0",
+      "replaces": "rhacs-operator.v4.6.0",
+      "skipRange": ">= 4.4.0 < 4.7.0",
+      "skips": [
+        "rhacs-operator.v4.1.0"
+      ]
     }
   ],
-  "name": "rhacs-4.6",
+  "name": "rhacs-4.8",
   "package": "rhacs-operator",
   "schema": "olm.channel"
 }

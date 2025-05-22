@@ -6,7 +6,7 @@
 #
 # This script:
 # 1. creates a temporary catalog template from the version controlled template
-# by injecting a bundle for a Konflux build, together with a rhacs-4.6 channel
+# by injecting a bundle for a Konflux build, together with a rhacs-4.8 channel
 # 2. renders this template into a version-controlled catalog.
 #
 # TODO: Once we stop building operator indexes using CPaaS/IIB, the entries for
@@ -36,16 +36,16 @@ latest_legacy_version="$(jq -r '.entries[]|select(.schema=="olm.channel" and .na
 
 tmp_template="$(mktemp)"
 trap 'rm -f $tmp_template' EXIT
-jq --slurpfile channel channel-4.6.json '.entries += $channel
+jq --slurpfile channel channel-4.8.json '.entries += $channel
  | .entries += [{"schema": "olm.bundle", "image": "quay.io/rhacs-eng/stackrox-operator-bundle@'${digest}'"}]
  | .entries |= map(
    if .schema == "olm.channel" and .name == "stable"
-   then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "'"${latest_legacy_version}"'", "skipRange": ">= 4.5.0 < 4.6.0"}]
+   then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "'"${latest_legacy_version}"'", "skipRange": ">= 4.7.0 < 4.8.0"}]
    else .
    end)
  | .entries |= map(
-   if .schema == "olm.channel" and .name == "rhacs-4.6"
-   then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "rhacs-operator.v4.5.0", "skipRange": ">= 4.5.0 < 4.6.0"}]
+   if .schema == "olm.channel" and .name == "rhacs-4.8"
+   then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "rhacs-operator.v4.7.0", "skipRange": ">= 4.7.0 < 4.8.0"}]
    else .
    end)
 ' catalog-template.json > "$tmp_template"
