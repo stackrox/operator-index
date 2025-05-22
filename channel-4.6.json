@@ -64,6 +64,54 @@
       "skips": [
         "rhacs-operator.v4.1.0"
       ]
+    },
+    {
+      "name": "rhacs-operator.v4.6.0",
+      "replaces": "rhacs-operator.v4.5.0",
+      "skipRange": ">= 4.5.0 < 4.6.0",
+      "skips": [
+        "rhacs-operator.v4.1.0"
+      ]
+    },
+    {
+      "name": "rhacs-operator.v4.6.1",
+      "replaces": "rhacs-operator.v4.6.0",
+      "skipRange": ">= 4.5.0 < 4.6.1",
+      "skips": [
+        "rhacs-operator.v4.1.0"
+      ]
+    },
+    {
+      "name": "rhacs-operator.v4.6.2",
+      "replaces": "rhacs-operator.v4.6.1",
+      "skipRange": ">= 4.5.0 < 4.6.2",
+      "skips": [
+        "rhacs-operator.v4.1.0"
+      ]
+    },
+    {
+      "name": "rhacs-operator.v4.6.3",
+      "replaces": "rhacs-operator.v4.6.2",
+      "skipRange": ">= 4.5.0 < 4.6.3",
+      "skips": [
+        "rhacs-operator.v4.1.0"
+      ]
+    },
+    {
+      "name": "rhacs-operator.v4.6.4",
+      "replaces": "rhacs-operator.v4.6.3",
+      "skipRange": ">= 4.5.0 < 4.6.4",
+      "skips": [
+        "rhacs-operator.v4.1.0"
+      ]
+    },
+    {
+      "name": "rhacs-operator.v4.6.5",
+      "replaces": "rhacs-operator.v4.6.4",
+      "skipRange": ">= 4.5.0 < 4.6.5",
+      "skips": [
+        "rhacs-operator.v4.1.0"
+      ]
     }
   ],
   "name": "rhacs-4.6",
