@@ -1,5 +1,5 @@
-# The `fbc-fips-check-oci-ta`` task has to pull production index images (registry.redhat.io/advanced-cluster-security).
-# This ImageDigestMirrorSet allos the task to pull the image from quay.io instead of registry.redhat.io.
+# The `fbc-fips-check-oci-ta` task pulls index images as specified in the catalog, which means from the production registry (`registry.redhat.io/advanced-cluster-security/`).
+# This ImageDigestMirrorSet allows the task to also pull our unreleased images from quay.io instead of registry.redhat.io.
 ---
 apiVersion: operator.openshift.io/v1alpha1
 kind: ImageDigestMirrorSet
