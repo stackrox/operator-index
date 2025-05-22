@@ -6,7 +6,7 @@
 #
 # This script:
 # 1. creates a temporary catalog template from the version controlled template
-# by injecting a bundle for a Konflux build, together with a rhacs-4.6 channel
+# by injecting a bundle for a Konflux build, together with a rhacs-4.8 channel
 # 2. renders this template into a version-controlled catalog.
 #
 # TODO: Once we stop building operator indexes using CPaaS/IIB, the entries for
@@ -28,24 +28,24 @@ shift
 # - take the tag from the "IMAGE_URL row"
 # - take the whole value from the "IMAGE_DIGEST" row,
 # - save and run make.
-version="v4.7.0-163-g8f9cf23be2-fast"
-digest="sha256:e05042a079ef49d3198297a5203420d165f44f23f7baf9c5f1bfb6c345771418"
+version="v4.8.0-749-gb5ee3108f8-fast"
+digest="sha256:d325aacb04787efccd5ca1188d72bfc8db27646eaa6b9b700741616c6c301d6c"
 
 # This
 latest_legacy_version="$(jq -r '.entries[]|select(.schema=="olm.channel" and .name == "stable") | .entries|.[-1] | .name' < catalog-template.json)"
 
 tmp_template="$(mktemp)"
 trap 'rm -f $tmp_template' EXIT
-jq --slurpfile channel channel-4.6.json '.entries += $channel
+jq --slurpfile channel channel-4.8.json '.entries += $channel
  | .entries += [{"schema": "olm.bundle", "image": "quay.io/rhacs-eng/stackrox-operator-bundle@'${digest}'"}]
  | .entries |= map(
    if .schema == "olm.channel" and .name == "stable"
-   then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "'"${latest_legacy_version}"'", "skipRange": ">= 4.5.0 < 4.6.0"}]
+   then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "'"${latest_legacy_version}"'", "skipRange": ">= 4.7.0 < 4.8.0"}]
    else .
    end)
  | .entries |= map(
-   if .schema == "olm.channel" and .name == "rhacs-4.6"
-   then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "rhacs-operator.v4.5.0", "skipRange": ">= 4.5.0 < 4.6.0"}]
+   if .schema == "olm.channel" and .name == "rhacs-4.8"
+   then .entries += [{"name": "rhacs-operator.'${version}'", "replaces": "rhacs-operator.v4.7.0", "skipRange": ">= 4.7.0 < 4.8.0"}]
    else .
    end)
 ' catalog-template.json > "$tmp_template"
