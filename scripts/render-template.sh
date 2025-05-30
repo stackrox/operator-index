@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Legacy script to render a catalog template with injecting a reference to the development konflux-built bundle.
+# TODO(ROX-27132): delete or repurpose this script.
 
 # The version-controlled catalog template in catalog-template.json is
 # currently auto-generated from the production catalog (in turn built by
