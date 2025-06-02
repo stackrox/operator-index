@@ -16,13 +16,13 @@ clean:
 	rm -f $(CATALOGS)
 	rm -rf catalog-migrate $$(dirname $(OPM))
 
-catalog-bundle-object/rhacs-operator/catalog.json: catalog-template.json $(OPM)
+catalog-bundle-object/rhacs-operator/catalog.json: catalog-template.yaml $(OPM)
 	mkdir -p "$$(dirname "$@")"
-	$(OPM) alpha render-template basic --migrate-level none catalog-template.json > $@
+	$(OPM) alpha render-template basic --migrate-level none $< > $@
 
-catalog-csv-metadata/rhacs-operator/catalog.json: catalog-template.json $(OPM)
+catalog-csv-metadata/rhacs-operator/catalog.json: catalog-template.yaml $(OPM)
 	mkdir -p "$$(dirname "$@")"
-	$(OPM) alpha render-template basic --migrate-level bundle-object-to-csv-metadata catalog-template.json > $@
+	$(OPM) alpha render-template basic --migrate-level bundle-object-to-csv-metadata $< > $@
 
 $(OPM):
 	mkdir -p "$$(dirname $@)"
@@ -41,3 +41,4 @@ $(OPM):
 import-legacy: $(OPM)
 	$(OPM) migrate registry.redhat.io/redhat/redhat-operator-index:v4.12 ./catalog-migrate
 	$(OPM) alpha convert-template basic ./catalog-migrate/rhacs-operator/catalog.json > catalog-template.json
+	yq -P --output-format yaml < catalog-template.json > catalog-template.yaml
