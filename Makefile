@@ -40,5 +40,4 @@ $(OPM):
 .PHONY: import-legacy
 import-legacy: $(OPM)
 	$(OPM) migrate registry.redhat.io/redhat/redhat-operator-index:v4.12 ./catalog-migrate
-	$(OPM) alpha convert-template basic ./catalog-migrate/rhacs-operator/catalog.json > catalog-template.json
-	yq -P --output-format yaml < catalog-template.json > catalog-template.yaml
+	$(OPM) alpha convert-template basic --output yaml ./catalog-migrate/rhacs-operator/catalog.json > catalog-template.yaml
