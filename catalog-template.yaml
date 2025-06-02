@@ -317,71 +317,28 @@ entries:
   schema: olm.channel
   package: rhacs-operator
   entries:
-  - name: rhacs-operator.v3.62.0
-    skipRange: '>= 3.61.0 < 3.62.0'
-  - name: rhacs-operator.v3.63.0
-    replaces: rhacs-operator.v3.62.0
-    skipRange: '>= 3.62.0 < 3.63.0'
-  - name: rhacs-operator.v3.64.0
-    replaces: rhacs-operator.v3.63.0
-    skipRange: '>= 3.63.0 < 3.64.0'
-  - name: rhacs-operator.v3.65.0
-    replaces: rhacs-operator.v3.64.0
-    skipRange: '>= 3.64.0 < 3.65.0'
-  - name: rhacs-operator.v3.66.0
-    replaces: rhacs-operator.v3.65.0
-    skipRange: '>= 3.65.0 < 3.66.0'
-  - name: rhacs-operator.v3.67.0
-    replaces: rhacs-operator.v3.66.0
-    skipRange: '>= 3.66.0 < 3.67.0'
-  - name: rhacs-operator.v3.68.0
-    replaces: rhacs-operator.v3.67.0
-    skipRange: '>= 3.67.0 < 3.68.0'
-  - name: rhacs-operator.v3.69.0
-    replaces: rhacs-operator.v3.68.0
-    skipRange: '>= 3.68.0 < 3.69.0'
-  - name: rhacs-operator.v3.70.0
-    replaces: rhacs-operator.v3.69.0
-    skipRange: '>= 3.69.0 < 3.70.0'
-  - name: rhacs-operator.v3.71.0
-    replaces: rhacs-operator.v3.70.0
-    skipRange: '>= 3.70.0 < 3.71.0'
-  - name: rhacs-operator.v3.72.0
-    replaces: rhacs-operator.v3.71.0
-    skipRange: '>= 3.71.0 < 3.72.0'
-  - name: rhacs-operator.v3.73.0
-    replaces: rhacs-operator.v3.72.0
-    skipRange: '>= 3.72.0 < 3.73.0'
-  - name: rhacs-operator.v3.74.0
-    replaces: rhacs-operator.v3.73.0
-    skipRange: '>= 3.73.0 < 3.74.0'
-  - name: rhacs-operator.v3.74.1
-    replaces: rhacs-operator.v3.74.0
-    skipRange: '>= 3.73.0 < 3.74.1'
-  - name: rhacs-operator.v3.74.2
-    replaces: rhacs-operator.v3.74.1
-    skipRange: '>= 3.73.0 < 3.74.2'
-  - name: rhacs-operator.v3.74.3
-    replaces: rhacs-operator.v3.74.2
-    skipRange: '>= 3.73.0 < 3.74.3'
-  - name: rhacs-operator.v3.74.4
-    replaces: rhacs-operator.v3.74.3
-    skipRange: '>= 3.73.0 < 3.74.4'
-  - name: rhacs-operator.v3.74.5
-    replaces: rhacs-operator.v3.74.4
-    skipRange: '>= 3.73.0 < 3.74.5'
-  - name: rhacs-operator.v3.74.6
-    replaces: rhacs-operator.v3.74.5
-    skipRange: '>= 3.73.0 < 3.74.6'
-  - name: rhacs-operator.v3.74.7
-    replaces: rhacs-operator.v3.74.6
-    skipRange: '>= 3.73.0 < 3.74.7'
-  - name: rhacs-operator.v3.74.8
-    replaces: rhacs-operator.v3.74.7
-    skipRange: '>= 3.73.0 < 3.74.8'
-  - name: rhacs-operator.v3.74.9
-    replaces: rhacs-operator.v3.74.8
-    skipRange: '>= 3.73.0 < 3.74.9'
+  - *bundle-3-62-0
+  - *bundle-3-63-0
+  - *bundle-3-64-0
+  - *bundle-3-65-0
+  - *bundle-3-66-0
+  - *bundle-3-67-0
+  - *bundle-3-68-0
+  - *bundle-3-69-0
+  - *bundle-3-70-0
+  - *bundle-3-71-0
+  - *bundle-3-72-0
+  - *bundle-3-73-0
+  - *bundle-3-74-0
+  - *bundle-3-74-1
+  - *bundle-3-74-2
+  - *bundle-3-74-3
+  - *bundle-3-74-4
+  - *bundle-3-74-5
+  - *bundle-3-74-6
+  - *bundle-3-74-7
+  - *bundle-3-74-8
+  - *bundle-3-74-9
 
 - name: rhacs-4.0
   schema: olm.channel
