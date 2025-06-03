@@ -14863,3 +14863,16 @@
         }
     ]
 }
+{
+    "schema": "olm.deprecations",
+    "package": "rhacs-operator",
+    "entries": [
+        {
+            "reference": {
+                "schema": "olm.channel",
+                "name": "latest"
+            },
+            "message": "Channel \"latest\" is no longer supported.  Please switch to channel \"stable\".\n"
+        }
+    ]
+}
