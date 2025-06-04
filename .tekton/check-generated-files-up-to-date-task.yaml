@@ -58,12 +58,8 @@ spec:
       catalogs=("catalog-template.yaml" "catalog-bundle-object/rhacs-operator/catalog.json" "catalog-csv-metadata/rhacs-operator/catalog.json")
 
       for catalog in "${catalogs[@]}"; do
-        if [[ ! -f "$catalog" ]]; then
-          echo >&2 "File $catalog does not exist."
-          continue
-        fi
 
-        if grep -q 'quay.io' "$catalog"; then
+        if grep -qF 'quay.io' "$catalog"; then
           echo >&2 "File $catalog contains references to quay.io. It is not allowed."
           exit 1
         fi
