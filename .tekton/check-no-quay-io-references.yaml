@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: check-no-quay-io-references
+  name: check-catalog-has-only-redhat-registry-images
   namespace: rh-acs-tenant
 spec:
   description: This task is used to ensure that no quay.io references are present in the catalog files,
@@ -24,7 +24,7 @@ spec:
     args:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
-  - name: check-no-quay-io-references
+  - name: check-catalog-bundle-images
     image: registry.access.redhat.com/ubi9:latest@sha256:304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
     workingDir: /var/workdir/source
     script: |
@@ -32,7 +32,9 @@ spec:
       set -euo pipefail
 
       time dnf -y upgrade --nobest
-      time dnf -y install yq
+      time dnf -y install wget
+      wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq && \
+        chmod +x /usr/local/bin/yq
 
       valid_bundle_image_repository="registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle"
 
