@@ -31,7 +31,12 @@ spec:
       #!/usr/bin/env bash
       set -euo pipefail
 
-      if grep -F 'quay.io' catalog-template.yaml; then
-        echo >&2 "catalog-template.yaml mentions quay.io. It is not allowed to merge quay.io based bundle images to master branch because it will no longer be releasable."
+      time dnf -y upgrade --nobest
+      time dnf -y install yq
+
+      valid_bundle_image_repository="registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle"
+
+      if yq eval '.. | select(has("image")) | .image' catalog-template.yaml | grep -v "^$valid_bundle_image_repository"; then
+        echo >&2 "catalog-template.yaml has image(s) not from $valid_bundle_image_repository repository. It is not allowed to merge such bundle images to master branch because it will no longer be releasable."
         exit 1
       fi
