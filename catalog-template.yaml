@@ -1266,5 +1266,7 @@ entries:
   schema: olm.bundle
 - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:b24edee77ea1320adb9c5ae3fd5ae538059e2b9475abf8f338ecce136c331e07
   schema: olm.bundle
+- image: quay.io/advanced-cluster-security/rhacs-operator-bundle@sha256:b24edee77ea1320adb9c5ae3fd5ae538059e2b9475abf8f338ecce136c331e07
+  schema: olm.bundle
 schema: olm.template.basic
 

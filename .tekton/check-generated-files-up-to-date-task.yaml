@@ -26,6 +26,21 @@ spec:
     args:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
+  - name: check-no-quay-io-references
+    image: registry.access.redhat.com/ubi9:sha256@304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
+    workingDir: /var/workdir/source
+    script: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      catalogs=("catalog-template.yaml" "catalog-bundle-object/rhacs-operator/catalog.json" "catalog-csv-metadata/rhacs-operator/catalog.json")
+
+      for catalog in "${catalogs[@]}"; do
+        if grep -F 'quay.io' "$catalog"; then
+          echo >&2 "File $catalog contains references to quay.io. It is not allowed."
+          exit 1
+        fi
+      done
   - name: check-generated-files-up-to-date
     image: registry.access.redhat.com/ubi9:sha256@304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
     workingDir: /var/workdir/source
@@ -47,19 +62,3 @@ spec:
         echo >&2 "Some generated files are not up to date with their source ^^^. Run '$cmd' to update them."
         exit 1
       fi
-  - name: check-no-quay-io-references
-    image: registry.access.redhat.com/ubi9:sha256@304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
-    workingDir: /var/workdir/source
-    script: |
-      #!/usr/bin/env bash
-      set -euo pipefail
-
-      catalogs=("catalog-template.yaml" "catalog-bundle-object/rhacs-operator/catalog.json" "catalog-csv-metadata/rhacs-operator/catalog.json")
-
-      for catalog in "${catalogs[@]}"; do
-
-        if grep -qF 'quay.io' "$catalog"; then
-          echo >&2 "File $catalog contains references to quay.io. It is not allowed."
-          exit 1
-        fi
-      done
