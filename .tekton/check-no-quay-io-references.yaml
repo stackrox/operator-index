@@ -1,10 +1,11 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: check-generated-files-up-to-date
+  name: check-no-quay-io-references
   namespace: rh-acs-tenant
 spec:
-  description: Runs `make` to regenerate files and verifies that no checked in files differ afterwards.
+  description: This task is used to ensure that no quay.io references are present in the catalog files,
+    as they are not allowed in the production environment.
   params:
   - name: SOURCE_ARTIFACT
     description: The Trusted Artifact URI pointing to the artifact with
@@ -26,24 +27,14 @@ spec:
     args:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
-  - name: check-generated-files-up-to-date
+  - name: check-no-quay-io-references
     image: registry.access.redhat.com/ubi9:latest@sha256:304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
     workingDir: /var/workdir/source
     script: |
       #!/usr/bin/env bash
       set -euo pipefail
-      set -x
 
-      time dnf -y upgrade --nobest
-      # TODO: find an image with these preinstalled to reduce flakiness
-      time dnf -y install git make jq
-
-      time make clean
-      cmd="make valid-catalogs"
-      time $cmd
-      set +x
-      if ! git diff --exit-code HEAD; then
-        git diff --stat HEAD || true
-        echo >&2 "Some generated files are not up to date with their source ^^^. Run '$cmd' to update them."
+      if grep -F 'quay.io' catalog-template.yaml catalog-bundle-object/rhacs-operator/catalog.json catalog-csv-metadata/rhacs-operator/catalog.json; then
+        echo >&2 "Catalog file contains references to quay.io. It is not allowed to merge quay.io based bundle images to master branch."
         exit 1
       fi
