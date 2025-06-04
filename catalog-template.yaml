@@ -666,6 +666,11 @@ entries:
     skipRange: '>= 4.5.0 < 4.6.6'
     skips:
     - rhacs-operator.v4.1.0
+  - name: rhacs-operator.v4.6.7
+    replaces: rhacs-operator.v4.6.6
+    skipRange: '>= 4.5.0 < 4.6.7'
+    skips:
+    - rhacs-operator.v4.1.0
 
 - schema: olm.channel
   name: rhacs-4.7
@@ -1023,3 +1028,5 @@ entries:
 - schema: olm.bundle
   # 4.7.4
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:8c3fd7e6809ecdbf54c4d29af25f8d9dca013fff31abefafba9908a86ef6c4d8
+- image: <INSERT_4.6.7_BUNDLE_IMAGE_AND_RUN_MAKE>
+  schema: olm.bundle
