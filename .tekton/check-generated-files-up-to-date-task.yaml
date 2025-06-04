@@ -51,7 +51,7 @@ spec:
 
       time dnf -y upgrade --nobest
       # TODO: find an image with these preinstalled to reduce flakiness
-      time dnf -y install git make jq curl
+      time dnf -y install git make jq
 
       time make clean
       cmd="make valid-catalogs"
