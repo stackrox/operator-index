@@ -27,7 +27,7 @@ spec:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
   - name: check-no-quay-io-references
-    image: registry.access.redhat.com/ubi9:sha256@304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
+    image: registry.access.redhat.com/ubi9@sha256:304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
     workingDir: /var/workdir/source
     script: |
       #!/usr/bin/env bash
@@ -42,7 +42,7 @@ spec:
         fi
       done
   - name: check-generated-files-up-to-date
-    image: registry.access.redhat.com/ubi9:sha256@304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
+    image: registry.access.redhat.com/ubi9@sha256:304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
     workingDir: /var/workdir/source
     script: |
       #!/usr/bin/env bash
