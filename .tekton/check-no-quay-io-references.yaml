@@ -9,8 +9,7 @@ spec:
   params:
   - name: SOURCE_ARTIFACT
     description: The Trusted Artifact URI pointing to the artifact with
-      the application source code. This should be the result of the git-clone task,
-      results from other tasks might fail as dirty.
+      the application source code.
     type: string
   volumes:
   - name: workdir
@@ -34,7 +33,7 @@ spec:
       #!/usr/bin/env bash
       set -euo pipefail
 
-      if grep -F 'quay.io' catalog-template.yaml catalog-bundle-object/rhacs-operator/catalog.json catalog-csv-metadata/rhacs-operator/catalog.json; then
-        echo >&2 "Catalog file contains references to quay.io. It is not allowed to merge quay.io based bundle images to master branch."
+      if grep -F 'quay.io' catalog-template.yaml; then
+        echo >&2 "catalog-template.yaml mentions quay.io. It is not allowed to merge quay.io based bundle images to master branch because it will no longer be releasable."
         exit 1
       fi
