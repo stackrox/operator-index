@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: check-catalog-has-only-redhat-registry-images
+  name: check-catalog-template-has-only-released-images
   namespace: rh-acs-tenant
 spec:
   description: This task is to prevent operator bundle images from quay.io or any repositories other than release ones to be added to the `master` branch. This is to make sure `master` is in good state to be released and would not require first cleaning unreleased bundles from it.
@@ -24,20 +24,13 @@ spec:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
   - name: check-bundle-images-in-catalog-template
-    image: registry.access.redhat.com/ubi9:latest@sha256:304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
+    image: quay.io/konflux-ci/release-service-utils:latest@sha256:e4a6f252f9c82335c814cc4454031ea39edbc49f6a5e379257b12c8fd0a5de88
     workingDir: /var/workdir/source
     script: |
       #!/usr/bin/env bash
       set -euo pipefail
 
-      time dnf -y upgrade --nobest
-      time dnf -y install wget
-      wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq && \
-        chmod +x /usr/local/bin/yq
-
-      valid_bundle_image_repository="registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle"
-
-      if yq eval '.. | select(has("image")) | .image' catalog-template.yaml | grep -v "^$valid_bundle_image_repository"; then
-        echo >&2 "catalog-template.yaml has image(s) not from $valid_bundle_image_repository repository. It is not allowed to merge such bundle images to master branch because it will no longer be releasable."
+      if yq eval '.. | select(has("image")) | .image' catalog-template.yaml | grep -vE '^registry\.redhat\.io/advanced-cluster-security/rhacs-operator-bundle(:|@)'; then
+        echo >&2 "catalog-template.yaml has image(s) not from registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle. It is not allowed to merge such bundle images to master branch because it will no longer be releasable."
         exit 1
       fi
