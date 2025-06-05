@@ -4,8 +4,7 @@ metadata:
   name: check-catalog-has-only-redhat-registry-images
   namespace: rh-acs-tenant
 spec:
-  description: This task is used to ensure that no quay.io references are present in the catalog files,
-    as they are not allowed in the production environment.
+  description: This task is to prevent operator bundle images from quay.io or any repositories other than release ones to be added to the `master` branch. This is to make sure `master` is in good state to be released and would not require first cleaning unreleased bundles from it.
   params:
   - name: SOURCE_ARTIFACT
     description: The Trusted Artifact URI pointing to the artifact with
@@ -24,7 +23,7 @@ spec:
     args:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
-  - name: check-catalog-bundle-images
+  - name: check-bundle-images-in-catalog-template
     image: registry.access.redhat.com/ubi9:latest@sha256:304b50df1ea4db9706d8a30f4bbf26f582936ebc80c7e075c72ff2af99292a54
     workingDir: /var/workdir/source
     script: |
