@@ -1022,5 +1022,6 @@ entries:
   schema: olm.bundle
 - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:b24edee77ea1320adb9c5ae3fd5ae538059e2b9475abf8f338ecce136c331e07
   schema: olm.bundle
-- image: registry-proxy.engineering.redhat.com/rh-osbs/rhacs-operator-bundle@sha256:53e2d2113ff7f6a829288bc8fd101d1968a5bd0cd6f3adaee787c32f967780bf
+# TODO: update to the released image before merging.
+- image: brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle@sha256:ac9118d298c84d4893848b89555fb78f8cb6f2bd6c3836c394ad6b5bf83602ec
   schema: olm.bundle
