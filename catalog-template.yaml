@@ -942,5 +942,3 @@ entries:
   schema: olm.bundle
 - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:b24edee77ea1320adb9c5ae3fd5ae538059e2b9475abf8f338ecce136c331e07
   schema: olm.bundle
-- image: totally_not_from_redhat_registry_image
-  schema: olm.bundle
