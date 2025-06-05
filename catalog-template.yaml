@@ -709,8 +709,6 @@ entries:
     name: rhacs-operator.v4.7.4
     replaces: rhacs-operator.v4.7.3
     skipRange: '>= 4.6.0 < 4.7.4'
-    skips:
-    - rhacs-operator.v4.1.0
 
 - schema: olm.channel
   name: stable
