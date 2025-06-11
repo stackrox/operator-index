@@ -54,7 +54,6 @@ get-build-images:
 		.items[]?.status.results[0].value \
 	end'
 
-
 .PHONY: monitor-release
 monitor-release:
 ifndef RELEASE_NAME_SUFFIX
