@@ -32,11 +32,13 @@ validate_input() {
         echo "ERROR: ENVIRONMENT input must either be 'staging' or 'prod'." >&2
         exit 1
     fi
-    if [[ "${ENVIRONMENT}" == "prod" && ! "${OPERATOR_INDEX_BRANCH}" != "master" ]]; then
+    if [[ "${ENVIRONMENT}" == "prod" && "${OPERATOR_INDEX_BRANCH}" != "master" ]]; then
         echo "ERROR: prod release has to be done on master branch" >&2
         exit 1
     fi
     if [[ "$snapshot_number" -ne "$supported_ocp_number" ]]; then
+        echo "snapshot list:" >&2
+        echo "$snapshot_list" >&2
         echo "ERROR: The number of snapshots for $OPERATOR_INDEX_COMMIT in branch $OPERATOR_INDEX_BRANCH does not match the number of supported OCP versions." >&2
         exit 1
     fi
