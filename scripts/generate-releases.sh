@@ -8,7 +8,7 @@ if [[ "$#" -lt 2 || "$#" -gt 4 ]]; then
     echo "ENVIRONMENT - allowed values: staging|prod"
     echo "RELEASE_NAME_SUFFIX - for production, use something like acs-4-6-x-1; for staging acs-4-6-x-staging-1"
     echo "OPERATOR_INDEX_COMMIT - default: currently checked out commit"
-    echo "OPERATOR_INDEX_BRANCH - default: currently checked branch"
+    echo "OPERATOR_INDEX_BRANCH - default: currently checked out branch"
     echo ""
     echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonflux/RHTAPforRHACS-GettingocCLItoworkwithKonflux."
     exit 1
@@ -39,7 +39,7 @@ validate_input() {
     if [[ "$snapshot_number" -ne "$supported_ocp_number" ]]; then
         echo "snapshot list:" >&2
         echo "$snapshot_list" >&2
-        echo "ERROR: The number of snapshots for $OPERATOR_INDEX_COMMIT in branch $OPERATOR_INDEX_BRANCH does not match the number of supported OCP versions." >&2
+        echo "ERROR: The number of snapshots for $OPERATOR_INDEX_COMMIT in branch $OPERATOR_INDEX_BRANCH does not match the number of supported OCP versions ($supported_ocp_number)." >&2
         exit 1
     fi
 }
