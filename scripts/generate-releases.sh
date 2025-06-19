@@ -21,8 +21,8 @@ OPERATOR_INDEX_BRANCH="${4:-$(git rev-parse --abbrev-ref HEAD)}"
 snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${OPERATOR_INDEX_COMMIT}" -o json | jq -r '.items[] | select(.metadata.annotations["pac.test.appstudio.openshift.io/branch"]=="'"${OPERATOR_INDEX_BRANCH}"'") | "\(.metadata.name)|\(.spec.application)"')"
 
 validate_input() {
-    supported_ocp_number=$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l | xargs)
-    snapshot_number=$(echo "$snapshot_list" | wc -l | xargs)
+    supported_ocp_number=$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l )
+    snapshot_number=$(echo "$snapshot_list" | wc -l )
 
     if [ "$snapshot_number" -eq 0 ]; then
         echo "ERROR: Could not find any Snapshots for the commit '${OPERATOR_INDEX_COMMIT}'. This must be a 40 character-long commit SHA. Default: currently checked out commit." >&2
