@@ -18,7 +18,18 @@ ENVIRONMENT="$1"
 RELEASE_NAME_SUFFIX="$2"
 OPERATOR_INDEX_COMMIT="${3:-$(git rev-parse HEAD)}"
 OPERATOR_INDEX_BRANCH="${4:-$(git rev-parse --abbrev-ref HEAD)}"
-snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${OPERATOR_INDEX_COMMIT}" -o json | jq -r '.items[] | select(.metadata.annotations["pac.test.appstudio.openshift.io/branch"]=="'"${OPERATOR_INDEX_BRANCH}"'") | "\(.metadata.name)|\(.spec.application)"')"
+
+# Fetch the list of snapshots for OPERATOR_INDEX_COMMIT and OPERATOR_INDEX_BRANCH. 
+# Make sure that only one snapshot per application is returned, and that the snapshots are sorted by creation timestamp.
+snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${OPERATOR_INDEX_COMMIT}" -o json | jq -r '
+  .items
+  | map(select(.metadata.annotations["pac.test.appstudio.openshift.io/branch"]=="'"${OPERATOR_INDEX_BRANCH}"'"))
+  | sort_by(.spec.application)
+  | group_by(.spec.application)
+  | map(sort_by(.metadata.creationTimestamp) | last)
+  | .[]
+  | "\(.metadata.name)|\(.spec.application)"
+')"
 
 validate_input() {
     supported_ocp_number=$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l )
