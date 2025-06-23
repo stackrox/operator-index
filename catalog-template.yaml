@@ -690,26 +690,22 @@ entries:
     skipRange: '>= 4.6.0 < 4.7.0'
     skips:
     - rhacs-operator.v4.1.0
-  - &bundle-4-7-1
-    name: rhacs-operator.v4.7.1
+  - name: rhacs-operator.v4.7.1
     replaces: rhacs-operator.v4.7.0
     skipRange: '>= 4.6.0 < 4.7.1'
     skips:
     - rhacs-operator.v4.1.0
-  - &bundle-4-7-2
-    name: rhacs-operator.v4.7.2
+  - name: rhacs-operator.v4.7.2
     replaces: rhacs-operator.v4.7.1
     skipRange: '>= 4.6.0 < 4.7.2'
     skips:
     - rhacs-operator.v4.1.0
-  - &bundle-4-7-3
-    name: rhacs-operator.v4.7.3
+  - name: rhacs-operator.v4.7.3
     replaces: rhacs-operator.v4.7.2
     skipRange: '>= 4.6.0 < 4.7.3'
     skips:
     - rhacs-operator.v4.1.0
-  - &bundle-4-7-4
-    name: rhacs-operator.v4.7.4
+  - name: rhacs-operator.v4.7.4
     replaces: rhacs-operator.v4.7.3
     skipRange: '>= 4.6.0 < 4.7.4'
 
@@ -748,10 +744,6 @@ entries:
   - *bundle-4-5-0
   - *bundle-4-6-0
   - *bundle-4-7-0
-  - *bundle-4-7-1
-  - *bundle-4-7-2
-  - *bundle-4-7-3
-  - *bundle-4-7-4
   - *bundle-4-8-0
 
 - schema: olm.deprecations
