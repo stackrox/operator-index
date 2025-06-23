@@ -49,7 +49,7 @@ get-build-images:
 	echo "Getting Konflux build images for \033[0;32m$$BRANCH\033[0m branch and commit \033[0;32m$$COMMIT\033[0m"; \
 	kubectl get pipelinerun -l pipelinesascode.tekton.dev/sha=$$COMMIT -o json | jq -r '\
 	if .items | length == 0 then \
-		"No pipelinerun CRs found for the current commit. It might be pruned alreadfy from the cluster. Use Konflux UI instead." \
+		"No PipelineRun CRs found for the current commit. It might be pruned already from the cluster. Use Konflux UI instead." \
 	else \
 		.items[]?.status.results[0].value \
 	end'
