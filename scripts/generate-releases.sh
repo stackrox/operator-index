@@ -33,7 +33,7 @@ snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${
 validate_input() {
     pipelines_count="$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l )"
     snapshots_count="$(echo "$snapshot_list" | wc -l )"
-    echo -e "found snapshots for \033[0;32m$COMMIT\033[0m commit in \033[0;32m$BRANCH\033[0m branch:" >&2
+    echo -e "found the following snapshots for \033[0;32m$COMMIT\033[0m commit in \033[0;32m$BRANCH\033[0m branch:" >&2
     echo "$snapshot_list" >&2
 
     if [[ "$snapshots_count" -eq 0 ]]; then
