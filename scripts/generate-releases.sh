@@ -2,28 +2,27 @@
 
 set -euo pipefail
 
-if [[ "$#" -lt 2 || "$#" -gt 4 ]]; then
-    echo "USAGE: ./generate-releases.sh <ENVIRONMENT> <RELEASE_NAME_SUFFIX> [COMMIT] [BRANCH]"
-    echo ""
-    echo "ENVIRONMENT - allowed values: staging|prod"
-    echo "RELEASE_NAME_SUFFIX - for production, use something like acs-4-6-x-1; for staging acs-4-6-x-staging-1"
-    echo "OPERATOR_INDEX_COMMIT - default: currently checked out commit"
-    echo "OPERATOR_INDEX_BRANCH - default: currently checked out branch"
-    echo ""
-    echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonflux/RHTAPforRHACS-GettingocCLItoworkwithKonflux."
+if [[ "$#" -lt 1 || "$#" -gt 3 ]]; then
+    echo "USAGE: ./generate-releases.sh <ENVIRONMENT> [COMMIT] [BRANCH]" >&2
+    echo "" >&2
+    echo "ENVIRONMENT - allowed values: staging|prod" >&2
+    echo "COMMIT - a 40 character-long SHA of the commit. Default: currently checked out commit" >&2
+    echo "BRANCH - an optional parameter to specify git branch name. Default: currently checked out branch" >&2
+    echo "" >&2
+    echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonflux/RHTAPforRHACS-GettingocCLItoworkwithKonflux." >&2
     exit 1
 fi
 
 ENVIRONMENT="$1"
-RELEASE_NAME_SUFFIX="$2"
-OPERATOR_INDEX_COMMIT="${3:-$(git rev-parse HEAD)}"
-OPERATOR_INDEX_BRANCH="${4:-$(git rev-parse --abbrev-ref HEAD)}"
+COMMIT="${2:-$(git rev-parse HEAD)}"
+BRANCH="${3:-$(git rev-parse --abbrev-ref HEAD)}"
 
-# Fetch the list of snapshots for OPERATOR_INDEX_COMMIT and OPERATOR_INDEX_BRANCH. 
+release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)"
+# Fetch the list of snapshots for COMMIT and BRANCH. 
 # Make sure that only one the most recent snapshot per application is returned.
-snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${OPERATOR_INDEX_COMMIT}" -o json | jq -r '
+snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${COMMIT}" -o json | jq -r '
   .items
-  | map(select(.metadata.annotations["pac.test.appstudio.openshift.io/branch"]=="'"${OPERATOR_INDEX_BRANCH}"'"))
+  | map(select(.metadata.annotations["pac.test.appstudio.openshift.io/branch"]=="'"${BRANCH}"'"))
   | sort_by(.spec.application)
   | group_by(.spec.application)
   | map(sort_by(.metadata.creationTimestamp) | last)
@@ -34,29 +33,29 @@ snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${
 validate_input() {
     pipelines_count="$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l )"
     snapshots_count="$(echo "$snapshot_list" | wc -l )"
+    echo -e "found snapshots for \033[0;32m$COMMIT\033[0m commit in \033[0;32m$BRANCH\033[0m branch:" >&2
+    echo "$snapshot_list" >&2
 
-    if [ "$snapshot_number" -eq 0 ]; then
-        echo "ERROR: Could not find any Snapshots for the commit '${OPERATOR_INDEX_COMMIT}'. This must be a 40 character-long commit SHA. Default: currently checked out commit." >&2
+    if [[ "$snapshots_count" -eq 0 ]]; then
+        echo "ERROR: Could not find any Snapshots for the commit '${COMMIT}'." >&2
         exit 1
     fi
     if [[ "${ENVIRONMENT}" != "staging" && "${ENVIRONMENT}" != "prod" ]]; then
         echo "ERROR: ENVIRONMENT input must either be 'staging' or 'prod'." >&2
         exit 1
     fi
-    if [[ "${ENVIRONMENT}" == "prod" && "${OPERATOR_INDEX_BRANCH}" != "master" ]]; then
+    if [[ "${ENVIRONMENT}" == "prod" && "${BRANCH}" != "master" ]]; then
         echo "ERROR: prod release has to be done on master branch" >&2
         exit 1
     fi
-    if [[ "$snapshot_number" -ne "$supported_ocp_number" ]]; then
-        echo "snapshot list:" >&2
-        echo "$snapshot_list" >&2
-        echo "ERROR: The number of snapshots for $OPERATOR_INDEX_COMMIT in branch $OPERATOR_INDEX_BRANCH does not match the number of supported OCP versions ($supported_ocp_number)." >&2
+    if [[ "$snapshots_count" -ne "$pipelines_count" ]]; then
+        echo "ERROR: The number of snapshots for $COMMIT in branch $BRANCH does not match the number of supported OCP versions ($pipelines_count)." >&2
         exit 1
     fi
 }
 
 generate_release_resources() {
-    for d in "${snapshot_list[@]}"; do
+    for d in ${snapshot_list[@]}; do
         snapshot="$(echo "$d" | cut -d "|" -f 1)"
         application="$(echo "$d" | cut -d "|" -f 2)"
         release_plan="${application/acs-operator-index/acs-operator-index-${ENVIRONMENT}}"
@@ -64,7 +63,7 @@ generate_release_resources() {
 apiVersion: appstudio.redhat.com/v1alpha1
 kind: Release
 metadata:
-  name: ${application}-${RELEASE_NAME_SUFFIX}
+  name: ${application}-${release_name}
   namespace: rh-acs-tenant
 spec:
   releasePlan: ${release_plan}
