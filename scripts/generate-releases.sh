@@ -3,7 +3,7 @@
 set -euo pipefail
 
 if [[ "$#" -lt 2 || "$#" -gt 4 ]]; then
-    echo "USAGE: ./generate-releases.sh <ENVIRONMENT> <RELEASE_NAME_SUFFIX> [<OPERATOR_INDEX_COMMIT>] [<OPERATOR_INDEX_BRANCH>]"
+    echo "USAGE: ./generate-releases.sh <ENVIRONMENT> <RELEASE_NAME_SUFFIX> [COMMIT] [BRANCH]"
     echo ""
     echo "ENVIRONMENT - allowed values: staging|prod"
     echo "RELEASE_NAME_SUFFIX - for production, use something like acs-4-6-x-1; for staging acs-4-6-x-staging-1"
@@ -20,7 +20,7 @@ OPERATOR_INDEX_COMMIT="${3:-$(git rev-parse HEAD)}"
 OPERATOR_INDEX_BRANCH="${4:-$(git rev-parse --abbrev-ref HEAD)}"
 
 # Fetch the list of snapshots for OPERATOR_INDEX_COMMIT and OPERATOR_INDEX_BRANCH. 
-# Make sure that only one snapshot per application is returned, and that the snapshots are sorted by creation timestamp.
+# Make sure that only one the most recent snapshot per application is returned.
 snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${OPERATOR_INDEX_COMMIT}" -o json | jq -r '
   .items
   | map(select(.metadata.annotations["pac.test.appstudio.openshift.io/branch"]=="'"${OPERATOR_INDEX_BRANCH}"'"))
@@ -32,8 +32,8 @@ snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${
 ')"
 
 validate_input() {
-    supported_ocp_number=$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l )
-    snapshot_number=$(echo "$snapshot_list" | wc -l )
+    pipelines_count="$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l )"
+    snapshots_count="$(echo "$snapshot_list" | wc -l )"
 
     if [ "$snapshot_number" -eq 0 ]; then
         echo "ERROR: Could not find any Snapshots for the commit '${OPERATOR_INDEX_COMMIT}'. This must be a 40 character-long commit SHA. Default: currently checked out commit." >&2
@@ -56,7 +56,7 @@ validate_input() {
 }
 
 generate_release_resources() {
-    for d in $snapshot_list; do
+    for d in "${snapshot_list[@]}"; do
         snapshot="$(echo "$d" | cut -d "|" -f 1)"
         application="$(echo "$d" | cut -d "|" -f 2)"
         release_plan="${application/acs-operator-index/acs-operator-index-${ENVIRONMENT}}"
