@@ -6,8 +6,8 @@ if [[ "$#" -lt 1 || "$#" -gt 3 ]]; then
     echo "USAGE: ./generate-releases.sh <ENVIRONMENT> [COMMIT] [BRANCH]" >&2
     echo "" >&2
     echo "ENVIRONMENT - allowed values: staging|prod" >&2
-    echo "COMMIT - a 40 character-long SHA of the commit. Default: currently checked out commit" >&2
-    echo "BRANCH - an optional parameter to specify git branch name. Default: currently checked out branch" >&2
+    echo "COMMIT - a 40 character-long SHA of the commit to pull Snapshots only with this commit label for the Release. Default: currently checked out commit" >&2
+    echo "BRANCH - an optional parameter to specify git branch name for filtering snapshots by having branch name in annotations. Default: currently checked out branch" >&2
     echo "" >&2
     echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonflux/RHTAPforRHACS-GettingocCLItoworkwithKonflux." >&2
     exit 1
@@ -17,7 +17,7 @@ ENVIRONMENT="$1"
 COMMIT="${2:-$(git rev-parse HEAD)}"
 BRANCH="${3:-$(git rev-parse --abbrev-ref HEAD)}"
 
-release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)"
+release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)-$(date +'%d-%m-%Y')"
 # Fetch the list of snapshots for COMMIT and BRANCH. 
 # Make sure that only one the most recent snapshot per application is returned.
 snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${COMMIT}" -o json | jq -r '
@@ -55,9 +55,10 @@ validate_input() {
 }
 
 generate_release_resources() {
-    for d in ${snapshot_list[@]}; do
-        snapshot="$(echo "$d" | cut -d "|" -f 1)"
-        application="$(echo "$d" | cut -d "|" -f 2)"
+    while IFS= read -r line
+    do
+        snapshot="$(echo "$line" | cut -d "|" -f 1)"
+        application="$(echo "$line" | cut -d "|" -f 2)"
         release_plan="${application/acs-operator-index/acs-operator-index-${ENVIRONMENT}}"
         echo "---
 apiVersion: appstudio.redhat.com/v1alpha1
@@ -68,7 +69,7 @@ metadata:
 spec:
   releasePlan: ${release_plan}
   snapshot: ${snapshot}"
-    done
+    done <<< "$snapshot_list"
 }
 
 validate_input
