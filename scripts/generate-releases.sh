@@ -17,12 +17,21 @@ ENVIRONMENT="$1"
 COMMIT="${2:-$(git rev-parse HEAD)}"
 BRANCH="${3:-$(git rev-parse --abbrev-ref HEAD)}"
 
+# an additional variable for filtering snapshots by branch name for the release. 
+# Konflux adds "pac.test.appstudio.openshift.io/source-branch" annotation to a snapshot if it is build in the master branch.
+# Otherwise the PR branch name is used as the value of this annotation.
+if [ "$BRANCH" = "master" ]; then
+  SOURCE_BRANCH="refs/heads/master"
+else
+  SOURCE_BRANCH="$BRANCH"
+fi
+
 release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)-$(date +'%Y-%m-%d_%H-%M')"
 # Fetch the list of snapshots for COMMIT and BRANCH. 
 # Make sure that only one the most recent snapshot per application is returned.
 snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${COMMIT}" -o json | jq -r '
   .items
-  | map(select(.metadata.annotations["pac.test.appstudio.openshift.io/branch"]=="'"${BRANCH}"'"))
+  | map(select(.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="'"${SOURCE_BRANCH}"'"))
   | sort_by(.spec.application)
   | group_by(.spec.application)
   | map(sort_by(.metadata.creationTimestamp) | last)
