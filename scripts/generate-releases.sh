@@ -17,7 +17,7 @@ ENVIRONMENT="$1"
 COMMIT="${2:-$(git rev-parse HEAD)}"
 BRANCH="${3:-$(git rev-parse --abbrev-ref HEAD)}"
 
-release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)-$(date +'%d-%m-%Y_%H-%M')"
+release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)-$(date +'%Y-%m-%d_%H-%M')"
 # Fetch the list of snapshots for COMMIT and BRANCH. 
 # Make sure that only one the most recent snapshot per application is returned.
 snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${COMMIT}" -o json | jq -r '
