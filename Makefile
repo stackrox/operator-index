@@ -16,6 +16,11 @@ clean:
 	rm -f $(CATALOGS)
 	rm -rf catalog-migrate $$(dirname $(OPM))
 
+.PHONY: generate-catalogs
+generate-catalogs:
+	$(MAKE) clean
+	$(MAKE)
+
 catalog-bundle-object/rhacs-operator/catalog.json: catalog-template.yaml $(OPM)
 	mkdir -p "$$(dirname "$@")"
 	$(OPM) alpha render-template basic --migrate-level none $< > $@
@@ -33,31 +38,3 @@ $(OPM):
 	done
 	chmod +x $@.tmp
 	mv $@.tmp $@
-
-# This is broken due to concurrency if invoked together with other targets (e.g. `make import-legacy valid-catalogs` - don't do this).
-# Instead invoke `make import-legacy && make valid-catalogs`.
-# TODO: fix it. Otherwise this target will disappear once konflux index builds replace the CPaaS-based ones.
-.PHONY: import-legacy
-import-legacy: $(OPM)
-	$(OPM) migrate registry.redhat.io/redhat/redhat-operator-index:v4.12 ./catalog-migrate
-	$(OPM) alpha convert-template basic --output yaml ./catalog-migrate/rhacs-operator/catalog.json > catalog-template.yaml
-
-.PHONY: get-build-images
-get-build-images:
-	@COMMIT=$$(git rev-parse HEAD); \
-	BRANCH=$$(git rev-parse --abbrev-ref HEAD); \
-	echo "Getting Konflux build images for \033[0;32m$$BRANCH\033[0m branch and commit \033[0;32m$$COMMIT\033[0m"; \
-	kubectl get pipelinerun -l pipelinesascode.tekton.dev/sha=$$COMMIT -o json | jq -r '\
-	if .items | length == 0 then \
-		"No pipelinerun CRs found for the current commit. It might be pruned alreadfy from the cluster. Use Konflux UI instead." \
-	else \
-		.items[]?.status.results[0].value \
-	end'
-
-.PHONY: monitor-release
-monitor-release:
-ifndef RELEASE_NAME_SUFFIX
-	$(error RELEASE_NAME_SUFFIX is not set. Please set it to the suffix of the release name you have generated and applied previously.)
-endif
-	@echo "Monitoring release $(RELEASE_NAME_SUFFIX)"
-	@kubectl get releases | grep "$(RELEASE_NAME_SUFFIX)"

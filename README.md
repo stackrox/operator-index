@@ -2,12 +2,16 @@
 
 This repository is for building the ACS (downstream) operator indexes on Konflux.
 
-## Initialization
+
+## Restarting Konflux job
+Comment in the PR `/test <job_name>` (e.g. `/test operator-index-ocp-v4-16-on-push`)
+
+## Updating catalogs
 
 Followed [this](https://gitlab.cee.redhat.com/konflux/docs/users/-/blob/main/topics/getting-started/building-olm-products.md)
 and [this](https://github.com/konflux-ci/olm-operator-konflux-sample/blob/main/docs/konflux-onboarding.md) doc:
 ```
-make import-legacy && make valid-catalogs
+make generate-catalogs
 ```
 
 ## Catalog formats

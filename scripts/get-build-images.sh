@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [[ "$#" -gt 2 ]]; then
+    echo "USAGE: ./generate-releases.sh [COMMIT] [BRANCH]"
+    echo ""
+    echo "COMMIT - an optional 40 character-long SHA of the commit to pull build images only with this commit sha. Default: the latest commit in the current branch"
+    echo "BRANCH - an optional parameter to specify git branch name for filtering build images by. Default: currently checked out branch"
+    echo ""
+    echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonflux/RHTAPforRHACS-GettingocCLItoworkwithKonflux."
+    exit 1
+fi
+
+COMMIT="${1:-$(git rev-parse HEAD)}"
+BRANCH="${2:-$(git rev-parse --abbrev-ref HEAD)}"
+
+echo -e "Getting build operator catalog images for \033[0;32m$COMMIT\033[0m commit in \033[0;32m$BRANCH\033[0m branch:"
+kubectl get pipelinerun -l pipelinesascode.tekton.dev/sha=$$COMMIT -o json | jq -r '
+    if .items | length == 0 then
+        "No pipelinerun CRs found for the current commit. It might be pruned alreadfy from the cluster. Use Konflux UI instead: https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/applications"
+    else
+        .items[]?.status.results[0].value
+    end'
