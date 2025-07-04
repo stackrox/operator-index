@@ -16,6 +16,24 @@ and [this](https://github.com/konflux-ci/olm-operator-konflux-sample/blob/main/d
 make generate-catalogs
 ```
 
+## Release operator catalog
+
+1. Make sure you logged in to the Konflux cluster.
+2. Make sure you are checked out `master` branch and fetched the latest commit: `git checkout master && git pull`
+3. Generate Release CR by running `./scripts/generate-releases.sh <staging|prod> > operator-index-release.yaml`. Use `staging` for test release and `prod` for production one.
+4. Apply generated Release CR to the cluster: `oc apply -f operator-index-release.yaml`
+5. Monitor release [using monitor release script](#monitoring-release). Release can have `Succeeded` or `Failed` statuses
+
+## Getting built images for specific commit
+
+Run `./scripts/get-built-images.sh <COMMIT>` to fetch built operator catalog images for the provided COMMIT for each supported OCP version. 
+:warning: The script uses current branch commit if no COMMIT argument provided
+
+## Monitoring Release
+
+Run `./scripts/get-built-images.sh <COMMIT>` to see the current status for the releases associated with the provided COMMIT.
+:warning: The script uses current branch commit if no COMMIT argument provided
+
 ## Catalog formats
 
 This directory contains two versions of the catalog, in subdirectories `catalog-bundle-object` and `catalog-csv-metadata`.
