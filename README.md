@@ -4,7 +4,9 @@ This repository is for building the ACS (downstream) operator indexes on Konflux
 
 
 ## Restarting Konflux job
-Comment in the PR `/test <job_name>` (e.g. `/test operator-index-ocp-v4-16-on-push`)
+
+Comment in the PR `/test <job_name>` (e.g. `/test operator-index-ocp-v4-16-on-push`).
+See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everything+Konflux+for+RHACS#HowtoeverythingKonfluxforRHACS-Howtore-runpipelines).
 
 ## Updating catalogs
 
