@@ -16,11 +16,6 @@ clean:
 	rm -f $(CATALOGS)
 	rm -rf catalog-migrate $$(dirname $(OPM))
 
-.PHONY: generate-catalogs
-generate-catalogs:
-	$(MAKE) clean
-	$(MAKE)
-
 catalog-bundle-object/rhacs-operator/catalog.json: catalog-template.yaml $(OPM)
 	mkdir -p "$$(dirname "$@")"
 	$(OPM) alpha render-template basic --migrate-level none $< > $@

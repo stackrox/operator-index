@@ -13,7 +13,7 @@ See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everyth
 Followed [this](https://gitlab.cee.redhat.com/konflux/docs/users/-/blob/main/topics/getting-started/building-olm-products.md)
 and [this](https://github.com/konflux-ci/olm-operator-konflux-sample/blob/main/docs/konflux-onboarding.md) doc:
 ```
-make generate-catalogs
+make clean && make valid-catalogs
 ```
 
 ## Release operator catalog
