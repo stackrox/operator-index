@@ -19,7 +19,7 @@ make generate-catalogs
 ## Release operator catalog
 
 1. Make sure you logged in to the Konflux cluster.
-2. Make sure you are checked out `master` branch and fetched the latest commit: `git checkout master && git pull`
+2. Make sure you checked out the latest master branch: `git checkout master && git pull`
 3. Generate Release CR by running `./scripts/generate-releases.sh <staging|prod> > operator-index-release.yaml`. Use `staging` for test release and `prod` for production one.
 4. Apply generated Release CR to the cluster: `oc apply -f operator-index-release.yaml`
 5. Monitor release [using monitor release script](#monitoring-release). Release can have `Succeeded` or `Failed` statuses
