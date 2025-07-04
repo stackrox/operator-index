@@ -2,16 +2,16 @@
 
 set -euo pipefail
 
-if [[ "$#" -lt 1 || "$#" -gt 2 ]]; then
-    echo "USAGE: ./monitor-release.sh <RELEASE_NAME>"
+if [[ "$#" -gt 1 ]]; then
+    echo "USAGE: ./monitor-release.sh [COMMIT]"
     echo ""
-    echo "RELEASE_NAME - name of the release. You can find it in the metadata.name of the generated .yaml for the release."
+    echo "COMMIT - an optional 40 character-long SHA of the commit to pull releases CRs associeted with this commit. Default: the latest commit in the current branch"
     echo ""
     echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonflux/RHTAPforRHACS-GettingocCLItoworkwithKonflux."
     exit 1
 fi
 
-RELEASE_NAME="$1"
+COMMIT="${1:-$(git rev-parse HEAD)}"
     
-echo "Release status for ${RELEASE_NAME}"
-kubectl get releases | grep "${RELEASE_NAME}"
+echo -e "Release status for \033[0;32m$COMMIT\033[0m commit (Press ctrl+C to quit):"
+kubectl get releases --watch -l pac.test.appstudio.openshift.io/sha="${COMMIT}"
