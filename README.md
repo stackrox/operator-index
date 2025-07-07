@@ -27,12 +27,12 @@ make clean && make valid-catalogs
 ## Getting built images for specific commit
 
 Run `./scripts/get-built-images.sh <COMMIT>` to fetch built operator catalog images for the provided COMMIT for each supported OCP version. 
-:warning: The script uses current branch commit if no COMMIT argument provided
+*Note:* The script uses current branch commit if no COMMIT argument provided
 
 ## Monitoring Release
 
-Run `./scripts/get-built-images.sh <COMMIT>` to see the current status for the releases associated with the provided COMMIT.
-:warning: The script uses current branch commit if no COMMIT argument provided
+Run `./scripts/monitor-release.sh <COMMIT>` to see the current status for the releases associated with the provided COMMIT.
+*Note:* The script uses current branch commit if no COMMIT argument provided
 
 ## Catalog formats
 
