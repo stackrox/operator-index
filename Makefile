@@ -14,7 +14,7 @@ valid-catalogs: $(CATALOGS) $(OPM)
 .PHONY: clean
 clean:
 	rm -f $(CATALOGS)
-	rm -rf catalog-migrate $$(dirname $(OPM))
+	rm -rf $$(dirname $(OPM))
 
 catalog-bundle-object/rhacs-operator/catalog.json: catalog-template.yaml $(OPM)
 	mkdir -p "$$(dirname "$@")"
