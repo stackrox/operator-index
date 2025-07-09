@@ -13,6 +13,20 @@ fi
 
 COMMIT="${1:-$(git rev-parse HEAD)}"
 
+# Check KUBECONFIG is set to Konflux cluster and correct project/namespace is selected
+if [[ "$(kubectl config view --minify --output 'jsonpath={..namespace}')" != "rh-acs-tenant" ]]; then
+    echo 'ERROR: Namespace "rh-acs-tenant" is not selected.'
+    echo "Make sure you loged in to Konflux cluster: https://oauth-openshift.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/oauth/token/request"
+    echo 'Switch to "rh-acs-tenant" project: oc project rh-acs-tenant'
+    exit 1
+fi
+
+# Check if COMMIT is a valid 40-character hexadecimal git SHA
+if ! [[ "$COMMIT" =~ ^[0-9a-fA-F]{40}$ ]] || ! git cat-file -e "$COMMIT"^{commit} 2>/dev/null; then
+    echo "ERROR: Provided COMMIT is not a 40 character-long git commit SHA."
+    exit 1
+fi
+
 echo -e "Operator catalog images for commit \033[0;32m$COMMIT\033[0m:"
 kubectl get pipelinerun -l pipelinesascode.tekton.dev/sha="${COMMIT}" -o json | jq -r '
     if .items | length == 0 then

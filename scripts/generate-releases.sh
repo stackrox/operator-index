@@ -17,6 +17,26 @@ ENVIRONMENT="$1"
 COMMIT="${2:-$(git rev-parse HEAD)}"
 BRANCH="${3:-$(git rev-parse --abbrev-ref HEAD)}"
 
+# Check KUBECONFIG is set to Konflux cluster and correct project/namespace is selected
+if [[ "$(kubectl config view --minify --output 'jsonpath={..namespace}')" != "rh-acs-tenant" ]]; then
+    echo 'ERROR: Namespace "rh-acs-tenant" is not selected.' >&2
+    echo "Make sure you loged in to Konflux cluster: https://oauth-openshift.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/oauth/token/request" >&2
+    echo 'Switch to "rh-acs-tenant" project: oc project rh-acs-tenant' >&2
+    exit 1
+fi
+
+# Check if COMMIT is a valid 40-character hexadecimal git SHA
+if ! [[ "$COMMIT" =~ ^[0-9a-fA-F]{40}$ ]] || ! git cat-file -e "$COMMIT"^{commit} 2>/dev/null; then
+    echo "ERROR: Provided COMMIT is not a 40 character-long git commit SHA." >&2
+    exit 1
+fi
+
+# Check if BRANCH is a valid git branch
+if ! git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
+    echo "ERROR: $BRANCH branch does not exist on remote." >&2
+    exit 1
+fi
+
 release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)-$(date +'%Y-%m-%d-%H-%M')"
 # Fetch the list of snapshots for COMMIT and BRANCH. 
 # Make sure that only one the most recent snapshot per application is returned.
