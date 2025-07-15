@@ -452,28 +452,36 @@ entries:
     name: rhacs-operator.v4.3.0
     replaces: rhacs-operator.v4.2.0
     skipRange: '>= 4.2.0 < 4.3.0'
-  - name: rhacs-operator.v4.3.1
+  - &bundle-4-3-1
+    name: rhacs-operator.v4.3.1
     replaces: rhacs-operator.v4.3.0
     skipRange: '>= 4.2.0 < 4.3.1'
-  - name: rhacs-operator.v4.3.2
+  - &bundle-4-3-2
+    name: rhacs-operator.v4.3.2
     replaces: rhacs-operator.v4.3.1
     skipRange: '>= 4.2.0 < 4.3.2'
-  - name: rhacs-operator.v4.3.3
+  - &bundle-4-3-3
+    name: rhacs-operator.v4.3.3
     replaces: rhacs-operator.v4.3.2
     skipRange: '>= 4.2.0 < 4.3.3'
-  - name: rhacs-operator.v4.3.4
+  - &bundle-4-3-4
+    name: rhacs-operator.v4.3.4
     replaces: rhacs-operator.v4.3.3
     skipRange: '>= 4.2.0 < 4.3.4'
-  - name: rhacs-operator.v4.3.5
+  - &bundle-4-3-5
+    name: rhacs-operator.v4.3.5
     replaces: rhacs-operator.v4.3.4
     skipRange: '>= 4.2.0 < 4.3.5'
-  - name: rhacs-operator.v4.3.6
+  - &bundle-4-3-6
+    name: rhacs-operator.v4.3.6
     replaces: rhacs-operator.v4.3.5
     skipRange: '>= 4.2.0 < 4.3.6'
-  - name: rhacs-operator.v4.3.7
+  - &bundle-4-3-7
+    name: rhacs-operator.v4.3.7
     replaces: rhacs-operator.v4.3.6
     skipRange: '>= 4.2.0 < 4.3.7'
-  - name: rhacs-operator.v4.3.8
+  - &bundle-4-3-8
+    name: rhacs-operator.v4.3.8
     replaces: rhacs-operator.v4.3.7
     skipRange: '>= 4.2.0 < 4.3.8'
 
