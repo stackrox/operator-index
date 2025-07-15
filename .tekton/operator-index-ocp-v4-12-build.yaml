@@ -27,10 +27,11 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: base-image
-    # The tag is pinned here because it seems the last one to include architectures other than x86_64.
+    # The digest is pinned here because it seems the last one to include architectures other than x86_64.
     # See https://redhat-internal.slack.com/archives/C04PZ7H0VA8/p1752509725098509
-    # The tag was found from https://catalog.redhat.com/software/containers/openshift4/ose-operator-registry/5cddd0bed70cc57c44b2e1f3/history
-    value: registry.redhat.io/openshift4/ose-operator-registry:v4.12-1746684240
+    # The last tag v4.12-174668424 with multiarch builds was found from
+    # https://catalog.redhat.com/software/containers/openshift4/ose-operator-registry/5cddd0bed70cc57c44b2e1f3/history
+    value: registry.redhat.io/openshift4/ose-operator-registry:v4.12@sha256:eaee94d7dc3f5aa541814672445acb32630fd69e096a77fa8d9baff69798fc98
   - name: output-image-tag
     value: ocp-v4-12-{{revision}}-fast
   - name: catalog-dir

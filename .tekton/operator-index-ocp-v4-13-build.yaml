@@ -27,8 +27,8 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: base-image
-    # The tag is pinned for the same reason as for 4.12, see the comment there.
-    value: registry.redhat.io/openshift4/ose-operator-registry:v4.13-1747313384
+    # The digest (corresponding to v4.13-1747313384) is pinned for the same reason as for 4.12, see the comment there.
+    value: registry.redhat.io/openshift4/ose-operator-registry:v4.13@sha256:8d8a62303271ba3abcfeaa50f01ed55552c2e38ee4d1c7147978a39ed7be6079
   - name: output-image-tag
     value: ocp-v4-13-{{revision}}-fast
   - name: catalog-dir
