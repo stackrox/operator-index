@@ -452,48 +452,30 @@ entries:
     name: rhacs-operator.v4.3.0
     replaces: rhacs-operator.v4.2.0
     skipRange: '>= 4.2.0 < 4.3.0'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.3.1
     replaces: rhacs-operator.v4.3.0
     skipRange: '>= 4.2.0 < 4.3.1'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.3.2
     replaces: rhacs-operator.v4.3.1
     skipRange: '>= 4.2.0 < 4.3.2'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.3.3
     replaces: rhacs-operator.v4.3.2
     skipRange: '>= 4.2.0 < 4.3.3'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.3.4
     replaces: rhacs-operator.v4.3.3
     skipRange: '>= 4.2.0 < 4.3.4'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.3.5
     replaces: rhacs-operator.v4.3.4
     skipRange: '>= 4.2.0 < 4.3.5'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.3.6
     replaces: rhacs-operator.v4.3.5
     skipRange: '>= 4.2.0 < 4.3.6'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.3.7
     replaces: rhacs-operator.v4.3.6
     skipRange: '>= 4.2.0 < 4.3.7'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.3.8
     replaces: rhacs-operator.v4.3.7
     skipRange: '>= 4.2.0 < 4.3.8'
-    skips:
-    - rhacs-operator.v4.1.0
 
 - schema: olm.channel
   name: rhacs-4.4
@@ -510,48 +492,30 @@ entries:
     name: rhacs-operator.v4.4.0
     replaces: rhacs-operator.v4.3.0
     skipRange: '>= 4.3.0 < 4.4.0'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.4.1
     replaces: rhacs-operator.v4.4.0
     skipRange: '>= 4.3.0 < 4.4.1'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.4.2
     replaces: rhacs-operator.v4.4.1
     skipRange: '>= 4.3.0 < 4.4.2'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.4.3
     replaces: rhacs-operator.v4.4.2
     skipRange: '>= 4.3.0 < 4.4.3'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.4.4
     replaces: rhacs-operator.v4.4.3
     skipRange: '>= 4.3.0 < 4.4.4'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.4.5
     replaces: rhacs-operator.v4.4.4
     skipRange: '>= 4.3.0 < 4.4.5'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.4.6
     replaces: rhacs-operator.v4.4.5
     skipRange: '>= 4.3.0 < 4.4.6'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.4.7
     replaces: rhacs-operator.v4.4.6
     skipRange: '>= 4.3.0 < 4.4.7'
-    skips:
-    - rhacs-operator.v4.1.0
   - name: rhacs-operator.v4.4.8
     replaces: rhacs-operator.v4.4.7
     skipRange: '>= 4.3.0 < 4.4.8'
-    skips:
-    - rhacs-operator.v4.1.0
 
 - schema: olm.channel
   name: rhacs-4.5
