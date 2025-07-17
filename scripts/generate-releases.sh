@@ -49,7 +49,7 @@ validate_input() {
         exit 1
     fi
     if [[ "$snapshots_count" -ne "$pipelines_count" ]]; then
-        echo "ERROR: The number of snapshots for $COMMIT in branch $BRANCH does not match the number of supported OCP versions $pipelines_count." >&2
+        echo "ERROR: The number of snapshots ($snapshots_count) for $COMMIT in branch $BRANCH does not match the number of supported OCP versions ($pipelines_count)." >&2
         exit 1
     fi
 }
