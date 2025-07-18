@@ -1,56 +1,9 @@
 #!/bin/bash
+source "$(dirname "$0")/helpers.sh"
 
 set -euo pipefail
 
-if [[ "$#" -lt 1 || "$#" -gt 3 ]]; then
-    echo "USAGE: ./generate-releases.sh <ENVIRONMENT> [COMMIT] [BRANCH]" >&2
-    echo "" >&2
-    echo "ENVIRONMENT - allowed values: staging|prod" >&2
-    echo "COMMIT - a 40 character-long SHA of the commit to pull Snapshots only with this commit label for the Release. Default: currently checked out commit" >&2
-    echo "BRANCH - an optional parameter to specify git branch name for filtering snapshots by having branch name in annotations. Default: currently checked out branch" >&2
-    echo "" >&2
-    echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonfluxforRHACS-GettingocCLItoworkwithKonflux." >&2
-    exit 1
-fi
-
-ENVIRONMENT="$1"
-COMMIT="${2:-$(git rev-parse HEAD)}"
-BRANCH="${3:-$(git rev-parse --abbrev-ref HEAD)}"
-
-# Check KUBECONFIG is set to Konflux cluster and correct project/namespace is selected
-if [[ "$(kubectl config view --minify --output 'jsonpath={..namespace}')" != "rh-acs-tenant" ]]; then
-    echo 'ERROR: Namespace "rh-acs-tenant" is not selected.' >&2
-    echo "Make sure you loged in to Konflux cluster: https://oauth-openshift.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/oauth/token/request" >&2
-    echo 'Switch to "rh-acs-tenant" project: oc project rh-acs-tenant' >&2
-    exit 1
-fi
-
-# Check if COMMIT is a valid 40-character hexadecimal git SHA
-if ! [[ "$COMMIT" =~ ^[0-9a-fA-F]{40}$ ]] || ! git cat-file -e "$COMMIT"^{commit} 2>/dev/null; then
-    echo "ERROR: Provided COMMIT is not a 40 character-long git commit SHA." >&2
-    exit 1
-fi
-
-# Check if BRANCH is a valid git branch
-if ! git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
-    echo "ERROR: $BRANCH branch does not exist on remote." >&2
-    exit 1
-fi
-
-release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)-$(date +'%Y-%m-%d-%H-%M')"
-# Fetch the list of snapshots for COMMIT and BRANCH. 
-# Make sure that only one the most recent snapshot per application is returned.
-snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${COMMIT}" -o json | jq -r '
-  .items
-  | map(select((.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="'"${BRANCH}"'") or (.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="refs/heads/'${BRANCH}'")))
-  | sort_by(.spec.application)
-  | group_by(.spec.application)
-  | map(sort_by(.metadata.creationTimestamp) | last)
-  | .[]
-  | "\(.metadata.name)|\(.spec.application)"
-')"
-
-validate_input() {
+validate_parameters() {
     pipelines_count="$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l )"
     snapshots_count="$(echo "$snapshot_list" | wc -l )"
     echo -e "found the following snapshots for \033[0;32m$COMMIT\033[0m commit in \033[0;32m$BRANCH\033[0m branch:" >&2
@@ -92,5 +45,37 @@ spec:
     done <<< "$snapshot_list"
 }
 
-validate_input
+if [[ "$#" -lt 1 || "$#" -gt 3 ]]; then
+    echo "USAGE: ./generate-releases.sh <ENVIRONMENT> [COMMIT] [BRANCH]" >&2
+    echo "" >&2
+    echo "ENVIRONMENT - allowed values: staging|prod" >&2
+    echo "COMMIT - a 40 character-long SHA of the commit to pull Snapshots only with this commit label for the Release. Default: currently checked out commit" >&2
+    echo "BRANCH - an optional parameter to specify git branch name for filtering snapshots by having branch name in annotations. Default: currently checked out branch" >&2
+    echo "" >&2
+    echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonfluxforRHACS-GettingocCLItoworkwithKonflux." >&2
+    exit 1
+fi
+
+ENVIRONMENT="$1"
+COMMIT="${2:-$(git rev-parse HEAD)}"
+BRANCH="${3:-$(git rev-parse --abbrev-ref HEAD)}"
+
+validate_kubeconfig
+validate_commit "$COMMIT"
+validate_branch "$BRANCH"
+
+release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)-$(date +'%Y-%m-%d-%H-%M')"
+# Fetch the list of snapshots for COMMIT and BRANCH. 
+# Make sure that only one the most recent snapshot per application is returned.
+snapshot_list="$(kubectl get snapshot -l pac.test.appstudio.openshift.io/sha="${COMMIT}" -o json | jq -r '
+  .items
+  | map(select((.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="'"${BRANCH}"'") or (.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="refs/heads/'${BRANCH}'")))
+  | sort_by(.spec.application)
+  | group_by(.spec.application)
+  | map(sort_by(.metadata.creationTimestamp) | last)
+  | .[]
+  | "\(.metadata.name)|\(.spec.application)"
+')"
+
+validate_parameters
 generate_release_resources

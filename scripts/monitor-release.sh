@@ -14,7 +14,7 @@ fi
 COMMIT="${1:-$(git rev-parse HEAD)}"
 
 # Check KUBECONFIG is set to Konflux cluster and correct project/namespace is selected
-if [[ "$(kubectl config view --minify --output 'jsonpath={..namespace}')" != "rh-acs-tenant" ]]; then
+if [[ "$(kubectl config view --minify --output 'jsonpath={...current-context}')" != "rh-acs-tenant" ]]; then
     echo 'ERROR: Namespace "rh-acs-tenant" is not selected.'
     echo "Make sure you loged in to Konflux cluster: https://oauth-openshift.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/oauth/token/request"
     echo 'Switch to "rh-acs-tenant" project: oc project rh-acs-tenant'
