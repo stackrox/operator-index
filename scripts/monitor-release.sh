@@ -28,4 +28,4 @@ if ! [[ "$COMMIT" =~ ^[0-9a-fA-F]{40}$ ]] || ! git cat-file -e "$COMMIT"^{commit
 fi
     
 echo -e "Release status for \033[0;32m$COMMIT\033[0m commit (Press ctrl+C to quit):"
-kubectl get releases --watch -l pac.test.appstudio.openshift.io/sha="${COMMIT}"
+kubectl -n rh-acs-tenant get releases.appstudio.redhat.com --watch -l pac.test.appstudio.openshift.io/sha="${COMMIT}"
