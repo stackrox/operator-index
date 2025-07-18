@@ -21,7 +21,7 @@ validate_commit() {
     fi
 }
 
-# Check if BRANCH is a valid git branch, otherwise it's unlikely that any Snapshots will be found for it.
+# Check if BRANCH is a valid known branch git branch for the remote repository, otherwise it's unlikely that any Snapshots will be found for it.
 validate_branch() {
     if ! git ls-remote --exit-code --heads origin "$1" > /dev/null; then
         echo "ERROR: $1 branch does not exist on remote." >&2
