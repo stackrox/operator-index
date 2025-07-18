@@ -8,6 +8,17 @@ This repository is for building the ACS (downstream) operator indexes on Konflux
 Comment in the PR `/test <job_name>` (e.g. `/test operator-index-ocp-v4-16-on-push`).
 See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everything+Konflux+for+RHACS#HowtoeverythingKonfluxforRHACS-Howtore-runpipelines).
 
+## Restarting Konflux Release
+
+1. Go to [list of Konflux applications](https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/applications).
+2. Open `acs-operator-index-ocp-v4-XX` Konflux application for OCP version you want to restart (`XX` means minor part of the OCP version).
+3. Select `Releases` tab.
+4. Find release by name you want to restart.
+5. Click on the action menu (3 dots) on the right.
+6. Press "Re-run release" optioin.
+7. Monitor the new release.
+8. Repeat restarting release if necessary. 
+
 ## Updating catalogs
 
 Followed [this](https://gitlab.cee.redhat.com/konflux/docs/users/-/blob/main/topics/getting-started/building-olm-products.md)
@@ -22,7 +33,8 @@ make clean && make valid-catalogs
 2. Make sure you checked out the latest master branch: `git checkout master && git pull`
 3. Generate Release CR by running `./scripts/generate-releases.sh <staging|prod> > operator-index-release.yaml`. Use `staging` for test release and `prod` for production one.
 4. Apply generated Release CR to the cluster: `oc create -f operator-index-release.yaml`
-5. Monitor release [using monitor release script](#monitoring-release). Release can have `Succeeded` or `Failed` statuses
+5. Monitor release [using monitor release script](#monitoring-release). Each supported OCP version has its own release. Successfully finished Release has `Succeeded` status.
+6. Follow [restarting release](#restarting-konflux-release) if release is failed or stuck for any OCP version.
 
 ## Getting built images for specific commit
 
