@@ -11,13 +11,10 @@ validate_kubeconfig() {
 }
 
 # Check if COMMIT is a valid git commit SHA. If it's a short 7-characters SHA, it will be expanded to a full 40-character SHA.
-validate_commit() {
-    if ! git cat-file -e "$1"^{commit} 2>/dev/null; then
-        echo "ERROR: Provided COMMIT is not a known git commit SHA on the repome repository." >&2
+verify_commit() {
+    if ! COMMIT="$(git rev-parse --verify --end-of-options "$1^{commit}")"; then
+        echo "Error: Could not resolve commit SHA for $1" >&2
         exit 1
-    fi
-    if [[ ${#1} -eq 7 ]]; then
-        COMMIT="$(git rev-parse --verify --end-of-options "$1^{commit}")"
     fi
 }
 
