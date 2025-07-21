@@ -5,8 +5,8 @@ set -euo pipefail
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 source "$SCRIPT_DIR/helpers.sh"
 
-# Validate the input parameters and ensure they are correct.
-validate_parameters() {
+# Describe the usage of the script if not enough arguments are provided.
+usage() {
     if [[ "$#" -lt 1 || "$#" -gt 3 ]]; then
         echo "USAGE: ./generate-releases.sh <ENVIRONMENT> [COMMIT] [BRANCH]" >&2
         echo "" >&2
@@ -16,26 +16,22 @@ validate_parameters() {
         echo "BRANCH - an optional parameter to specify git branch name for filtering snapshots by having branch name in annotations. Default: currently checked out branch" >&2
         echo "" >&2
         echo "You must have your KUBECONFIG point to the Konflux cluster, see https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonfluxforRHACS-GettingocCLItoworkwithKonflux." >&2
-        exit 1
+        return 1
     fi
+}
 
+# Validate environment input and ensure it is either 'staging' or 'prod' (for master branch only).
+validate_environment() {
     environment="$1"
-    commit="${2:-$(git rev-parse HEAD)}"
-    commit="$(expand_commit "$commit")"
-
-    branch="${3:-$(git rev-parse --abbrev-ref HEAD)}"
-    validate_branch "$branch"
-
+    branch="$2"
     if [[ "${environment}" != "staging" && "${environment}" != "prod" ]]; then
         echo "ERROR: ENVIRONMENT input must either be 'staging' or 'prod'." >&2
-        exit 1
+        return 1
     fi
     if [[ "${environment}" == "prod" && "${branch}" != "master" ]]; then
         echo "ERROR: prod release has to be done on master branch" >&2
-        exit 1
+        return 1
     fi
-
-    echo "${environment}:${commit}:${branch}"
 }
 
 # Fetch the list of snapshots for provided commit and branch values. 
@@ -50,14 +46,13 @@ get_snapshots() {
         | group_by(.spec.application)
         | map(sort_by(.metadata.creationTimestamp) | last)
         | .[]
-        | "\(.metadata.name)|\(.spec.application)"
-        '
+        | "\(.metadata.name)|\(.spec.application)"'
 }
 
 # Validate all expected Snapshots were found.
 validate_snapshots() {
     commit="$1"
-    snapshot_list="$1"
+    snapshot_list="$2"
     pipelines_count="$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l )"
     snapshots_count="$(echo "$snapshot_list" | wc -l )"
 
@@ -97,9 +92,20 @@ spec:
     done <<< "$snapshot_list"
 }
 
-result="$(validate_parameters "$@")"
-IFS=":" read -r environment commit branch <<< "$result"
+# Main body of the script.
+usage "$@"
 
-snapshot_list="$(get_snapshots "$commit" "$branch")"
+environment="$1"
+
+commit="${2:-$(git rev-parse HEAD)}"
+commit="$(expand_commit "$commit")"
+
+branch="${3:-$(git rev-parse --abbrev-ref HEAD)}"
+validate_branch "$branch"
+
+validate_environment "$environment" "$branch"
+
+snapshot_list=$(get_snapshots "$commit" "$branch")
 validate_snapshots "$commit" "$snapshot_list"
+
 generate_release_resources "$environment" "$snapshot_list"
