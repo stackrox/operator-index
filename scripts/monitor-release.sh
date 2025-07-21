@@ -19,9 +19,8 @@ COMMIT="$(expand_commit "$COMMIT")"
 
 # Set the interval for checking releases in seconds
 interval=10
-echo -e "Release status for \033[0;32m$COMMIT\033[0m commit (Press ctrl+C to quit):"
 while true; do
-    tput reset # Clear the terminal screen
+    clear # Clear the terminal screen
     date  # Show current timestamp
     kubectl -n rh-acs-tenant get releases.appstudio.redhat.com -l pac.test.appstudio.openshift.io/sha="${COMMIT}"
     echo -e "\nChecking again in \033[0;33m$interval\033[0m seconds..."
