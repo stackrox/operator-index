@@ -39,8 +39,8 @@ See [konflux docs](https://github.com/konflux-ci/build-definitions/blob/c93ea73d
 3. Generate Release CR by running `./scripts/generate-releases.sh <staging|prod> > operator-index-release.yaml`. Use `staging` for test release and `prod` for production one.
 4. Apply generated Release CR to the cluster: `oc create -f operator-index-release.yaml`
 5. Monitor release [using monitor release script](#monitoring-release). Each supported OCP version has its own release. Successfully finished Release has `Succeeded` status.
-    - If all OCP versions releases successfully finished then the file-based catalog release is done. If you perform it as part of a bigger release procedure, you should go back to that procedure and continue with further steps.
-6. Follow [the restarting release step below](#restarting-konflux-release) if release is failed or stuck for any OCP version.
+6. Follow [the restarting release step below](#restarting-konflux-release) if any of Releases failes for any OCP version.
+7. Once releases for all OCP versions successfully finished, then the operator catalog release is done. If you perform it as part of a bigger release procedure, you should go back to that procedure and continue with further steps.
 
 #### Restarting Konflux Release
 
