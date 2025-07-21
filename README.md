@@ -42,6 +42,11 @@ See [konflux docs](https://github.com/konflux-ci/build-definitions/blob/c93ea73d
 6. Follow [the restarting release step below](#restarting-konflux-release) if any of Releases failes for any OCP version.
 7. Once releases for all OCP versions successfully finished, then the operator catalog release is done. If you perform it as part of a bigger release procedure, you should go back to that procedure and continue with further steps.
 
+#### Monitoring Release
+
+Run `./scripts/monitor-release.sh [COMMIT]` to see the current status for the releases associated with the provided `COMMIT`.
+*Note:* The script uses current branch commit if no `COMMIT` argument provided.
+
 #### Restarting Konflux Release
 
 If a particular Release fails, you should restart it until it succeeds. Failing to do so will leave corresponding OpenShift Operator catalog without updates.
@@ -54,8 +59,3 @@ If a particular Release fails, you should restart it until it succeeds. Failing 
 6. Press "Re-run release" optioin.
 7. Monitor the new release.
 8. Repeat restarting release if the release keeps failing. If you find yourself re-running a Release five times or more, open a high severity request in [#konflux-users](https://redhat.enterprise.slack.com/archives/C04PZ7H0VA8) Slack channel describing the problem and providing names/links to Release CRs.
-
-#### Monitoring Release
-
-Run `./scripts/monitor-release.sh [COMMIT]` to see the current status for the releases associated with the provided `COMMIT`.
-*Note:* The script uses current branch commit if no `COMMIT` argument provided.
