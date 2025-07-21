@@ -1,12 +1,5 @@
 #!/bin/bash
-SCRIPT_SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SCRIPT_SOURCE" ]; do
-  DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
-  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
-  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$DIR/$SCRIPT_SOURCE"
-done
-SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
-
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 source "$SCRIPT_DIR/helpers.sh"
 
 set -euo pipefail
@@ -68,9 +61,12 @@ ENVIRONMENT="$1"
 COMMIT="${2:-$(git rev-parse HEAD)}"
 BRANCH="${3:-$(git rev-parse --abbrev-ref HEAD)}"
 
-validate_kubeconfig
-verify_commit "$COMMIT"
-validate_branch "$BRANCH"
+if ! COMMIT=$(expand_commit "$COMMIT"); then
+    exit 1
+fi
+if ! validate_branch "$BRANCH"; then
+    exit 1
+fi
 
 release_name="${ENVIRONMENT}-$(git rev-parse --short HEAD)-$(date +'%Y-%m-%d-%H-%M')"
 # Fetch the list of snapshots for COMMIT and BRANCH. 

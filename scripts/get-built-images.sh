@@ -1,12 +1,5 @@
 #!/bin/bash
-SCRIPT_SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SCRIPT_SOURCE" ]; do
-  DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
-  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
-  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$DIR/$SCRIPT_SOURCE"
-done
-SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
-
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 source "$SCRIPT_DIR/helpers.sh"
 
 set -euo pipefail
@@ -22,8 +15,9 @@ fi
 
 COMMIT="${1:-$(git rev-parse HEAD)}"
 
-validate_kubeconfig
-verify_commit "$COMMIT"
+if ! COMMIT=$(expand_commit "$COMMIT"); then
+    exit 1
+fi
 
 echo -e "Operator catalog images for commit \033[0;32m$COMMIT\033[0m:"
 kubectl -n rh-acs-tenant get pipelinerun.tekton.dev -l pipelinesascode.tekton.dev/sha="${COMMIT}" -o json | jq -r '
