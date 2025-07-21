@@ -15,7 +15,7 @@ if [[ "$#" -gt 1 ]]; then
 fi
 
 COMMIT="${1:-$(git rev-parse HEAD)}"
-COMMIT=$(expand_commit "$COMMIT")
+COMMIT="$(expand_commit "$COMMIT")"
 
 echo -e "Operator catalog images for commit \033[0;32m$COMMIT\033[0m:"
 kubectl -n rh-acs-tenant get pipelinerun.tekton.dev -l pipelinesascode.tekton.dev/sha="${COMMIT}" -o json | jq -r '

@@ -21,9 +21,9 @@ validate_parameters() {
 
     environment="$1"
     commit="${2:-$(git rev-parse HEAD)}"
-    branch="${3:-$(git rev-parse --abbrev-ref HEAD)}"
+    commit="$(expand_commit "$commit")"
 
-    commit=$(expand_commit "$commit")
+    branch="${3:-$(git rev-parse --abbrev-ref HEAD)}"
     validate_branch "$branch"
 
     if [[ "${environment}" != "staging" && "${environment}" != "prod" ]]; then
@@ -43,7 +43,7 @@ validate_parameters() {
 get_snapshots() {
     commit="$1"
     branch="$2"
-    echo "$(kubectl get -n rh-acs-tenant snapshot -l pac.test.appstudio.openshift.io/sha="${commit}" -o json | jq -r '
+    kubectl get -n rh-acs-tenant snapshot -l pac.test.appstudio.openshift.io/sha="${commit}" -o json | jq -r '
         .items
         | map(select((.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="'"${branch}"'") or (.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="refs/heads/'${branch}'")))
         | sort_by(.spec.application)
@@ -51,10 +51,10 @@ get_snapshots() {
         | map(sort_by(.metadata.creationTimestamp) | last)
         | .[]
         | "\(.metadata.name)|\(.spec.application)"
-        ')"
+        '
 }
 
-# Validate the list of snapshots against the number of pipelines available in the .tekton directory.
+# Validate all expected Snapshots were found.
 validate_snapshots() {
     commit="$1"
     snapshot_list="$1"
@@ -66,11 +66,11 @@ validate_snapshots() {
 
     if [[ "$snapshots_count" -eq 0 ]]; then
         echo "ERROR: Could not find any Snapshots for the commit '${commit}'." >&2
-        exit 1
+        return 1
     fi
     if [[ "$snapshots_count" -ne "$pipelines_count" ]]; then
         echo "ERROR: The number of snapshots $snapshots_count for $commit does not match the number of supported OCP versions $pipelines_count." >&2
-        exit 1
+        return 1
     fi
 }
 

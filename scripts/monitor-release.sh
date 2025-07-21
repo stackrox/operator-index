@@ -15,11 +15,10 @@ if [[ "$#" -gt 1 ]]; then
 fi
 
 COMMIT="${1:-$(git rev-parse HEAD)}"
-COMMIT=$(expand_commit "$COMMIT")
+COMMIT="$(expand_commit "$COMMIT")"
 
 # Set the interval for checking releases in seconds
 interval=10
-shift
 echo -e "Release status for \033[0;32m$COMMIT\033[0m commit (Press ctrl+C to quit):"
 while true; do
     tput reset # Clear the terminal screen
