@@ -1,8 +1,9 @@
 #!/bin/bash
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
-source "$SCRIPT_DIR/helpers.sh"
 
 set -euo pipefail
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+source "$SCRIPT_DIR/helpers.sh"
 
 if [[ "$#" -gt 1 ]]; then
     echo "USAGE: ./monitor-release.sh [COMMIT]"
@@ -14,10 +15,7 @@ if [[ "$#" -gt 1 ]]; then
 fi
 
 COMMIT="${1:-$(git rev-parse HEAD)}"
-
-if ! COMMIT=$(expand_commit "$COMMIT"); then
-    exit 1
-fi
+COMMIT=$(expand_commit "$COMMIT")
 
 # Set the interval for checking releases in seconds
 interval=10

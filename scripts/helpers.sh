@@ -1,12 +1,9 @@
 # Expand commit to a full 40-character SHA. Returns the full commit SHA if successful, or an error message if not.
 expand_commit() {
-    local commit="$1"
-    if ! commit="$(git rev-parse --verify --end-of-options "$commit^{commit}")"; then
-        echo "Cannot expand commit $COMMIT to a full 40-character long SHA." >&2
+    if ! git rev-parse --verify --end-of-options "$1^{commit}"; then
+        echo "Cannot expand commit $1 to a full 40-character long SHA." >&2
         return 1
     fi
-    echo "$commit"
-    return 0
 }
 
 # Check if BRANCH is a valid known branch git branch for the remote repository, otherwise it's unlikely that any Snapshots will be found for it.
