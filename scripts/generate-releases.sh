@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/helpers.sh"
 # Check command-line arguments and display usage help, if needed.
 usage() {
     if [[ "$#" -lt 1 || "$#" -gt 3 || "${1:-}" == "--help" ]]; then
-        echo "USAGE: ./generate-releases.sh <ENVIRONMENT> [COMMIT] [BRANCH]" >&2
+        echo "USAGE: ./$(basename "${BASH_SOURCE[0]}") <ENVIRONMENT> [COMMIT] [BRANCH]" >&2
         echo "" >&2
         echo "ENVIRONMENT - allowed values: staging|prod" >&2
         echo "COMMIT - a SHA of the commit to pull Snapshots only with this commit label for the Release." >&2

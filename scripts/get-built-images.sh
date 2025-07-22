@@ -5,8 +5,8 @@ set -euo pipefail
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 source "$SCRIPT_DIR/helpers.sh"
 
-if [[ "$#" -gt 1 ]]; then
-    echo "USAGE: ./get-built-images.sh [COMMIT]"
+if [[ "$#" -gt 1 || "${1:-}" == "--help" ]]; then
+    echo "USAGE: ./$(basename "${BASH_SOURCE[0]}") [COMMIT]"
     echo ""
     echo "COMMIT - an optional 40 character-long SHA of the commit to pull built images only with this commit sha. Default: the latest commit in the current branch"
     echo ""
