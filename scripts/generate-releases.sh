@@ -74,31 +74,73 @@ validate_snapshots() {
 
 # Generate the Release resources for each snapshot found.
 generate_release_resources() {
+    ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." &> /dev/null && pwd)"
+
     local -r environment="$1"
-    local -r snapshot_list="$2"
+    local -r commit="$2"
+    local -r snapshot_list="$3"
 
     local release_name
-    release_name="${environment}-$(git rev-parse --short HEAD)-$(date +'%Y-%m-%d-%H-%M')"
-
     local snapshot
     local application
     local release_plan
+
+    case ${environment} in
+    staging)
+        env_short=stg
+        ;;
+    prod)
+        env_short=prd
+        ;;
+    *)
+        echo "ERROR: ENVIRONMENT input must either be 'staging' or 'prod'." >&2
+        exit 1
+      ;;
+    esac
+    
+    release_name="$(date +"%Y-%m-%d")-$(git rev-parse --short "$commit")-${environment}"
+    release_name_short="$(date +"%Y%m%d")-$(git rev-parse --short "$commit")-${env_short}" # save space for retry suffix
+    whitelist_file="$ROOT_DIR/release-history/.whitelist.yaml"
+    out_file="$ROOT_DIR/release-history/${release_name}.yaml"
+    echo "Writing resources to ${out_file} ..." >&2
     
     while IFS= read -r line
     do
         snapshot="$(echo "$line" | cut -d "|" -f 1)"
+        snapshot_copy="${snapshot%-*}-${release_name}" # replace random suffix with release name
+        echo "---"
+        kubectl -n rh-acs-tenant get snapshot.appstudio.redhat.com "${snapshot}" -o yaml | \
+        yq -P 'load("'"${whitelist_file}"'") as $whitelisted
+         | del(.metadata.annotations |keys[]|select(. as $needle | $whitelisted.annotations | has($needle) | not))
+         | del(.metadata.labels |keys[]|select(. as $needle | $whitelisted.labels | has($needle) | not))
+         | {"apiVersion": .apiVersion,
+            "kind": .kind,
+            "metadata": {
+              "annotations": .metadata.annotations + {"acs.redhat.com/original-snapshot-name": "'"${snapshot}"'"},
+              "labels": .metadata.labels,
+              "name": "'"${snapshot_copy}"'",
+              "namespace": .metadata.namespace
+            },
+            "spec": .spec
+           }'
+
         application="$(echo "$line" | cut -d "|" -f 2)"
-        release_plan="${application/acs-operator-index/acs-operator-index-${environment}}"
-        echo "---
-apiVersion: appstudio.redhat.com/v1alpha1
-kind: Release
-metadata:
-  name: ${application}-${release_name}
-  namespace: rh-acs-tenant
-spec:
-  releasePlan: ${release_plan}
-  snapshot: ${snapshot}"
-    done <<< "$snapshot_list"
+        release_plan="${application/acs-operator-index/acs-operator-index-${ENVIRONMENT}}"
+        sed -E 's/^[[:blank:]]{8}//' <<<"
+        ---
+        apiVersion: appstudio.redhat.com/v1alpha1
+        kind: Release
+        metadata:
+          name: ${application}-${release_name_short}
+          namespace: rh-acs-tenant
+        spec:
+          releasePlan: ${release_plan}
+          snapshot: ${snapshot_copy}"
+
+    done <<< "$snapshot_list" > "${out_file}"
+
+    echo "Staging the file for commit..."
+    git add --verbose "${out_file}"
 }
 
 usage "$@"
@@ -116,4 +158,4 @@ validate_environment "$environment" "$branch"
 snapshot_list=$(get_snapshots "$commit" "$branch")
 validate_snapshots "$commit" "$snapshot_list"
 
-generate_release_resources "$environment" "$snapshot_list"
+generate_release_resources "$environment" "$commit" "$snapshot_list"
