@@ -21,9 +21,9 @@ COMMIT="$(expand_commit "$COMMIT")"
 interval=10
 while true; do
     clear # Clear the terminal screen
+    echo -e "Release status for \033[0;32m$COMMIT\033[0m commit (Press ctrl+C to quit):"
     date  # Show current timestamp
     kubectl -n rh-acs-tenant get releases.appstudio.redhat.com -l pac.test.appstudio.openshift.io/sha="${COMMIT}"
     echo -e "\nChecking again in \033[0;33m$interval\033[0m seconds..."
-    echo "(Press ctrl+C to quit)"
     sleep "$interval"
 done
