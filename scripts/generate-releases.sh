@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." &> /dev/null && pwd)"
-SCRIPT_DIR="${ROOT_DIR}/scripts"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+ROOT_DIR="${SCRIPT_DIR}/.."
 source "$SCRIPT_DIR/helpers.sh"
 
 # Check command-line arguments and display usage help, if needed.
