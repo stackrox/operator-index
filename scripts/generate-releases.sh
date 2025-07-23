@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-ROOT_DIR="${SCRIPT_DIR}/.."
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." &> /dev/null && pwd)"
+SCRIPT_DIR="${ROOT_DIR}/scripts"
 source "$SCRIPT_DIR/helpers.sh"
 
 # Check command-line arguments and display usage help, if needed.
@@ -91,10 +91,6 @@ generate_release_resources() {
     prod)
         env_short=prd
         ;;
-    *)
-        echo "ERROR: ENVIRONMENT input must either be 'staging' or 'prod'." >&2
-        exit 1
-      ;;
     esac
     
     release_name="$(date +"%Y-%m-%d")-$(git rev-parse --short "$commit")-${environment}"
