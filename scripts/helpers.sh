@@ -13,3 +13,16 @@ validate_branch() {
         return 1
     fi
 }
+
+# Fetch the list of snapshots for provided commit and branch values. 
+# Make sure that only one the most recent snapshot per application is returned.
+get_snapshots() {
+    local -r commit="$1"
+    local -r branch="$2"
+    kubectl get -n rh-acs-tenant snapshot -l pac.test.appstudio.openshift.io/sha="${commit}" -o json | jq -r '
+        .items
+        | map(select((.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="'"${branch}"'") or (.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="refs/heads/'${branch}'")))
+        | sort_by(.spec.application)
+        | group_by(.spec.application)
+        | map(sort_by(.metadata.creationTimestamp) | last)'
+}
