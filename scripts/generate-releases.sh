@@ -102,7 +102,6 @@ generate_release_resources() {
     whitelist_file="$ROOT_DIR/release-history/.whitelist.yaml"
     out_file="$ROOT_DIR/release-history/${release_name}.yaml"
     echo "Writing resources to ${out_file} ..." >&2
-    
     while IFS= read -r line
     do
         snapshot="$(echo "$line" | cut -d "|" -f 1)"
