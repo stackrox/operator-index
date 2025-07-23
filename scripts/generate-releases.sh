@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." &> /dev/null && pwd)"
+SCRIPT_DIR="${ROOT_DIR}/scripts"
 source "$SCRIPT_DIR/helpers.sh"
 
 # Check command-line arguments and display usage help, if needed.
@@ -74,8 +75,6 @@ validate_snapshots() {
 
 # Generate the Release resources for each snapshot found.
 generate_release_resources() {
-    ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." &> /dev/null && pwd)"
-
     local -r environment="$1"
     local -r commit="$2"
     local -r snapshot_list="$3"
@@ -125,7 +124,7 @@ generate_release_resources() {
            }'
 
         application="$(echo "$line" | cut -d "|" -f 2)"
-        release_plan="${application/acs-operator-index/acs-operator-index-${ENVIRONMENT}}"
+        release_plan="${application/acs-operator-index/acs-operator-index-${environment}}"
         sed -E 's/^[[:blank:]]{8}//' <<<"
         ---
         apiVersion: appstudio.redhat.com/v1alpha1
