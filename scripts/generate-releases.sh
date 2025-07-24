@@ -140,7 +140,7 @@ commit="${2:-$(git rev-parse HEAD)}"
 commit="$(expand_commit "$commit")"
 
 branch="${3:-$(git rev-parse --abbrev-ref HEAD)}"
-validate_branch "$branch"
+validate_branch "$branch" "$commit"
 
 validate_environment "$environment" "$branch"
 
