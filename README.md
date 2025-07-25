@@ -17,6 +17,7 @@ and [this](https://github.com/konflux-ci/olm-operator-konflux-sample/blob/main/d
 ```
 make clean && make valid-catalogs
 ```
+if new bundle was added then you should see that `catalog-bundle-object/rhacs-operator/catalog.json` and `catalog-csv-metadata/rhacs-operator/catalog.json` files are changed.
 
 #### Getting built images for specific commit
 
