@@ -60,6 +60,12 @@ Run `./scripts/monitor-release.sh [COMMIT]` to see the current status for the re
 If a particular Release fails (i.e. the CRs status changes to `Failed`), you should restart it until it succeeds. Failing to do so will leave corresponding OpenShift Operator catalog without updates.
 
 1. Go to [the list of Konflux applications](https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/applications).
+<details>
+<summary>Click to see Release rerun navigation gif</summary>
+
+![rerun_release](https://github.com/user-attachments/assets/a24f3bbc-e81f-42e2-8db7-05e3cbcdff7f)
+</details>
+
 2. Open `acs-operator-index-ocp-v4-XX` Konflux application for OCP version you want to restart (`XX` means minor part of the OCP version).
 3. Select `Releases` tab.
 4. Find release by name you want to restart.
