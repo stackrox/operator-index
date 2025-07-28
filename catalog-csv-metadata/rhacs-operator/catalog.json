@@ -136975,7 +136975,7 @@
     "schema": "olm.bundle",
     "name": "rhacs-operator.v4.8.1",
     "package": "rhacs-operator",
-    "image": "brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle@sha256:272e3d6e2f7f207b3d3866d8be00715e6a6086d50b110c45662d99d217d48dbc",
+    "image": "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:272e3d6e2f7f207b3d3866d8be00715e6a6086d50b110c45662d99d217d48dbc",
     "properties": [
         {
             "type": "olm.gvk",
@@ -138755,10 +138755,6 @@
     ],
     "relatedImages": [
         {
-            "name": "",
-            "image": "brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle@sha256:272e3d6e2f7f207b3d3866d8be00715e6a6086d50b110c45662d99d217d48dbc"
-        },
-        {
             "name": "central_db",
             "image": "registry.redhat.io/advanced-cluster-security/rhacs-central-db-rhel8@sha256:7aec522e832e03e32ccc955c7b42056921d892a97c6f50223b87c1cbac4d8de0"
         },
@@ -138769,6 +138765,10 @@
         {
             "name": "main",
             "image": "registry.redhat.io/advanced-cluster-security/rhacs-main-rhel8@sha256:b8b33abc5143ab77d7d39057b7aa7188a59de3e9f2679f48d94968174be0e689"
+        },
+        {
+            "name": "",
+            "image": "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:272e3d6e2f7f207b3d3866d8be00715e6a6086d50b110c45662d99d217d48dbc"
         },
         {
             "name": "manager",
