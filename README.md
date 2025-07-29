@@ -74,6 +74,8 @@ make clean && make valid-catalogs
 ```
 if new bundle was added then you should see that `catalog-bundle-object/rhacs-operator/catalog.json` and `catalog-csv-metadata/rhacs-operator/catalog.json` files are changed.
 
+#### Historical note
+
 The following documentation was used for setting up catalogs update ([this](https://gitlab.cee.redhat.com/konflux/docs/users/-/blob/main/topics/getting-started/building-olm-products.md) and [this](https://github.com/konflux-ci/olm-operator-konflux-sample/blob/main/docs/konflux-onboarding.md))
 
 ### Getting built images for specific commit
