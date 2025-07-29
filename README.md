@@ -29,12 +29,12 @@ See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everyth
      skipRange: '>= 4.PREVIOUS_CHANNEL_Y.0 < 4.Y.Z'
    ```
    Replace `Y`, `Z`, `PREVIOUS_Y`, `PREVIOUS_Z`, `PREVIOUS_CHANNEL_Y` accordingly.
-   ** `Y` is the minor component of the version (e.g. for 4.9.1 `Y` equals to 9)
-   ** `Z` is the patch component of the version (e.g. for 4.9.1 `Z` equals to 1)
-   ** `PREVIOUS_Y` is the minor component of the previous version (e.g. the previous version for 4.5.3 is 4.5.2 so`PREVIOUS_Y` equals to 5. For 4.3.0 `PREVIOUS_Y` is equal to 2)
-   ** `PREVIOUS_Z` is the minor component of the previous version (e.g. the previous version for 4.5.3 is 4.5.2 so`PREVIOUS_Z` equals to 2. For 4.3.0 `PREVIOUS_Z` is equal to 5 because the previous version is 4.2.5)
-   ** `PREVIOUS_CHANNEL_Y` is the minor component of the previous **channel** version (e.g. for 4.6.3 the previous channel is 4.5 so `PREVIOUS_CHANNEL_Y` is equal to 4)
-   - *Note* Add an empty line after the last entry if you add a new Y version with Z equals to 0 (e.g. 4.9.0). It helps visually separate different Y version in the list.
+   * `Y` is the minor component of the version (e.g. for 4.9.1 `Y` equals to 9)
+   * `Z` is the patch component of the version (e.g. for 4.9.1 `Z` equals to 1)
+   * `PREVIOUS_Y` is the minor component of the previous version (e.g. the previous version for 4.5.3 is 4.5.2 so`PREVIOUS_Y` equals to 5. For 4.3.0 `PREVIOUS_Y` is equal to 2)
+   * `PREVIOUS_Z` is the minor component of the previous version (e.g. the previous version for 4.5.3 is 4.5.2 so`PREVIOUS_Z` equals to 2. For 4.3.0 `PREVIOUS_Z` is equal to 5 because the previous version is 4.2.5)
+   * `PREVIOUS_CHANNEL_Y` is the minor component of the previous **channel** version (e.g. for 4.6.3 the previous channel is 4.5 so `PREVIOUS_CHANNEL_Y` is equal to 4)
+   - *Note:* Add an empty line after the last entry if you add a new Y version with Z equals to 0 (e.g. 4.9.0). It helps visually separate different Y version in the list.
 4. (For new Y version only where Z is equal to 0) Create a new channel block:
    ```yaml
    - schema: olm.channel
@@ -59,8 +59,8 @@ See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everyth
    image: OPERATOR_BUNDLE_REGISTRY@OPERATOR_BUNDLE_SHA256
    ```
    Replace `Y`, `Z` accordingly.
-   ** `OPERATOR_BUNDLE_REGISTRY` set to `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle` for ready to release version. Use `brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle` for release candidates.
-   ** `OPERATOR_BUNDLE_SHA256` the operator bundle SHA starts with `sha256:`
+   * `OPERATOR_BUNDLE_REGISTRY` set to `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle` for ready to release version. Use `brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle` for release candidates.
+   * `OPERATOR_BUNDLE_SHA256` the operator bundle SHA starts with `sha256:`
 7. Update catalogs (follow [updating catalogs steps](#updating-catalogs))
 8. open a PR with `Add 4.Y.Z version` title
 
