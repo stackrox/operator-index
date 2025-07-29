@@ -40,9 +40,7 @@ get_snapshots_data() {
     local -r commit="$1"
     local -r branch="$2"
     snapshot_list="$(get_snapshots "$commit" "$branch")"
-    echo "$snapshot_list" | jq -r '
-        .[]
-        | "\(.metadata.name)|\(.spec.application)"'
+    echo "$snapshot_list" | jq -r '.[] | "\(.metadata.name)|\(.spec.application)"'
 }
 
 # Validate all expected Snapshots were found.
