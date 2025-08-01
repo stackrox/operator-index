@@ -35,14 +35,14 @@ See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everyth
    * `PREVIOUS_Z` is the minor component of the previous version (e.g. the previous version for 4.5.3 is 4.5.2 so`PREVIOUS_Z` equals to 2. For 4.3.0 `PREVIOUS_Z` is equal to 5 because the previous version is 4.2.5)
    * `PREVIOUS_CHANNEL_Y` is the minor component of the previous **channel** version (e.g. for 4.6.3 the previous channel is 4.5 so `PREVIOUS_CHANNEL_Y` is equal to 4)
    - *Note:* Add an empty line after the last entry if you add a new Y version with Z equals to 0 (e.g. 4.9.0). It helps visually separate different Y version in the list.
-3. **(Skip this step if there is no greater version than 4.Y.Z)** Find the next version after `4.Y.Z` in the `stable` channel block. Typically it has anchor `&bundle-4-Y+1-0` (e.g. for Y = 5 then the anchor for the next version is `&bundle-4-6-0`). Update `replaces` value for the next version to be euqlal to `rhacs-operator.v4.Y.Z`:
+4. **(Skip this step if there is no higher version than 4.Y.Z)** Find the higher version after `4.Y.Z` in the `stable` channel block. Typically it has anchor `&bundle-4-Y+1-0` (e.g. for Y = 5, the anchor for the higher version is `&bundle-4-6-0`). Update `replaces` value for the higher version to be equal to `rhacs-operator.v4.Y.Z`:
    ```yaml
    - &bundle-4-(Y+1)-0
      name: rhacs-operator.v4.(Y+1).0
      replaces: rhacs-operator.v4.Y.Z # Only this line is updated
    ```
    Replace `Y` and `Z` accordingly.
-4. **(Skip this step if `Z` > 0)** Create a new channel block:
+5. **(Skip this step if `Z` > 0)** Create a new channel block:
    ```yaml
    - schema: olm.channel
      name: rhacs-4.Y
@@ -51,7 +51,7 @@ See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everyth
    ```
    Replace `Y` accordingly.
    Keep the channel blocks sorted in ascending order (e.g. 4.6 goes after 4.5).
-5. Find a channel block for your Y version and insert a new entry to the `entries` list. Use the yaml anchor declared on the 3d step (starts with `&`):
+6. Find a channel block for your Y version and insert a new entry to the `entries` list. Use the yaml anchor declared on the 3d step (starts with `&`):
    ```yaml
    - schema: olm.channel
      name: rhacs-4.Y
@@ -60,7 +60,7 @@ See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everyth
       - *bundle-4-Y-Z
    ```
    Replace `Y` and `Z` accordingly.
-6. Add a new block with operator bundle image for this version to the list:
+7. Add a new block with operator bundle image for this version to the list:
    ```yaml
    - schema: olm.bundle
    # 4.Y.Z
@@ -69,8 +69,8 @@ See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everyth
    Replace `Y`, `Z` accordingly.
    * `OPERATOR_BUNDLE_REGISTRY` set to `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle` for ready to release version. Use `brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle` for release candidates.
    * `OPERATOR_BUNDLE_SHA256` the operator bundle SHA starts with `sha256:`. In order to fetch SHA find an email `[CVP] (SUCCESS) cvp-redhatadvancedclustersecurity: rhacs-operator-bundle-container-4.Y.Z-x` subject. Open `Brew Build Info` link and find the digest of the`registry-proxy.engineering.redhat.com/rh-osbs/rhacs-operator-bundle` image. Use the digest value for the `OPERATOR_BUNDLE_SHA256`.
-7. Update catalogs (follow [updating catalogs steps](#updating-catalogs))
-8. open a PR with `Add 4.Y.Z version` title
+8. Update catalogs (follow [updating catalogs steps](#updating-catalogs))
+9. open a PR with `Add 4.Y.Z version` title
 
 
 
