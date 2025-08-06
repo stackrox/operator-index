@@ -119,7 +119,7 @@ If a new bundle was added then you should see that `catalog-bundle-object/rhacs-
 
 The following documentation was used for setting up catalogs update ([this](https://gitlab.cee.redhat.com/konflux/docs/users/-/blob/main/topics/getting-started/building-olm-products.md) and [this](https://github.com/konflux-ci/olm-operator-konflux-sample/blob/main/docs/konflux-onboarding.md)).
 
-### Getting built images for specific commit
+### <a name="get-built-image-index"></a> Getting built images for specific commit
 
 Run `./scripts/get-built-images.sh [COMMIT]` to fetch built operator catalog images for the provided `COMMIT` for each supported OCP version.
 *Note:* The script uses current branch commit if no `COMMIT` argument provided.
