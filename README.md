@@ -5,9 +5,9 @@ This repository is for building the ACS (downstream) operator indexes on Konflux
 
 ## Development
 
-### Restarting Konflux job
+### Restarting Konflux pipeline
 
-Comment in the PR `/test <job_name>` (e.g. `/test operator-index-ocp-v4-16-on-push`).
+If some pipeline failed, you can restart it by commenting in the PR `/test <pipeline-name>` (e.g. `/test operator-index-ocp-v4-16-on-push`).
 See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everything+Konflux+for+RHACS#HowtoeverythingKonfluxforRHACS-Howtore-runpipelines).
 
 ### Adding new ACS operator version
@@ -16,7 +16,13 @@ Do the following changes in the `catalog-template.yaml` file.
 
 1. Add bundle image.
    1. Find entries with `schema: olm.bundle` towards the end of the file.
-   2. Add a new entry for your bundle image.
+   2. Add a new entry for your bundle image.  
+      It should look something looking like this, for example:
+      ```yaml
+      - schema: olm.bundle
+        # 4.7.9
+        image: brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle@sha256:c82e8330c257e56eb43cb5fa7b0c842a7f7f0414e32e26a792ef36817cb5ca02
+      ```
       * Note that the image must be referenced by digest, not by tag.
       * Keep entries sorted according to version.
       * Add a comment stating the version, see how it's done for other items there.
@@ -31,13 +37,6 @@ Do the following changes in the `catalog-template.yaml` file.
         link in `Brew Build Info` and find the digest of the
         `registry-proxy.engineering.redhat.com/rh-osbs/rhacs-operator-bundle` image. Take that image and replace
         `registry-proxy.engineering.redhat.com` with `brew.registry.redhat.io`.
-
-      It should look something looking like this, for example:
-      ```yaml
-      - schema: olm.bundle
-        # 4.7.9
-        image: brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle@sha256:c82e8330c257e56eb43cb5fa7b0c842a7f7f0414e32e26a792ef36817cb5ca02
-      ```
 2. Add entry to the `stable` channel.
    1. Find the `stable` channel block. It starts with:
       ```yaml
@@ -60,8 +59,8 @@ Do the following changes in the `catalog-template.yaml` file.
         * `PREVIOUS_Y` and `PREVIOUS_Z` with minor and patch versions of the previous item (e.g., when you add `4.8.2`
           after `4.8.1`, that'd be `8` and `1`; when you add `4.9.0` after `4.8.3`, that'd be `8` and `3`),
         * `(Y-1)` with the value of `Y` minus 1 (e.g., when you add `4.8.2`, that'd be `7`).
-   3. If the item you added is not the last one in the `entries` list, i.e., not the highest version, adjust the
-      following item in the `entries` list.  
+   3. If the item you added is not the last one in the `entries` list, i.e., not the highest version, adjust the next
+      item in the `entries` list.  
       Set its `replaces:` to be `rhacs-operator.v4.Y.Z`.  
       For example:
       ```yaml
