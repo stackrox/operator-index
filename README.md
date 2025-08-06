@@ -10,7 +10,7 @@ This repository is for building the ACS (downstream) operator indexes on Konflux
 If some pipeline failed, you can restart it by commenting in the PR `/test <pipeline-name>` (e.g. `/test operator-index-ocp-v4-16-on-push`).
 See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everything+Konflux+for+RHACS#HowtoeverythingKonfluxforRHACS-Howtore-runpipelines).
 
-### Adding new ACS operator version
+### <a name="add-bundle"></a> Adding new ACS operator version
 
 Do the following changes in the `catalog-template.yaml` file.
 
@@ -130,7 +130,7 @@ The former is expected by OpenShift versions up to and including 4.16, and the l
 
 See [konflux docs](https://github.com/konflux-ci/build-definitions/blob/c93ea73dbc30b8be15615e4d230040c70a0cf826/task/fbc-validation/0.1/TROUBLESHOOTING.md?plain=1#L7-L8).
 
-## Release File-based operator catalog
+## <a name="release"></a> Release File-based operator catalog
 
 ### Release process
 
