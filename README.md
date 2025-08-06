@@ -1,7 +1,8 @@
 # ACS Operator Index
 
-This repository is for building the ACS (downstream) operator indexes on Konflux.
-
+This repository is for building and releasing the ACS operator indexes on Konflux.  
+It's for updating Operator Catalogs, i.e., make OpenShift clusters see new versions of ACS operator in their
+OperatorHub.
 
 ## Development
 
