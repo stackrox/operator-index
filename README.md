@@ -1,7 +1,7 @@
 # ACS Operator Index
 
 This repository is for building and releasing the ACS operator indexes on Konflux.  
-It's for updating Operator Catalogs, i.e., make OpenShift clusters see new versions of ACS operator in their
+It's for updating Operator Catalogs, i.e., so OpenShift clusters can see new versions of ACS operator in their
 OperatorHub.
 
 ## Development
@@ -18,7 +18,7 @@ Do the following changes in the `catalog-template.yaml` file.
 1. Add bundle image.
    1. Find entries with `schema: olm.bundle` towards the end of the file.
    2. Add a new entry for your bundle image.  
-      It should look something looking like this, for example:
+      It should look something like this:
       ```yaml
       - schema: olm.bundle
         # 4.7.9
@@ -31,7 +31,7 @@ Do the following changes in the `catalog-template.yaml` file.
         pullable) during development and/or when preparing to release.  
         Ultimately, all released bundle images must come from
         `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle` repo because this is where customers expect
-        to find them. There's a CI check which should make it impossible to push to `master` if there's any bundle from
+        to find them. There's a CI check which prevents pushing to `master` if there's any bundle from
         a different repo.
       * If you're adding a bundle as part of downstream release, you will find bundle image's digest in
         `[CVP] (SUCCESS) cvp-redhatadvancedclustersecurity: rhacs-operator-bundle-container-4.Y.Z-x` email. Open the
@@ -44,7 +44,7 @@ Do the following changes in the `catalog-template.yaml` file.
       - schema: olm.channel
         name: stable
       ```
-   2. Add a new item in to its `entries` list.
+   2. Add a new item into its `entries` list.
       * Entries must be sorted by version (e.g., you must insert `4.8.2` after `4.8.1` but before `4.9.0`).
       * Ensure there are consistent blank lines between entries of different Y-streams.
       * Entry format is
@@ -80,7 +80,7 @@ Do the following changes in the `catalog-template.yaml` file.
         skipRange: '>= 4.7.0 < 4.8.0'
       ```
 3. Add entry to `rhacs-4.?` channels.
-   * For every `schema: olm.channel` with `name` like `rhacs-4.?` where `?` is >= `Z`,
+   * For every `schema: olm.channel` with `name` like `rhacs-4.?` where `?` is >= `Y`,
    * add `- *bundle-4-Y-Z` to the `entries:` list (replacing `Y` and `Z` with minor and patch versions).
    * Maintain the entries sorted and with consistent linebreaks.
 4. Add `rhacs-4.Y` channel. Skip this step if the channel already exists (i.e., when `Z` > `0`).
