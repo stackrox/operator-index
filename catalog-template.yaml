@@ -615,7 +615,7 @@ entries:
     skipRange: '>= 4.6.0 < 4.7.5'
   - &bundle-4-7-6
     name: rhacs-operator.v4.7.6
-    replaces: rhacs-operator.v4.7.6
+    replaces: rhacs-operator.v4.7.5
     skipRange: '>= 4.6.0 < 4.7.6'
 
   - &bundle-4-8-0
