@@ -1351,7 +1351,7 @@ entries:
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:208b2b32acdcd58ff3702421c2a303fb2f237f320ec53d5428d280a677211484
 - schema: olm.bundle
   # 4.7.6
-  image: brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle@sha256:3b99056ad9f5f53c75eff0e70c07cf3892c3867fe36c59138468b645f24547f2
+  image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:3b99056ad9f5f53c75eff0e70c07cf3892c3867fe36c59138468b645f24547f2
 - schema: olm.bundle
   # 4.8.0
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:59c16145f8691120ba7af1448ca7a3bd8c4e5a0cb912bcf7a6a10779dc2919be
