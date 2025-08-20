@@ -1,0 +1,600 @@
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev=e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/commit_sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/check-run-id: "48488951777"
+    pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret", "gRepo": "pipelines-as-code"}'
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-lsdwgk
+    pac.test.appstudio.openshift.io/git-provider: github
+    pac.test.appstudio.openshift.io/installation-id: "41511273"
+    pac.test.appstudio.openshift.io/log-url: https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/pipelinerun/operator-index-ocp-v4-12-on-push-5kslb
+    pac.test.appstudio.openshift.io/max-keep-runs: "500"
+    pac.test.appstudio.openshift.io/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request" && body.action != "ready_for_review")
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-12-on-push
+    pac.test.appstudio.openshift.io/repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+    pac.test.appstudio.openshift.io/sender: msugakov
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/sha-title: Add 4.7.6 version (#174)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    pac.test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"acs-operator-index-ocp-enterprise-contract-ocp-v4-12-acs-operator-index-ocp-v4-12-llcnd":{"lastUpdateTime":"2025-08-20T12:47:40.321759237Z"}}}'
+    test.appstudio.openshift.io/pipelinerunstarttime: "1755693497"
+    test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    test.appstudio.openshift.io/status: '[{"scenario":"acs-operator-index-ocp-enterprise-contract-ocp-v4-12","status":"TestPassed","lastUpdateTime":"2025-08-20T12:47:40.321759237Z","details":"Integration test passed","startTime":"2025-08-20T12:47:16.895730394Z","completionTime":"2025-08-20T12:47:40.321759237Z","testPipelineRunName":"acs-operator-index-ocp-enterprise-contract-ocp-v4-12-prxzj"}]'
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-12-llcnd
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
+    appstudio.openshift.io/build-pipelinerun: operator-index-ocp-v4-12-on-push-5kslb
+    appstudio.openshift.io/component: operator-index-ocp-v4-12
+    pac.test.appstudio.openshift.io/check-run-id: "48488951777"
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-12-on-push
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/pipelinerunfinishtime: "1755694033"
+    test.appstudio.openshift.io/type: component
+  name: acs-operator-index-ocp-v4-12-2025-08-20-e1eb045-prod
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-12
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:631bbe44d77ce83f54fc35b5cb00bf830fbb8c75395e140463739e03d9a78c80
+      name: operator-index-ocp-v4-12
+      source:
+        git:
+          revision: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-12-20250820-e1eb045-prd
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-12
+  snapshot: acs-operator-index-ocp-v4-12-2025-08-20-e1eb045-prod
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev=e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/commit_sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/check-run-id: "48488951911"
+    pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret", "gRepo": "pipelines-as-code"}'
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-bdhxkd
+    pac.test.appstudio.openshift.io/git-provider: github
+    pac.test.appstudio.openshift.io/installation-id: "41511273"
+    pac.test.appstudio.openshift.io/log-url: https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/pipelinerun/operator-index-ocp-v4-13-on-push-xtx2d
+    pac.test.appstudio.openshift.io/max-keep-runs: "500"
+    pac.test.appstudio.openshift.io/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request" && body.action != "ready_for_review")
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-13-on-push
+    pac.test.appstudio.openshift.io/repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+    pac.test.appstudio.openshift.io/sender: msugakov
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/sha-title: Add 4.7.6 version (#174)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    pac.test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"acs-operator-index-ocp-enterprise-contract-ocp-v4-13-acs-operator-index-ocp-v4-13-4djqr":{"lastUpdateTime":"2025-08-20T12:47:52.447027175Z"}}}'
+    test.appstudio.openshift.io/pipelinerunstarttime: "1755693497"
+    test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    test.appstudio.openshift.io/status: '[{"scenario":"acs-operator-index-ocp-enterprise-contract-ocp-v4-13","status":"TestPassed","lastUpdateTime":"2025-08-20T12:47:52.447027175Z","details":"Integration test passed","startTime":"2025-08-20T12:47:27.699248647Z","completionTime":"2025-08-20T12:47:52.447027175Z","testPipelineRunName":"acs-operator-index-ocp-enterprise-contract-ocp-v4-13-g9gds"}]'
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-13-4djqr
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-13
+    appstudio.openshift.io/build-pipelinerun: operator-index-ocp-v4-13-on-push-xtx2d
+    appstudio.openshift.io/component: operator-index-ocp-v4-13
+    pac.test.appstudio.openshift.io/check-run-id: "48488951911"
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-13-on-push
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/pipelinerunfinishtime: "1755694044"
+    test.appstudio.openshift.io/type: component
+  name: acs-operator-index-ocp-v4-13-2025-08-20-e1eb045-prod
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-13
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:e51cdb99087c0815b4e617c00b2d63c21f3cab06c8282ccc742bc41762848546
+      name: operator-index-ocp-v4-13
+      source:
+        git:
+          revision: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-13-20250820-e1eb045-prd
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-13
+  snapshot: acs-operator-index-ocp-v4-13-2025-08-20-e1eb045-prod
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev=e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/commit_sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/check-run-id: "48488952081"
+    pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret", "gRepo": "pipelines-as-code"}'
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-dswerd
+    pac.test.appstudio.openshift.io/git-provider: github
+    pac.test.appstudio.openshift.io/installation-id: "41511273"
+    pac.test.appstudio.openshift.io/log-url: https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/pipelinerun/operator-index-ocp-v4-14-on-push-5n29k
+    pac.test.appstudio.openshift.io/max-keep-runs: "500"
+    pac.test.appstudio.openshift.io/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request" && body.action != "ready_for_review")
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-14-on-push
+    pac.test.appstudio.openshift.io/repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+    pac.test.appstudio.openshift.io/sender: msugakov
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/sha-title: Add 4.7.6 version (#174)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    pac.test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"acs-operator-index-ocp-enterprise-contract-ocp-v4-14-acs-operator-index-ocp-v4-14-bw5hg":{"lastUpdateTime":"2025-08-20T12:54:09.90258477Z"}}}'
+    test.appstudio.openshift.io/pipelinerunstarttime: "1755693498"
+    test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    test.appstudio.openshift.io/status: '[{"scenario":"acs-operator-index-ocp-enterprise-contract-ocp-v4-14","status":"TestPassed","lastUpdateTime":"2025-08-20T12:54:09.90258477Z","details":"Integration test passed","startTime":"2025-08-20T12:53:26.433850559Z","completionTime":"2025-08-20T12:54:09.90258477Z","testPipelineRunName":"acs-operator-index-ocp-enterprise-contract-ocp-v4-14-52btg"}]'
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-14-bw5hg
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-14
+    appstudio.openshift.io/build-pipelinerun: operator-index-ocp-v4-14-on-push-5n29k
+    appstudio.openshift.io/component: operator-index-ocp-v4-14
+    pac.test.appstudio.openshift.io/check-run-id: "48488952081"
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-14-on-push
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/pipelinerunfinishtime: "1755694399"
+    test.appstudio.openshift.io/type: component
+  name: acs-operator-index-ocp-v4-14-2025-08-20-e1eb045-prod
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-14
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:1a8082a5177cf2c926e59756dd4bf61948bd8bd53164eab7155e2bca0dfcdb26
+      name: operator-index-ocp-v4-14
+      source:
+        git:
+          revision: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-14-20250820-e1eb045-prd
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-14
+  snapshot: acs-operator-index-ocp-v4-14-2025-08-20-e1eb045-prod
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev=e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/commit_sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/check-run-id: "48488951742"
+    pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret", "gRepo": "pipelines-as-code"}'
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-kbfnqk
+    pac.test.appstudio.openshift.io/git-provider: github
+    pac.test.appstudio.openshift.io/installation-id: "41511273"
+    pac.test.appstudio.openshift.io/log-url: https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/pipelinerun/operator-index-ocp-v4-15-on-push-46q6b
+    pac.test.appstudio.openshift.io/max-keep-runs: "500"
+    pac.test.appstudio.openshift.io/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request" && body.action != "ready_for_review")
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-15-on-push
+    pac.test.appstudio.openshift.io/repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+    pac.test.appstudio.openshift.io/sender: msugakov
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/sha-title: Add 4.7.6 version (#174)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    pac.test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"acs-operator-index-ocp-enterprise-contract-ocp-v4-15-acs-operator-index-ocp-v4-15-rrk5r":{"lastUpdateTime":"2025-08-20T12:53:31.389351284Z"}}}'
+    test.appstudio.openshift.io/pipelinerunstarttime: "1755693498"
+    test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    test.appstudio.openshift.io/status: '[{"scenario":"acs-operator-index-ocp-enterprise-contract-ocp-v4-15","status":"TestPassed","lastUpdateTime":"2025-08-20T12:53:31.389351284Z","details":"Integration test passed","startTime":"2025-08-20T12:52:44.570880103Z","completionTime":"2025-08-20T12:53:31.389351284Z","testPipelineRunName":"acs-operator-index-ocp-enterprise-contract-ocp-v4-15-hwtsd"}]'
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-15-rrk5r
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-15
+    appstudio.openshift.io/build-pipelinerun: operator-index-ocp-v4-15-on-push-46q6b
+    appstudio.openshift.io/component: operator-index-ocp-v4-15
+    pac.test.appstudio.openshift.io/check-run-id: "48488951742"
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-15-on-push
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/pipelinerunfinishtime: "1755694358"
+    test.appstudio.openshift.io/type: component
+  name: acs-operator-index-ocp-v4-15-2025-08-20-e1eb045-prod
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-15
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:98f84cde0f2600dfd1bcdf77216ea1ad8e7bcd82002128acbe863561a856dc49
+      name: operator-index-ocp-v4-15
+      source:
+        git:
+          revision: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-15-20250820-e1eb045-prd
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-15
+  snapshot: acs-operator-index-ocp-v4-15-2025-08-20-e1eb045-prod
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev=e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/commit_sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/check-run-id: "48488951875"
+    pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret", "gRepo": "pipelines-as-code"}'
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-ftdnji
+    pac.test.appstudio.openshift.io/git-provider: github
+    pac.test.appstudio.openshift.io/installation-id: "41511273"
+    pac.test.appstudio.openshift.io/log-url: https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/pipelinerun/operator-index-ocp-v4-16-on-push-hxstr
+    pac.test.appstudio.openshift.io/max-keep-runs: "500"
+    pac.test.appstudio.openshift.io/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request" && body.action != "ready_for_review")
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-16-on-push
+    pac.test.appstudio.openshift.io/repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+    pac.test.appstudio.openshift.io/sender: msugakov
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/sha-title: Add 4.7.6 version (#174)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    pac.test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"acs-operator-index-ocp-enterprise-contract-ocp-v4-16-acs-operator-index-ocp-v4-16-bkvmn":{"lastUpdateTime":"2025-08-20T12:56:26.296642771Z"}}}'
+    test.appstudio.openshift.io/pipelinerunstarttime: "1755693498"
+    test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    test.appstudio.openshift.io/status: '[{"scenario":"acs-operator-index-ocp-enterprise-contract-ocp-v4-16","status":"TestPassed","lastUpdateTime":"2025-08-20T12:56:26.296642771Z","details":"Integration test passed","startTime":"2025-08-20T12:55:41.609662025Z","completionTime":"2025-08-20T12:56:26.296642771Z","testPipelineRunName":"acs-operator-index-ocp-enterprise-contract-ocp-v4-16-4wnb5"}]'
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-16-bkvmn
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-16
+    appstudio.openshift.io/build-pipelinerun: operator-index-ocp-v4-16-on-push-hxstr
+    appstudio.openshift.io/component: operator-index-ocp-v4-16
+    pac.test.appstudio.openshift.io/check-run-id: "48488951875"
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-16-on-push
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/pipelinerunfinishtime: "1755694535"
+    test.appstudio.openshift.io/type: component
+  name: acs-operator-index-ocp-v4-16-2025-08-20-e1eb045-prod
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-16
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:6f9983b7c130b94598bd2049cccbf1ec87a045b17d0a7f19669475ac8b798811
+      name: operator-index-ocp-v4-16
+      source:
+        git:
+          revision: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-16-20250820-e1eb045-prd
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-16
+  snapshot: acs-operator-index-ocp-v4-16-2025-08-20-e1eb045-prod
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev=e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/commit_sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/check-run-id: "48488951874"
+    pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret", "gRepo": "pipelines-as-code"}'
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-ldfqnu
+    pac.test.appstudio.openshift.io/git-provider: github
+    pac.test.appstudio.openshift.io/installation-id: "41511273"
+    pac.test.appstudio.openshift.io/log-url: https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/pipelinerun/operator-index-ocp-v4-17-on-push-5cg28
+    pac.test.appstudio.openshift.io/max-keep-runs: "500"
+    pac.test.appstudio.openshift.io/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request" && body.action != "ready_for_review")
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-17-on-push
+    pac.test.appstudio.openshift.io/repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+    pac.test.appstudio.openshift.io/sender: msugakov
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/sha-title: Add 4.7.6 version (#174)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    pac.test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"acs-operator-index-ocp-enterprise-contract-ocp-v4-17-acs-operator-index-ocp-v4-17-fl9dq":{"lastUpdateTime":"2025-08-20T12:49:39.472768422Z"}}}'
+    test.appstudio.openshift.io/pipelinerunstarttime: "1755693497"
+    test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    test.appstudio.openshift.io/status: '[{"scenario":"acs-operator-index-ocp-enterprise-contract-ocp-v4-17","status":"TestPassed","lastUpdateTime":"2025-08-20T12:49:39.472768422Z","details":"Integration test passed","startTime":"2025-08-20T12:48:53.618996438Z","completionTime":"2025-08-20T12:49:39.472768422Z","testPipelineRunName":"acs-operator-index-ocp-enterprise-contract-ocp-v4-17-jg2dt"}]'
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-17-fl9dq
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+    appstudio.openshift.io/build-pipelinerun: operator-index-ocp-v4-17-on-push-5cg28
+    appstudio.openshift.io/component: operator-index-ocp-v4-17
+    pac.test.appstudio.openshift.io/check-run-id: "48488951874"
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-17-on-push
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/pipelinerunfinishtime: "1755694127"
+    test.appstudio.openshift.io/type: component
+  name: acs-operator-index-ocp-v4-17-2025-08-20-e1eb045-prod
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-17
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:97f83b614a2ae83ad774ba38ed92ff503f9e3764e0f0c2f8e722ff20e9911aef
+      name: operator-index-ocp-v4-17
+      source:
+        git:
+          revision: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-17-20250820-e1eb045-prd
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-17
+  snapshot: acs-operator-index-ocp-v4-17-2025-08-20-e1eb045-prod
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev=e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/commit_sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/check-run-id: "48488951649"
+    pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret", "gRepo": "pipelines-as-code"}'
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-fwgzif
+    pac.test.appstudio.openshift.io/git-provider: github
+    pac.test.appstudio.openshift.io/installation-id: "41511273"
+    pac.test.appstudio.openshift.io/log-url: https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/pipelinerun/operator-index-ocp-v4-18-on-push-l7dnv
+    pac.test.appstudio.openshift.io/max-keep-runs: "500"
+    pac.test.appstudio.openshift.io/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request" && body.action != "ready_for_review")
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-18-on-push
+    pac.test.appstudio.openshift.io/repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+    pac.test.appstudio.openshift.io/sender: msugakov
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/sha-title: Add 4.7.6 version (#174)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    pac.test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"acs-operator-index-ocp-enterprise-contract-ocp-v4-18-acs-operator-index-ocp-v4-18-g6rhq":{"lastUpdateTime":"2025-08-20T12:55:07.474197559Z"}}}'
+    test.appstudio.openshift.io/pipelinerunstarttime: "1755693498"
+    test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    test.appstudio.openshift.io/status: '[{"scenario":"acs-operator-index-ocp-enterprise-contract-ocp-v4-18","status":"TestPassed","lastUpdateTime":"2025-08-20T12:55:07.474197559Z","details":"Integration test passed","startTime":"2025-08-20T12:54:25.062797789Z","completionTime":"2025-08-20T12:55:07.474197559Z","testPipelineRunName":"acs-operator-index-ocp-enterprise-contract-ocp-v4-18-7f9vr"}]'
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-18-g6rhq
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-18
+    appstudio.openshift.io/build-pipelinerun: operator-index-ocp-v4-18-on-push-l7dnv
+    appstudio.openshift.io/component: operator-index-ocp-v4-18
+    pac.test.appstudio.openshift.io/check-run-id: "48488951649"
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-18-on-push
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/pipelinerunfinishtime: "1755694459"
+    test.appstudio.openshift.io/type: component
+  name: acs-operator-index-ocp-v4-18-2025-08-20-e1eb045-prod
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-18
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:beb1f78a91a71c312a018493b61c5276c0f18e3927c4cc9bca70870099ac029b
+      name: operator-index-ocp-v4-18
+      source:
+        git:
+          revision: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-18-20250820-e1eb045-prd
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-18
+  snapshot: acs-operator-index-ocp-v4-18-2025-08-20-e1eb045-prod
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev=e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/commit_sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/check-run-id: "48488951992"
+    pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret", "gRepo": "pipelines-as-code"}'
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-uhlpug
+    pac.test.appstudio.openshift.io/git-provider: github
+    pac.test.appstudio.openshift.io/installation-id: "41511273"
+    pac.test.appstudio.openshift.io/log-url: https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/rh-acs-tenant/pipelinerun/operator-index-ocp-v4-19-on-push-pgmp7
+    pac.test.appstudio.openshift.io/max-keep-runs: "500"
+    pac.test.appstudio.openshift.io/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request" && body.action != "ready_for_review")
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-19-on-push
+    pac.test.appstudio.openshift.io/repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+    pac.test.appstudio.openshift.io/sender: msugakov
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/sha-title: Add 4.7.6 version (#174)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    pac.test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"acs-operator-index-ocp-enterprise-contract-ocp-v4-19-acs-operator-index-ocp-v4-19-bj27r":{"lastUpdateTime":"2025-08-20T12:49:40.811282681Z"}}}'
+    test.appstudio.openshift.io/pipelinerunstarttime: "1755693498"
+    test.appstudio.openshift.io/source-repo-url: https://github.com/stackrox/operator-index
+    test.appstudio.openshift.io/status: '[{"scenario":"acs-operator-index-ocp-enterprise-contract-ocp-v4-19","status":"TestPassed","lastUpdateTime":"2025-08-20T12:49:40.811282681Z","details":"Integration test passed","startTime":"2025-08-20T12:48:53.45175736Z","completionTime":"2025-08-20T12:49:40.811282681Z","testPipelineRunName":"acs-operator-index-ocp-enterprise-contract-ocp-v4-19-jrb6p"}]'
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-19-bj27r
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-19
+    appstudio.openshift.io/build-pipelinerun: operator-index-ocp-v4-19-on-push-pgmp7
+    appstudio.openshift.io/component: operator-index-ocp-v4-19
+    pac.test.appstudio.openshift.io/check-run-id: "48488951992"
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/original-prname: operator-index-ocp-v4-19-on-push
+    pac.test.appstudio.openshift.io/repository: operator-index
+    pac.test.appstudio.openshift.io/sha: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+    pac.test.appstudio.openshift.io/state: completed
+    pac.test.appstudio.openshift.io/url-org: stackrox
+    pac.test.appstudio.openshift.io/url-repository: operator-index
+    test.appstudio.openshift.io/pipelinerunfinishtime: "1755694127"
+    test.appstudio.openshift.io/type: component
+  name: acs-operator-index-ocp-v4-19-2025-08-20-e1eb045-prod
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-19
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:cd536375d7954aa555f5b2186f6995966f4ea925ba79738d9ed6422b52250660
+      name: operator-index-ocp-v4-19
+      source:
+        git:
+          revision: e1eb04597589f6dd41cecc75cfe81570e9ad655b
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-19-20250820-e1eb045-prd
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-19
+  snapshot: acs-operator-index-ocp-v4-19-2025-08-20-e1eb045-prod
