@@ -12,21 +12,24 @@ YQ="${ROOT_DIR}/.bin/yq-${YQ_VERSION}"
 # Make sure appropriate YQ is available. There are incompatibilities between versions so we use a version which is
 # known to produce good results.
 ensure_yq() {
-  if [ -x "${YQ}" ]; then
-    return 0
-  fi
-  local -r kernel_name=$(uname -s) || true
-  local -r os_name=$(uname | tr '[:upper:]' '[:lower:]') || true
-  local -r arch=$(go env GOARCH) || true
-  local -r url="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_${os_name}_${arch}"
+    if [[ -x "${YQ}" ]]; then
+        return 0
+    fi
+    local kernel_name
+    local os_name
+    local arch
+    kernel_name="$(uname -s)"
+    os_name="$(uname | tr '[:upper:]' '[:lower:]')"
+    arch="$(go env GOARCH)"
+    local -r url="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_${os_name}_${arch}"
 
-  rm -f "${YQ}" # In case it's a stale partial download.
-  mkdir -p "$(dirname "${YQ}")"
-  echo "Fetching ${url}..." >&2
-  curl --silent --fail --location --retry 3 --output "${YQ}" "${url}"
-  [[ "${kernel_name}" != "Darwin" ]] || xattr -c "${YQ}"
-  chmod +x "${YQ}"
-  echo "Done." >&2
+    rm -f "${YQ}" # In case it's a stale partial download.
+    mkdir -p "$(dirname "${YQ}")"
+    echo "Fetching ${url}..." >&2
+    curl --silent --fail --location --retry 3 --output "${YQ}" "${url}"
+    [[ "${kernel_name}" != "Darwin" ]] || xattr -c "${YQ}"
+    chmod +x "${YQ}"
+    echo "Done." >&2
 }
 
 # Check command-line arguments and display usage help, if needed.
