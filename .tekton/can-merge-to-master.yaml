@@ -15,7 +15,7 @@ metadata:
   labels:
     # Arbitrarily chosen application. It just needs to exist, see https://redhat-internal.slack.com/archives/C04PZ7H0VA8/p1731696009187979
     appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
-  name: checks
+  name: can-merge-to-master
   namespace: rh-acs-tenant
 
 spec:
@@ -36,7 +36,8 @@ spec:
 
   pipelineSpec:
     description: |
-      This pipeline performs checks not specific to any OCP version.
+      This pipeline verifies whether a branch (or PR) can be merged to the `master` branch.
+      `master` should always be releasable.
 
     params:
     - description: Source Repository URL
@@ -82,15 +83,6 @@ spec:
       workspaces:
       - name: basic-auth
         workspace: git-auth
-
-    - name: check-generated-files-up-to-date
-      params:
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
-      # Retries are for the cases when opm alpha render-template occasionally fails to pull images.
-      retries: 3
-      taskRef:
-        name: check-generated-files-up-to-date
 
     - name: check-catalog-template-has-only-released-images
       params:
