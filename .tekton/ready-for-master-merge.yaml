@@ -15,7 +15,7 @@ metadata:
   labels:
     # Arbitrarily chosen application. It just needs to exist, see https://redhat-internal.slack.com/archives/C04PZ7H0VA8/p1731696009187979
     appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
-  name: can-merge-to-master
+  name: ready-for-master-merge
   namespace: rh-acs-tenant
 
 spec:
