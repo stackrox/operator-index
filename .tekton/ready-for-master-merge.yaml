@@ -106,8 +106,10 @@ spec:
           script: |
             #!/usr/bin/env bash
             set -euo pipefail
+            repo="registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle"
 
             if yq eval '.. | select(has("image")) | .image' catalog-template.yaml | grep -vE '^registry\.redhat\.io/advanced-cluster-security/rhacs-operator-bundle(:|@)'; then
-              echo >&2 "catalog-template.yaml has image(s) not from registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle. It is not allowed to merge such bundle images to master branch because it will no longer be releasable."
+              echo >&2 "catalog-template.yaml has image(s) not from ${repo}. It is not allowed to merge such bundle images to master branch because it will no longer be releasable."
               exit 1
             fi
+            echo "All good, no bundle images outside of ${repo} detected."
