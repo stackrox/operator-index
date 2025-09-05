@@ -68,7 +68,7 @@ spec:
       - name: revision
         value: $(params.revision)
       - name: ociStorage
-        value: $(params.oci-repo):konflux-checks-$(params.revision).git
+        value: $(params.oci-repo):konflux-ready-for-master-merge-$(params.revision).git
       - name: ociArtifactExpiresAfter
         value: $(params.oci-artifact-expires-after)
       taskRef:
