@@ -1,0 +1,101 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/stackrox/operator-index?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/max-keep-runs: "500"
+    # The on-push filter includes konflux/* branches which are created by Mintmaker so that CI runs for commits pushed
+    # onto these branches even without PRs and so that Mintmaker/Renovate can automerge its updates without PRs.
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
+      (event == "pull_request" && body.action != "ready_for_review")
+  labels:
+    # Arbitrarily chosen application. It just needs to exist, see https://redhat-internal.slack.com/archives/C04PZ7H0VA8/p1731696009187979
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+  name: checks
+  namespace: rh-acs-tenant
+
+spec:
+
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-operator-index-ocp-v4-17
+
+  workspaces:
+  - name: git-auth
+    secret:
+      secretName: '{{ git_auth_secret }}'
+
+  pipelineSpec:
+    description: |
+      This pipeline performs checks not specific to any OCP version.
+
+    params:
+    - description: Source Repository URL
+      name: git-url
+      type: string
+    - description: Revision of the Source Repository
+      name: revision
+      type: string
+    - default: quay.io/rhacs-eng/stackrox-operator-index
+      description: Intermediate Image Repository
+      name: oci-repo
+      type: string
+    - default: "1d"
+      description: This sets the expiration time for intermediate OCI artifacts produced and used during builds after
+        which they can be garbage collected.
+      name: oci-artifact-expires-after
+      type: string
+
+    workspaces:
+    - name: git-auth
+
+    tasks:
+
+    - name: clone-repository
+      params:
+      - name: url
+        value: $(params.git-url)
+      - name: revision
+        value: $(params.revision)
+      - name: ociStorage
+        value: $(params.oci-repo):konflux-checks-$(params.revision).git
+      - name: ociArtifactExpiresAfter
+        value: $(params.oci-artifact-expires-after)
+      taskRef:
+        params:
+        - name: name
+          value: git-clone-oci-ta
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:4a601aeec58a1dd89c271e728fd8f0d84777825b46940c3aec27f15bab3edacf
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+      - name: basic-auth
+        workspace: git-auth
+
+    - name: check-generated-files-up-to-date
+      params:
+      - name: SOURCE_ARTIFACT
+        value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
+      # Retries are for the cases when opm alpha render-template occasionally fails to pull images.
+      retries: 3
+      taskRef:
+        name: check-generated-files-up-to-date
+
+    - name: check-catalog-template-has-only-released-images
+      params:
+      - name: SOURCE_ARTIFACT
+        value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
+      retries: 3
+      taskRef:
+        name: check-catalog-template-has-only-released-images
