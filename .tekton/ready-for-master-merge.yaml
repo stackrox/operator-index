@@ -85,8 +85,8 @@ spec:
         workspace: git-auth
 
     - name: check-catalog-template-has-only-released-images
-      description: This task is to prevent operator bundle images from quay.io or any repositories other than release ones to be added to the `master` branch. This is to make sure `master` is in good state to be released and would not require first cleaning unreleased bundles from it.
       taskSpec:
+        description: This task is to prevent operator bundle images from quay.io or any repositories other than release ones to be added to the `master` branch. This is to make sure `master` is in good state to be released and would not require first cleaning unreleased bundles from it.
         volumes:
         - name: workdir
           emptyDir: { }
