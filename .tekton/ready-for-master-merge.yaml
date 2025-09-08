@@ -13,8 +13,8 @@ metadata:
       (event == "push" && target_branch.matches("^(master|konflux/references/master|konflux/mintmaker/.*)$")) ||
       (event == "pull_request" && body.action != "ready_for_review")
   labels:
-    # Arbitrarily chosen application. It just needs to exist, see https://redhat-internal.slack.com/archives/C04PZ7H0VA8/p1731696009187979
-    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+    # The version should correspond to the serviceAccountName below. See the comment there.
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-19
   name: ready-for-master-merge
   namespace: rh-acs-tenant
 
@@ -27,7 +27,9 @@ spec:
     value: '{{revision}}'
 
   taskRunTemplate:
-    serviceAccountName: build-pipeline-operator-index-ocp-v4-17
+    # This pipeline doesn't have its own Component, but it has to have some ServiceAccount.
+    # The pipeline has no special needs for SA, therefore, we re-use SA from one of the existing Components.
+    serviceAccountName: build-pipeline-operator-index-ocp-v4-19
 
   workspaces:
   - name: git-auth
