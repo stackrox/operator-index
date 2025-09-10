@@ -638,10 +638,12 @@ entries:
     name: rhacs-operator.v4.8.3
     replaces: rhacs-operator.v4.8.2
     skipRange: '>= 4.7.0 < 4.8.3'
-  - &bundle-4-9-x
-    name: v4.9.0-726-gc4dee46c78-fast
+  - &bundle-4-8-4
+    name: rhacs-operator.v4.9.0-726-gc4dee46c78-fast
     replaces: rhacs-operator.v4.8.3
     skipRange: '>= 4.7.0 < v4.9.0-726-gc4dee46c78-fast'
+    skips:
+    - rhacs-operator.v4.8.3
 
 - schema: olm.channel
   name: rhacs-4.0
@@ -1062,7 +1064,7 @@ entries:
   - *bundle-4-8-1
   - *bundle-4-8-2
   - *bundle-4-8-3
-  - *bundle-4-9-x
+  - *bundle-4-8-4
 
 - schema: olm.deprecations
   package: rhacs-operator
