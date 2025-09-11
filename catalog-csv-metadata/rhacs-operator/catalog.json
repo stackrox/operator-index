@@ -2824,10 +2824,7 @@
         },
         {
             "name": "rhacs-operator.v4.8.4-rc.0",
-            "replaces": "rhacs-operator.v4.8.2",
-            "skips": [
-                "rhacs-operator.v4.8.3"
-            ],
+            "replaces": "rhacs-operator.v4.8.3",
             "skipRange": ">= 4.7.0 < v4.8.4-rc.0"
         }
     ]
@@ -3214,10 +3211,7 @@
         },
         {
             "name": "rhacs-operator.v4.8.4-rc.0",
-            "replaces": "rhacs-operator.v4.8.2",
-            "skips": [
-                "rhacs-operator.v4.8.3"
-            ],
+            "replaces": "rhacs-operator.v4.8.3",
             "skipRange": ">= 4.7.0 < v4.8.4-rc.0"
         }
     ]
