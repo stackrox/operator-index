@@ -151687,6 +151687,13 @@
                 "name": "rhacs-4.5"
             },
             "message": "This version is no longer supported. Please switch to the `stable` channel or a channel for a version that is still supported.\n"
+        },
+        {
+            "reference": {
+                "schema": "olm.channel",
+                "name": "rhacs-4.6"
+            },
+            "message": "This version is no longer supported. Please switch to the `stable` channel or a channel for a version that is still supported.\n"
         }
     ]
 }
