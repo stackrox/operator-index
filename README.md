@@ -22,7 +22,7 @@ Do the following changes in the `catalog-template.yaml` file.
       ```yaml
       - schema: olm.bundle
         # 4.7.9
-        image: brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle@sha256:c82e8330c257e56eb43cb5fa7b0c842a7f7f0414e32e26a792ef36817cb5ca02
+        image: quay.io/rhacs-eng/release-operator-bundle@sha256:c82e8330c257e56eb43cb5fa7b0c842a7f7f0414e32e26a792ef36817cb5ca02
       ```
       * Note that the image must be referenced by digest, not by tag.
       * Keep entries sorted according to version.
