@@ -94,19 +94,6 @@ validate_snapshots() {
     fi
 }
 
-# Validate the length of the release name.
-# To allow for Konflux' re-run suffix (12 chars), the full release name must be at most 51 characters long.
-# Otherwise, the re-run Release CR will fail to be created as its name would exceed the Kubernetes limit of 63 characters.
-validate_release_name_length() {
-    local -r release_name_with_application="$1"
-
-    if [[ ${#release_name_with_application} -gt 51 ]]; then
-        echo "ERROR: Generated release name '${release_name_with_application}' is ${#release_name_with_application} characters long, which exceeds the 51 character limit." >&2
-        echo "You must update the script to generate a shorter release name." >&2
-        exit 1
-    fi
-}
-
 # Generate the Release resources for each snapshot found.
 generate_release_resources() {
     local -r environment="$1"
@@ -126,7 +113,7 @@ generate_release_resources() {
     while IFS= read -r line
     do
         snapshot="$(echo "$line" | cut -d "|" -f 1)"
-        snapshot_copy_name="$(echo "${snapshot%-*}-${release_name_suffix}" | cut -c -51)" # replace random suffix with release name and crop to 63 characters to avoid the Kubernetes limit.
+        snapshot_copy_name="$(echo "${snapshot%-*}-${release_name_suffix}" | cut -c -63)" # Replace random suffix with release name and crop to 63 characters to avoid running over the Kubernetes limit.
         echo "---"
         kubectl -n rh-acs-tenant get snapshot.appstudio.redhat.com "${snapshot}" -o yaml | \
         "${YQ}" -P 'load("'"${whitelist_file}"'") as $whitelisted
@@ -145,7 +132,7 @@ generate_release_resources() {
 
         application="$(echo "$line" | cut -d "|" -f 2)"
 
-        # Crop the release name to 51 characters to avoid the Kubernetes limit of 63 characters for re-runs.
+        # Crop the release name to 51 characters to avoid exceeding the Kubernetes limit of 63 characters for re-runs.
         release_name_with_application="$(echo "${application}-${release_name_suffix}" | cut -c -51)"
         release_plan="${application/acs-operator-index/acs-operator-index-${environment}}"
 

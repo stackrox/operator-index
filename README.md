@@ -138,7 +138,7 @@ See [konflux docs](https://github.com/konflux-ci/build-definitions/blob/c93ea73d
    1. make sure the previous operator index release is complete (has a green check mark emoticon)
    2. if not, coordinate with the person conducting that release
    3. once that release is complete, start a new thread for your release
-6. Apply generated CRs to the cluster: `oc create -f release-history/<YYYYMMDD>-<SHA>-<stage|prod>.yaml`
+6. Apply generated CRs to the cluster: `oc create -f release-history/<YYYYMMDD>-<stage|prod>-<SHA>.yaml`
 7. Monitor release [using monitor release script](#monitoring-release). Each supported OCP version has its own `Release`. Successfully finished `Release` has `Succeeded` status.
 8. Follow [the restarting release step below](#restarting-konflux-release) if any of the `Release`s fails for any OCP version.
 9. (Skip for `stage` release.) Once done, go back to the Slack thread you started earlier, add a message that your release is done and add a green check mark emoticon on the initial message of the thread.
