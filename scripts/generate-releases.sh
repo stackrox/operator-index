@@ -39,7 +39,7 @@ usage() {
     if [[ "$#" -lt 1 || "$#" -gt 3 || "${1:-}" == "--help" ]]; then
         echo "USAGE: ./$(basename "${BASH_SOURCE[0]}") <ENVIRONMENT> [COMMIT] [BRANCH]" >&2
         echo "" >&2
-        echo "ENVIRONMENT - allowed values: staging|prod" >&2
+        echo "ENVIRONMENT - allowed values: stage|prod" >&2
         echo "COMMIT - a SHA of the commit to pull Snapshots only with this commit label for the Release." >&2
         echo "If provided commit SHA is less than 40 characters then it will be expanded to a full 40-characters long SHA. Default: currently checked out commit" >&2
         echo "BRANCH - an optional parameter to specify git branch name for filtering snapshots by having branch name in annotations. Default: currently checked out branch" >&2
@@ -49,12 +49,12 @@ usage() {
     fi
 }
 
-# Validate environment input and ensure it is either 'staging' or 'prod' (for master branch only).
+# Validate environment input and ensure it is either 'stage' or 'prod' (for master branch only).
 validate_environment() {
     local -r environment="$1"
     local -r branch="$2"
-    if [[ "${environment}" != "staging" && "${environment}" != "prod" ]]; then
-        echo "ERROR: ENVIRONMENT input must either be 'staging' or 'prod'." >&2
+    if [[ "${environment}" != "stage" && "${environment}" != "prod" ]]; then
+        echo "ERROR: ENVIRONMENT input must either be 'stage' or 'prod'." >&2
         return 1
     fi
     if [[ "${environment}" == "prod" && "${branch}" != "master" ]]; then
@@ -100,29 +100,20 @@ generate_release_resources() {
     local -r commit="$2"
     local -r snapshots_data="$3"
 
-    local release_name
+    local release_name_suffix
     local snapshot
     local application
     local release_plan
 
-    case ${environment} in
-    staging)
-        env_short=stg
-        ;;
-    prod)
-        env_short=prd
-        ;;
-    esac
-    
-    release_name="$(date +"%Y-%m-%d")-$(git rev-parse --short "$commit")-${environment}"
-    release_name_short="$(date +"%Y%m%d")-$(git rev-parse --short "$commit")-${env_short}" # save space for retry suffix
+    release_name_suffix="$(date +"%Y%m%d")-${environment}-$(git rev-parse --short "$commit")"
     whitelist_file="$ROOT_DIR/release-history/.whitelist.yaml"
-    out_file="$ROOT_DIR/release-history/${release_name}.yaml"
+    out_file="$ROOT_DIR/release-history/${release_name_suffix}.yaml"
+
     echo "Writing resources to ${out_file} ..." >&2
     while IFS= read -r line
     do
         snapshot="$(echo "$line" | cut -d "|" -f 1)"
-        snapshot_copy="${snapshot%-*}-${release_name}" # replace random suffix with release name
+        snapshot_copy_name="$(echo "${snapshot%-*}-${release_name_suffix}" | cut -c -63)" # Replace random suffix with release name and crop to 63 characters to avoid running over the Kubernetes limit.
         echo "---"
         kubectl -n rh-acs-tenant get snapshot.appstudio.redhat.com "${snapshot}" -o yaml | \
         "${YQ}" -P 'load("'"${whitelist_file}"'") as $whitelisted
@@ -133,24 +124,28 @@ generate_release_resources() {
             "metadata": {
               "annotations": .metadata.annotations + {"acs.redhat.com/original-snapshot-name": "'"${snapshot}"'"},
               "labels": .metadata.labels,
-              "name": "'"${snapshot_copy}"'",
+              "name": "'"${snapshot_copy_name}"'",
               "namespace": .metadata.namespace
             },
             "spec": .spec
            }'
 
         application="$(echo "$line" | cut -d "|" -f 2)"
+
+        # Crop the release name to 51 characters to avoid exceeding the Kubernetes limit of 63 characters for re-runs.
+        release_name_with_application="$(echo "${application}-${release_name_suffix}" | cut -c -51)"
         release_plan="${application/acs-operator-index/acs-operator-index-${environment}}"
+
         sed -E 's/^[[:blank:]]{8}//' <<<"
         ---
         apiVersion: appstudio.redhat.com/v1alpha1
         kind: Release
         metadata:
-          name: ${application}-${release_name_short}
+          name: ${release_name_with_application}
           namespace: rh-acs-tenant
         spec:
           releasePlan: ${release_plan}
-          snapshot: ${snapshot_copy}"
+          snapshot: ${snapshot_copy_name}"
 
     done <<< "$snapshots_data" > "${out_file}"
 
