@@ -1,7 +1,7 @@
 # Expand commit to a full 40-character SHA. Returns the full commit SHA if successful, or an error message if not.
 expand_commit() {
     git fetch --all --quiet
-    
+
     if ! git rev-parse --verify --end-of-options "$1^{commit}"; then
         echo "Cannot expand commit $1 to a full 40-character long SHA." >&2
         return 1
@@ -24,15 +24,18 @@ validate_branch() {
     fi
 }
 
-# Fetch the list of snapshots for provided commit and branch values. 
+# Fetch the list of snapshots for provided commit and branch values.
 # Make sure that only one the most recent snapshot per application is returned.
 get_snapshots() {
     local -r commit="$1"
     local -r branch="$2"
+
     kubectl get -n rh-acs-tenant snapshot -l pac.test.appstudio.openshift.io/sha="${commit}" -o json | jq '
         .items
         | map(select((.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="'"${branch}"'") or (.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="refs/heads/'${branch}'")))
         | sort_by(.spec.application)
         | group_by(.spec.application)
-        | map(sort_by(.metadata.creationTimestamp) | last)'
+        | map(sort_by(.metadata.creationTimestamp)
+        | map(select(.metadata.annotations["acs.redhat.com/original-snapshot-name"] == null))
+        | last)'
 }

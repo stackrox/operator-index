@@ -63,7 +63,7 @@ validate_environment() {
     fi
 }
 
-# Fetch the list of snapshot names and associented application name for provided commit and branch values.
+# Fetch the list of snapshot names and associated application names for provided commit and branch values.
 get_snapshots_data() {
     local -r commit="$1"
     local -r branch="$2"
