@@ -33,9 +33,9 @@ get_snapshots() {
     kubectl get -n rh-acs-tenant snapshot -l pac.test.appstudio.openshift.io/sha="${commit}" -o json | jq '
         .items
         | map(select((.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="'"${branch}"'") or (.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="refs/heads/'${branch}'")))
+        | map(select(.metadata.annotations["acs.redhat.com/original-snapshot-name"] == null))
         | sort_by(.spec.application)
         | group_by(.spec.application)
         | map(sort_by(.metadata.creationTimestamp)
-        | map(select(.metadata.annotations["acs.redhat.com/original-snapshot-name"] == null))
         | last)'
 }
