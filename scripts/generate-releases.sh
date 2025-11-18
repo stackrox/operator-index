@@ -63,7 +63,7 @@ validate_environment() {
     fi
 }
 
-# Fetch the list of snapshot names and associented application name for provided commit and branch values.
+# Fetch the list of snapshot names and associated application names for provided commit and branch values.
 get_snapshots_data() {
     local -r commit="$1"
     local -r branch="$2"
@@ -122,7 +122,7 @@ generate_release_resources() {
          | {"apiVersion": .apiVersion,
             "kind": .kind,
             "metadata": {
-              "annotations": .metadata.annotations + {"acs.redhat.com/original-snapshot-name": "'"${snapshot}"'"},
+              "annotations": .metadata.annotations + {"'"${ORIGINAL_SNAPSHOT_ANNOTATION_NAME}"'": "'"${snapshot}"'"},
               "labels": .metadata.labels,
               "name": "'"${snapshot_copy_name}"'",
               "namespace": .metadata.namespace
