@@ -24,8 +24,9 @@ validate_branch() {
     fi
 }
 
-# Fetch the list of snapshots for provided commit and branch values.
-# Make sure that only one the most recent snapshot per application is returned.
+# Fetches the list of snapshots for provided commit and branch values.
+# Makes sure that only one the most recent snapshot per application is returned.
+# Snapshot copies created by generate-releases.sh are filtered out via our custom annotation.
 get_snapshots() {
     local -r commit="$1"
     local -r branch="$2"
