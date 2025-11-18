@@ -1,3 +1,8 @@
+#!/bin/bash
+
+# Constant for the annotation name of the original snapshot name.
+ORIGINAL_SNAPSHOT_ANNOTATION_NAME="acs.redhat.com/original-snapshot-name"
+
 # Expand commit to a full 40-character SHA. Returns the full commit SHA if successful, or an error message if not.
 expand_commit() {
     git fetch --all --quiet
@@ -34,7 +39,7 @@ get_snapshots() {
     kubectl get -n rh-acs-tenant snapshot -l pac.test.appstudio.openshift.io/sha="${commit}" -o json | jq '
         .items
         | map(select((.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="'"${branch}"'") or (.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="refs/heads/'${branch}'")))
-        | map(select(.metadata.annotations["acs.redhat.com/original-snapshot-name"] == null))
+        | map(select(.metadata.annotations["'"${ORIGINAL_SNAPSHOT_ANNOTATION_NAME}"'"] == null))
         | sort_by(.spec.application)
         | group_by(.spec.application)
         | map(sort_by(.metadata.creationTimestamp)
