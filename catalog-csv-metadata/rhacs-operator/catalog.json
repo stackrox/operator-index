@@ -3280,9 +3280,9 @@
             "skipRange": ">= 4.8.0 < 4.9.0"
         },
         {
-            "name": "rhacs-operator.v4.9.1",
+            "name": "rhacs-operator.v4.9.1-rc.2",
             "replaces": "rhacs-operator.v4.9.0",
-            "skipRange": ">= 4.8.0 < 4.9.1"
+            "skipRange": ">= 4.8.0 < 4.9.1-rc.2"
         }
     ]
 }
@@ -3697,9 +3697,9 @@
             "skipRange": ">= 4.8.0 < 4.9.0"
         },
         {
-            "name": "rhacs-operator.v4.9.1",
+            "name": "rhacs-operator.v4.9.1-rc.2",
             "replaces": "rhacs-operator.v4.9.0",
-            "skipRange": ">= 4.8.0 < 4.9.1"
+            "skipRange": ">= 4.8.0 < 4.9.1-rc.2"
         }
     ]
 }

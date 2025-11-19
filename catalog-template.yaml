@@ -664,9 +664,9 @@ entries:
     replaces: rhacs-operator.v4.8.5
     skipRange: '>= 4.8.0 < 4.9.0'
   - &bundle-4-9-1
-    name: rhacs-operator.v4.9.1
+    name: rhacs-operator.v4.9.1-rc.2
     replaces: rhacs-operator.v4.9.0
-    skipRange: '>= 4.8.0 < 4.9.1'
+    skipRange: '>= 4.8.0 < 4.9.1-rc.2'
 
 - schema: olm.channel
   name: rhacs-4.0
