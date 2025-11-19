@@ -663,6 +663,10 @@ entries:
     name: rhacs-operator.v4.9.0
     replaces: rhacs-operator.v4.8.5
     skipRange: '>= 4.8.0 < 4.9.0'
+  - &bundle-4-9-1
+    name: rhacs-operator.v4.9.1
+    replaces: rhacs-operator.v4.9.0
+    skipRange: '>= 4.8.0 < 4.9.1'
 
 - schema: olm.channel
   name: rhacs-4.0
@@ -1180,6 +1184,7 @@ entries:
   - *bundle-4-8-5
 
   - *bundle-4-9-0
+  - *bundle-4-9-1
 
 - schema: olm.deprecations
   package: rhacs-operator
@@ -1523,3 +1528,6 @@ entries:
 - schema: olm.bundle
   # 4.9.0
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:02a50a53dddbbdd749b0b6cc01f555308ab3c16045130d07483bfddd6861de42
+- schema: olm.bundle
+  # 4.9.1
+  image: quay.io/rhacs-eng/release-operator-bundle@sha256:0b5aa5048f63746ac845441b8cce3875e3d5e0c160a8b6c58100c0c09708ef10
