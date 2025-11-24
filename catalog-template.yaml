@@ -1530,4 +1530,4 @@ entries:
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:02a50a53dddbbdd749b0b6cc01f555308ab3c16045130d07483bfddd6861de42
 - schema: olm.bundle
   # 4.9.1
-  image: quay.io/rhacs-eng/release-operator-bundle@sha256:9312c096fef02f70b642551338fdf968ec6657ff0385f51c13767d8b29afc76d
+  image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:9312c096fef02f70b642551338fdf968ec6657ff0385f51c13767d8b29afc76d
