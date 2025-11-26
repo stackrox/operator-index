@@ -659,13 +659,13 @@ entries:
     replaces: rhacs-operator.v4.8.4
     skipRange: '>= 4.7.0 < 4.8.5'
   - &bundle-4-8-6
-    name: rhacs-operator.v4.8.6-rc.2
+    name: rhacs-operator.v4.8.6
     replaces: rhacs-operator.v4.8.5
-    skipRange: '>= 4.7.0 < 4.8.6-rc.2'
+    skipRange: '>= 4.7.0 < 4.8.6'
 
   - &bundle-4-9-0
     name: rhacs-operator.v4.9.0
-    replaces: rhacs-operator.v4.8.6-rc.2
+    replaces: rhacs-operator.v4.8.6
     skipRange: '>= 4.8.0 < 4.9.0'
   - &bundle-4-9-1
     name: rhacs-operator.v4.9.1
