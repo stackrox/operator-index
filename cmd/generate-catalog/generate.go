@@ -1,6 +1,9 @@
 package main
 
 import (
+	// needed for digest algorithm validation
+	_ "crypto/sha256"
+
 	"encoding/base64"
 	"fmt"
 	"log"
@@ -9,7 +12,9 @@ import (
 
 	semver "github.com/Masterminds/semver/v3"
 	"github.com/goccy/go-yaml"
-	container "github.com/google/go-containerregistry/pkg/name"
+
+	"github.com/distribution/reference"
+	// container "github.com/google/go-containerregistry/pkg/name"
 )
 
 const (
@@ -342,11 +347,32 @@ func validateImageReferences(images []BundleImage) error {
 	return nil
 }
 
+// validateImageReference checks that the given image reference string is a valid container image reference and includes a registry, repository and digest.
+// Also check that tag is not present. See tag related issue: https://redhat-internal.slack.com/archives/C031USXS2FJ/p1755792504667849?thread_ts=1755622785.895239&cid=C031USXS2FJ
 func validateImageReference(imageRef string) error {
-	// Use NewDigest with StrictValidation to ensure the reference includes a digest, repository and registry.
-	_, err := container.NewDigest(imageRef, container.StrictValidation)
+	ref, err := reference.Parse(imageRef)
 	if err != nil {
-		return fmt.Errorf("cannot parse string as container image reference: %w", err)
+		return fmt.Errorf("cannot parse string as container image reference %s: %w", imageRef, err)
 	}
+
+	// check that digest is provided
+	if _, ok := ref.(reference.Canonical); !ok {
+		return fmt.Errorf("image reference %s does not include a digest", imageRef)
+	}
+
+	named, ok := ref.(reference.Named)
+	if !ok {
+		return fmt.Errorf("image reference %s has invalid format", imageRef)
+	}
+	// check that registry is provided
+	domain := reference.Domain(named)
+	if domain == "" {
+		return fmt.Errorf("image reference %s needs the registry to be explicitly defined", imageRef)
+	}
+	tagged, ok := ref.(reference.Tagged)
+	if ok && tagged.Tag() != "" {
+		return fmt.Errorf("image reference %s should not contain a tag", imageRef)
+	}
+
 	return nil
 }

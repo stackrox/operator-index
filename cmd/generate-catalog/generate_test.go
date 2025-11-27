@@ -165,7 +165,7 @@ func TestReadInputFile(t *testing.T) {
 		{
 			name:          "Image reference without digest",
 			filePath:      "testdata/image_without_digest.yaml",
-			expectedError: "cannot parse string as container image reference: a digest must contain exactly one '@' separator (e.g. registry/repository@digest) saw: example.com/image:v1",
+			expectedError: "image reference example.com/image:v1 does not include a digest",
 		},
 		{
 			name:          "Image reference is not a strict semantic version",
@@ -218,32 +218,32 @@ func TestValidateImageReference(t *testing.T) {
 		{
 			name:          "Empty image reference",
 			image:         "",
-			expectedError: "cannot parse string as container image reference: a digest must contain exactly one '@' separator (e.g. registry/repository@digest) saw: ",
-		},
-		{
-			name:          "Invalid image reference format",
-			image:         "invalid_image_reference",
-			expectedError: "cannot parse string as container image reference: a digest must contain exactly one '@' separator (e.g. registry/repository@digest) saw: invalid_image_reference",
+			expectedError: "cannot parse string as container image reference : repository name must have at least one component",
 		},
 		{
 			name:          "Image reference without digest",
-			image:         "example.com/image:v1",
-			expectedError: "cannot parse string as container image reference: a digest must contain exactly one '@' separator (e.g. registry/repository@digest) saw: example.com/image:v1",
+			image:         "invalid_image_reference",
+			expectedError: "image reference invalid_image_reference does not include a digest",
 		},
 		{
 			name:          "Image reference with unsupported digest algorithm",
 			image:         "example.com/image@md5:9241e37fcf7f3f88c5e944bd46b0a268",
-			expectedError: "cannot parse string as container image reference: unsupported digest algorithm: md5:9241e37fcf7f3f88c5e944bd46b0a268",
+			expectedError: "cannot parse string as container image reference example.com/image@md5:9241e37fcf7f3f88c5e944bd46b0a268: unsupported digest algorithm",
 		},
 		{
 			name:          "Image reference with invalid sha256 digest",
 			image:         "example.com/image@sha256:invaliddigest",
-			expectedError: "cannot parse string as container image reference: invalid checksum digest length",
+			expectedError: "cannot parse string as container image reference example.com/image@sha256:invaliddigest: invalid reference format",
 		},
 		{
 			name:          "image reference without registry",
 			image:         "bare-image-name-without-registry@sha256:6cdcf20771f9c46640b466f804190d00eaf2e59caee6d420436e78b283d177bf",
-			expectedError: "cannot parse string as container image reference: strict validation requires the registry to be explicitly defined",
+			expectedError: "image reference bare-image-name-without-registry@sha256:6cdcf20771f9c46640b466f804190d00eaf2e59caee6d420436e78b283d177bf needs the registry to be explicitly defined",
+		},
+		{
+			name:          "image reference with both tag and digest",
+			image:         "registry.example.com/repo/image:v1.0.0@sha256:7fd7595e6a61352088f9a3a345be03a6c0b9caa0bbc5ddd8c61ba1d38b2c3b8e",
+			expectedError: "image reference registry.example.com/repo/image:v1.0.0@sha256:7fd7595e6a61352088f9a3a345be03a6c0b9caa0bbc5ddd8c61ba1d38b2c3b8e should not contain a tag",
 		},
 	}
 
