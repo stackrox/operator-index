@@ -1,4 +1,4 @@
-module cataloggen
+module github.com/stackrox/operator-index
 
 go 1.24.4
 
