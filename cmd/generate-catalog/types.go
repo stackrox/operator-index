@@ -283,15 +283,6 @@ func newBundleEntry(image string) BundleEntry {
 	}
 }
 
-// getAllVersions extracts all operator versions from the input images.
-func getAllVersions(images []BundleImage) []*semver.Version {
-	versions := make([]*semver.Version, 0, len(images))
-	for _, img := range images {
-		versions = append(versions, img.Version)
-	}
-	return versions
-}
-
 func generateBundleName(version *semver.Version) string {
 	return fmt.Sprintf("%s.v%s", rhacsOperator, version)
 }

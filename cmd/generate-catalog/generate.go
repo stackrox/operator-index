@@ -277,6 +277,15 @@ func writeToFile(filename string, ct CatalogTemplate) error {
 	return nil
 }
 
+// getAllVersions extracts all operator versions from the input images.
+func getAllVersions(images []BundleImage) []*semver.Version {
+	versions := make([]*semver.Version, 0, len(images))
+	for _, img := range images {
+		versions = append(versions, img.Version)
+	}
+	return versions
+}
+
 // validateVersionsAreSorted checks that the operator versions are sorted in ascending order and that there are no duplicates.
 // The sorted order is important for the correct functioning of the rest of the program.
 func validateVersionsAreSorted(versions []*semver.Version) error {
