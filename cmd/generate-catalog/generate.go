@@ -25,17 +25,6 @@ const (
 	bundleDeprecationMessage        = "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
 	versionBrokenMessage            = "This product version has known significant defects and should not be used. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
 	latestChannelDeprecationMessage = "The `latest` channel is no longer supported. Use the `stable` channel."
-	rhacsOperator                   = "rhacs-operator"
-	olmTemplateSchema               = "olm.template.basic"
-	olmPackageSchema                = "olm.package"
-	olmChannelSchema                = "olm.channel"
-	olmDeprecationsSchema           = "olm.deprecations"
-	olmBundleSchema                 = "olm.bundle"
-	latestChannelName               = "latest"
-	stableChannelName               = "stable"
-	first3MajorVersion              = "3.62.0"
-	first4MajorVersion              = "4.0.0"
-	brokenVersionSkippingOffset     = 2 // The number of versions to skip in the `skips` field of the channel entry for broken versions.
 )
 
 var headComment = []string{
@@ -206,9 +195,9 @@ func generateChannelEntries(versions []*semver.Version, skippedVersions map[*sem
 }
 
 func populateChannelEntries(channels []Channel, channelEntries []ChannelEntry) {
-	for i, channel := range channels {
+	for i := range channels {
 		for _, entry := range channelEntries {
-			if channelShouldHaveEntry(channel, entry) {
+			if channelShouldHaveEntry(channels[i], entry) {
 				channels[i].Entries = append(channels[i].Entries, entry)
 			}
 		}

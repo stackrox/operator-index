@@ -7,6 +7,20 @@ import (
 	semver "github.com/Masterminds/semver/v3"
 )
 
+const (
+	rhacsOperator               = "rhacs-operator"
+	olmTemplateSchema           = "olm.template.basic"
+	olmPackageSchema            = "olm.package"
+	olmChannelSchema            = "olm.channel"
+	olmDeprecationsSchema       = "olm.deprecations"
+	olmBundleSchema             = "olm.bundle"
+	latestChannelName           = "latest"
+	stableChannelName           = "stable"
+	first3MajorVersion          = "3.62.0"
+	first4MajorVersion          = "4.0.0"
+	brokenVersionSkippingOffset = 2 // The number of versions to skip in the `skips` field of the channel entry for broken versions.
+)
+
 // A list of versions which must not have "replaces" key in they channel entries.
 var versionsWithoutReplaces = []string{first3MajorVersion, first4MajorVersion}
 
