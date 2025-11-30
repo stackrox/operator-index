@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"slices"
 
 	semver "github.com/Masterminds/semver/v3"
 )
@@ -14,13 +13,8 @@ const (
 	olmChannelSchema            = "olm.channel"
 	olmDeprecationsSchema       = "olm.deprecations"
 	olmBundleSchema             = "olm.bundle"
-	first3MajorVersion          = "3.62.0"
-	first4MajorVersion          = "4.0.0"
 	brokenVersionSkippingOffset = 2 // The number of versions to skip in the `skips` field of the channel entry for broken versions.
 )
-
-// A list of versions which must not have "replaces" key in they channel entries.
-var versionsWithoutReplaces = []string{first3MajorVersion, first4MajorVersion}
 
 // Describes format of the input file for catalog template generation.
 // It contains:
@@ -205,21 +199,17 @@ func newChannel(version *semver.Version) Channel {
 // |    skipRange: '>= <previousYStreamVersion> < <version>'
 // |    skips:
 // |      - rhacs-operator.v<skippedVersions>
-func newChannelEntry(version, previousEntryVersion, previousYStreamVersion *semver.Version, skippedVersions map[*semver.Version]bool) ChannelEntry {
+func newChannelEntry(version *semver.Version, skippedVersions map[*semver.Version]bool) ChannelEntry {
 	entry := ChannelEntry{
 		Name:    generateBundleName(version),
 		version: version,
 	}
-	entry.addReplaces(version, previousEntryVersion)
-	entry.addSkipRange(previousYStreamVersion, version)
 	entry.addSkips(version, skippedVersions)
 	return entry
 }
 
 func (e *ChannelEntry) addReplaces(version, previousEntryVersion *semver.Version) {
-	if !slices.Contains(versionsWithoutReplaces, version.String()) {
-		e.Replaces = generateBundleName(previousEntryVersion)
-	}
+	e.Replaces = generateBundleName(previousEntryVersion)
 }
 
 func (e *ChannelEntry) addSkipRange(skipRangeFrom, skipRangeTo *semver.Version) {

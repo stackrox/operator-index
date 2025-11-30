@@ -67,7 +67,8 @@ func generateCatalogTemplateFile() error {
 	emptyChannels := generateChannels(config.Versions)
 	populateChannels(roots, emptyChannels)
 
-	entries := generateChannelEntries(config.Versions, config.BrokenVersions)
+	rootFromVersions := []*semver.Version{latestChannelFromVersion, stableChannelFromVersion}
+	entries := generateChannelEntries(config.Versions, rootFromVersions, config.BrokenVersions)
 	populateChannelEntries(roots, entries)
 
 	channels := flattenChannelsFromRoots(roots)
@@ -186,7 +187,7 @@ func generateChannels(versions []*semver.Version) []Channel {
 	return channels
 }
 
-func generateChannelEntries(versions []*semver.Version, skippedVersions map[*semver.Version]bool) []ChannelEntry {
+func generateChannelEntries(versions []*semver.Version, rootFromVersions []*semver.Version, skippedVersions map[*semver.Version]bool) []ChannelEntry {
 	channelEntries := make([]ChannelEntry, 0)
 	// We know that our catalog begins with 3.62.0. We set previousEntryVersion to 3.61.0 in order to have 3.62.0's `skipRange` consistent with others.
 	previousEntryVersion := semver.New(3, 61, 0, "", "")
@@ -197,7 +198,12 @@ func generateChannelEntries(versions []*semver.Version, skippedVersions map[*sem
 			previousYStreamVersion = makeYStreamVersion(previousEntryVersion)
 		}
 
-		e := newChannelEntry(v, previousEntryVersion, previousYStreamVersion, skippedVersions)
+		firstInRoot := slices.ContainsFunc(rootFromVersions, v.Equal)
+		e := newChannelEntry(v, skippedVersions)
+		if !firstInRoot {
+			e.addReplaces(v, previousEntryVersion)
+		}
+		e.addSkipRange(previousYStreamVersion, v)
 		channelEntries = append(channelEntries, e)
 
 		previousEntryVersion = v

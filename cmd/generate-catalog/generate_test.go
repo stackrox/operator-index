@@ -511,63 +511,219 @@ func TestGenerateChannelEntries(t *testing.T) {
 	tests := []struct {
 		name             string
 		versions         []*semver.Version
+		rootFromVersions []*semver.Version
 		skippedVersions  map[*semver.Version]bool
 		expectedEntries  int
 		validate         func(t *testing.T, entries []ChannelEntry)
 	}{
 		{
-			name: "Simple version sequence",
+			name: "Simple version sequence with first version at root",
 			versions: []*semver.Version{
 				semver.MustParse("3.62.0"),
 				semver.MustParse("3.62.1"),
 			},
+			rootFromVersions: []*semver.Version{
+				semver.MustParse("3.62.0"),
+			},
 			skippedVersions: nil,
 			expectedEntries: 2,
 			validate: func(t *testing.T, entries []ChannelEntry) {
-				// First entry should not have replaces
+				// First entry should not have replaces (it's a root version)
 				assert.Equal(t, "rhacs-operator.v3.62.0", entries[0].Name)
 				assert.Empty(t, entries[0].Replaces)
+				assert.Equal(t, ">= 3.61.0 < 3.62.0", entries[0].SkipRange)
+				assert.Empty(t, entries[0].Skips)
 
-				// Second entry should have replaces
+				// Second entry should have replaces and skipRange from same Y-stream (3.61.0)
+				// because previousYStreamVersion is only updated when minor changes
 				assert.Equal(t, "rhacs-operator.v3.62.1", entries[1].Name)
 				assert.Equal(t, "rhacs-operator.v3.62.0", entries[1].Replaces)
+				assert.Equal(t, ">= 3.61.0 < 3.62.1", entries[1].SkipRange)
 			},
 		},
 		{
-			name: "With skipped version",
+			name: "Version sequence with no broken versions",
 			versions: []*semver.Version{
 				semver.MustParse("4.0.0"),
 				semver.MustParse("4.0.1"),
 				semver.MustParse("4.0.2"),
+				semver.MustParse("4.1.0"),
 			},
-			skippedVersions: map[*semver.Version]bool{
-				semver.MustParse("4.0.1"): true,
+			rootFromVersions: []*semver.Version{
+				semver.MustParse("4.0.0"),
 			},
-			expectedEntries: 3,
+			skippedVersions: nil,
+			expectedEntries: 4,
 			validate: func(t *testing.T, entries []ChannelEntry) {
-				// 4.0.2 should skip 4.0.1
-				assert.Contains(t, entries[2].Skips, "rhacs-operator.v4.0.1")
+				// 4.0.0 is root, should not have replaces
+				assert.Equal(t, "rhacs-operator.v4.0.0", entries[0].Name)
+				assert.Empty(t, entries[0].Replaces)
+				assert.Equal(t, ">= 3.61.0 < 4.0.0", entries[0].SkipRange)
+
+				// 4.0.1 should have replaces, skipRange still from 3.61.0 (previousYStreamVersion not updated yet)
+				assert.Equal(t, "rhacs-operator.v4.0.1", entries[1].Name)
+				assert.Equal(t, "rhacs-operator.v4.0.0", entries[1].Replaces)
+				assert.Equal(t, ">= 3.61.0 < 4.0.1", entries[1].SkipRange)
+
+				// 4.1.0 is new Y-stream, skipRange should start from previous Y-stream (4.0.0)
+				assert.Equal(t, "rhacs-operator.v4.1.0", entries[3].Name)
+				assert.Equal(t, "rhacs-operator.v4.0.2", entries[3].Replaces)
+				assert.Equal(t, ">= 4.0.0 < 4.1.0", entries[3].SkipRange)
 			},
 		},
 		{
-			name: "Major version transition",
+			name: "With broken/skipped version",
+			versions: (func() []*semver.Version {
+				v1 := semver.MustParse("4.0.0")
+				v2 := semver.MustParse("4.0.1")
+				v3 := semver.MustParse("4.0.2")
+				return []*semver.Version{v1, v2, v3}
+			})(),
+			rootFromVersions: []*semver.Version{
+				semver.MustParse("4.0.0"),
+			},
+			skippedVersions: nil, // Will be set in test body
+			expectedEntries: 3,
+			validate: func(t *testing.T, entries []ChannelEntry) {
+				// 4.0.2 should skip 4.0.1
+				assert.Equal(t, "rhacs-operator.v4.0.2", entries[2].Name)
+				assert.ElementsMatch(t, []string{"rhacs-operator.v4.0.1"}, entries[2].Skips)
+			},
+		},
+		{
+			name: "Major version transition - 4.0.0 is root",
 			versions: []*semver.Version{
+				semver.MustParse("3.62.0"),
+				semver.MustParse("3.62.1"),
+				semver.MustParse("4.0.0"),
+			},
+			rootFromVersions: []*semver.Version{
 				semver.MustParse("3.62.0"),
 				semver.MustParse("4.0.0"),
 			},
 			skippedVersions: nil,
-			expectedEntries: 2,
+			expectedEntries: 3,
 			validate: func(t *testing.T, entries []ChannelEntry) {
-				// 4.0.0 should not have replaces
-				assert.Equal(t, "rhacs-operator.v4.0.0", entries[1].Name)
-				assert.Empty(t, entries[1].Replaces)
+				// 3.62.0 should not have replaces (root)
+				assert.Equal(t, "rhacs-operator.v3.62.0", entries[0].Name)
+				assert.Empty(t, entries[0].Replaces)
+
+				// 3.62.1 should have replaces
+				assert.Equal(t, "rhacs-operator.v3.62.1", entries[1].Name)
+				assert.Equal(t, "rhacs-operator.v3.62.0", entries[1].Replaces)
+
+				// 4.0.0 should not have replaces (it's a root version)
+				assert.Equal(t, "rhacs-operator.v4.0.0", entries[2].Name)
+				assert.Empty(t, entries[2].Replaces)
+				assert.Equal(t, ">= 3.62.0 < 4.0.0", entries[2].SkipRange)
+			},
+		},
+		{
+			name: "Multiple broken versions in same Y-stream",
+			versions: (func() []*semver.Version {
+				v1 := semver.MustParse("4.2.0")
+				v2 := semver.MustParse("4.2.1")
+				v3 := semver.MustParse("4.2.2")
+				v4 := semver.MustParse("4.3.0")
+				return []*semver.Version{v1, v2, v3, v4}
+			})(),
+			rootFromVersions: []*semver.Version{
+				semver.MustParse("4.2.0"),
+			},
+			skippedVersions: nil, // Will be set in test body
+			expectedEntries: 4,
+			validate: func(t *testing.T, entries []ChannelEntry) {
+				// 4.3.0 should skip both 4.2.1 and 4.2.2
+				assert.Equal(t, "rhacs-operator.v4.3.0", entries[3].Name)
+				assert.ElementsMatch(t, []string{"rhacs-operator.v4.2.1", "rhacs-operator.v4.2.2"}, entries[3].Skips)
+			},
+		},
+		{
+			name: "Broken version 2 minor versions ahead should not be in skips",
+			versions: (func() []*semver.Version {
+				v1 := semver.MustParse("4.1.0")
+				v2 := semver.MustParse("4.1.1")
+				v3 := semver.MustParse("4.2.0")
+				v4 := semver.MustParse("4.3.0")
+				v5 := semver.MustParse("4.4.0")
+				v6 := semver.MustParse("4.5.0")
+				return []*semver.Version{v1, v2, v3, v4, v5, v6}
+			})(),
+			rootFromVersions: []*semver.Version{
+				semver.MustParse("4.1.0"),
+			},
+			skippedVersions: nil, // Will be set in test body
+			expectedEntries: 6,
+			validate: func(t *testing.T, entries []ChannelEntry) {
+				// brokenVersionSkippingOffset = 2
+				// skipsUntilVersion = 4.1 + 2 = 4.3.0
+				// Skips added if: version > 4.1.1 AND version < 4.3.0
+
+				// 4.2.0: 4.2.0 > 4.1.1 AND 4.2.0 < 4.3.0 ✓
+				assert.ElementsMatch(t, []string{"rhacs-operator.v4.1.1"}, entries[2].Skips) // 4.2.0
+
+				// 4.3.0: 4.3.0 > 4.1.1 AND 4.3.0 < 4.3.0 ✗ (NOT less than itself)
+				assert.Empty(t, entries[3].Skips) // 4.3.0
+
+				// 4.4.0 and beyond: version >= 4.3.0, so NOT less than 4.3.0
+				assert.Empty(t, entries[4].Skips) // 4.4.0
+				assert.Empty(t, entries[5].Skips) // 4.5.0
+			},
+		},
+		{
+			name: "SkipRange changes at Y-stream boundaries",
+			versions: []*semver.Version{
+				semver.MustParse("4.0.0"),
+				semver.MustParse("4.0.1"),
+				semver.MustParse("4.0.2"),
+				semver.MustParse("4.1.0"),
+				semver.MustParse("4.1.1"),
+			},
+			rootFromVersions: []*semver.Version{
+				semver.MustParse("4.0.0"),
+			},
+			skippedVersions: nil,
+			expectedEntries: 5,
+			validate: func(t *testing.T, entries []ChannelEntry) {
+				// 4.0.0 is first, skipRange from 3.61.0
+				assert.Equal(t, ">= 3.61.0 < 4.0.0", entries[0].SkipRange) // 4.0.0
+
+				// Within 4.0.x, skipRange stays at 3.61.0 until minor changes
+				assert.Equal(t, ">= 3.61.0 < 4.0.1", entries[1].SkipRange) // 4.0.1
+				assert.Equal(t, ">= 3.61.0 < 4.0.2", entries[2].SkipRange) // 4.0.2
+
+				// At 4.1.0 (new Y-stream), previousYStreamVersion gets updated to 4.0.0
+				assert.Equal(t, ">= 4.0.0 < 4.1.0", entries[3].SkipRange) // 4.1.0
+
+				// Within 4.1.x, skipRange stays from 4.0.0
+				assert.Equal(t, ">= 4.0.0 < 4.1.1", entries[4].SkipRange) // 4.1.1
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			entries := generateChannelEntries(tt.versions, tt.skippedVersions)
+			skippedVersions := tt.skippedVersions
+
+			// Set up broken versions for specific tests
+			if tt.name == "With broken/skipped version" {
+				skippedVersions = map[*semver.Version]bool{
+					tt.versions[1]: true, // 4.0.1
+				}
+			}
+			if tt.name == "Multiple broken versions in same Y-stream" {
+				skippedVersions = map[*semver.Version]bool{
+					tt.versions[1]: true, // 4.2.1
+					tt.versions[2]: true, // 4.2.2
+				}
+			}
+			if tt.name == "Broken version 2 minor versions ahead should not be in skips" {
+				skippedVersions = map[*semver.Version]bool{
+					tt.versions[1]: true, // 4.1.1
+				}
+			}
+
+			entries := generateChannelEntries(tt.versions, tt.rootFromVersions, skippedVersions)
 
 			assert.Len(t, entries, tt.expectedEntries)
 			if tt.validate != nil {
