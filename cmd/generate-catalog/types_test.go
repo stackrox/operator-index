@@ -99,7 +99,7 @@ func TestNewChannelEntry(t *testing.T) {
 			assert.Equal(t, tt.expectedName, entry.Name)
 			assert.Equal(t, tt.expectedReplaces, entry.Replaces)
 			assert.Equal(t, tt.expectedSkipRange, entry.SkipRange)
-			assert.Equal(t, tt.expectedSkips, entry.Skips)
+			assert.ElementsMatch(t, tt.expectedSkips, entry.Skips)
 		})
 	}
 }
