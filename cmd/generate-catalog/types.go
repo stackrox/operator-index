@@ -14,8 +14,6 @@ const (
 	olmChannelSchema            = "olm.channel"
 	olmDeprecationsSchema       = "olm.deprecations"
 	olmBundleSchema             = "olm.bundle"
-	latestChannelName           = "latest"
-	stableChannelName           = "stable"
 	first3MajorVersion          = "3.62.0"
 	first4MajorVersion          = "4.0.0"
 	brokenVersionSkippingOffset = 2 // The number of versions to skip in the `skips` field of the channel entry for broken versions.
@@ -79,6 +77,13 @@ type Package struct {
 type Icon struct {
 	Base64data string `yaml:"base64data"`
 	MediaType  string `yaml:"mediatype"`
+}
+
+type GraphRoot struct {
+	MainChannel  Channel // The main channel (e.g., "stable" or "latest") which contains all versions associated with this root (e.g., stable: 4.0.x, 4.1.x, etc.)
+	Channels     []Channel
+	FromVersion  *semver.Version // Inclusive lower bound of versions associated with this root.
+	UntilVersion *semver.Version // Exclusive upper bound of versions associated with this root.
 }
 
 type Channel struct {
@@ -163,6 +168,19 @@ func (c *CatalogTemplate) addBundles(bundles []BundleEntry) {
 	}
 }
 
+func newRootChannel(name string, from, until *semver.Version) GraphRoot {
+	mainChannel := Channel{
+		Schema:  olmChannelSchema,
+		Name:    name,
+		Package: rhacsOperator,
+	}
+	return GraphRoot{
+		MainChannel:  mainChannel,
+		FromVersion:  from,
+		UntilVersion: until,
+	}
+}
+
 // Create a new "olm.channel" object.
 // it will be represented in YAML like this:
 // |  - schema: olm.channel
@@ -176,26 +194,6 @@ func newChannel(version *semver.Version) Channel {
 		Name:           fmt.Sprintf("rhacs-%d.%d", version.Major(), version.Minor()),
 		Package:        rhacsOperator,
 		yStreamVersion: makeYStreamVersion(version),
-	}
-}
-
-// Create a special "olm.channel" object with the name "latest".
-// It is a now-deprecated channel which was used before "stable" was introduced.
-func newLatestChannel() Channel {
-	return Channel{
-		Schema:  olmChannelSchema,
-		Name:    latestChannelName,
-		Package: rhacsOperator,
-	}
-}
-
-// Create a special "olm.channel" object with the name "stable".
-// It is a default channel for all versions after 4.0.0.
-func newStableChannel() Channel {
-	return Channel{
-		Schema:  olmChannelSchema,
-		Name:    stableChannelName,
-		Package: rhacsOperator,
 	}
 }
 
