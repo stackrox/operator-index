@@ -22,16 +22,6 @@ func TestReadInputFile(t *testing.T) {
 			filePath: "testdata/valid_input.yaml",
 			validate: func(t *testing.T, config Configuration) {
 				assert.Equal(t, "4.0.0", config.OldestSupportedVersion.String())
-				assert.Len(t, config.BrokenVersions, 1)
-				// Check broken version exists in the map
-				hasBrokenVersion := false
-				for v := range config.BrokenVersions {
-					if v.String() == "4.1.0" {
-						hasBrokenVersion = true
-						break
-					}
-				}
-				assert.True(t, hasBrokenVersion, "Should have broken version 4.1.0")
 				assert.Len(t, config.Images, 4)
 				assert.Len(t, config.Versions, 4)
 
@@ -57,11 +47,6 @@ func TestReadInputFile(t *testing.T) {
 			expectedError: "invalid oldest_supported_version",
 		},
 		{
-			name:          "Invalid broken_versions",
-			filePath:      "testdata/invalid_broken_versions.yaml",
-			expectedError: "invalid item in broken_versions",
-		},
-		{
 			name:          "Invalid image version",
 			filePath:      "testdata/invalid_image_version.yaml",
 			expectedError: "invalid version",
@@ -79,11 +64,6 @@ func TestReadInputFile(t *testing.T) {
 		{
 			name:          "oldest_supported_version is not a strict semantic version",
 			filePath:      "testdata/not_strict_oldest_supported_version.yaml",
-			expectedError: "invalid semantic version",
-		},
-		{
-			name:          "broken_versions is not a strict semantic version",
-			filePath:      "testdata/not_strict_broken_versions.yaml",
 			expectedError: "invalid semantic version",
 		},
 		{
@@ -386,59 +366,6 @@ func TestHasGapInVersions(t *testing.T) {
 	}
 }
 
-func TestValidateBrokenVersions(t *testing.T) {
-	tests := []struct {
-		name           string
-		brokenVersions map[*semver.Version]bool
-		versions       []*semver.Version
-		expectedError  string
-	}{
-		{
-			name: "All broken versions exist",
-			brokenVersions: map[*semver.Version]bool{
-				semver.MustParse("1.0.1"): true,
-				semver.MustParse("2.0.0"): true,
-			},
-			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("1.0.1"),
-				semver.MustParse("2.0.0"),
-			},
-		},
-		{
-			name:           "No broken versions",
-			brokenVersions: map[*semver.Version]bool{},
-			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-			},
-		},
-		{
-			name: "Broken version does not exist",
-			brokenVersions: map[*semver.Version]bool{
-				semver.MustParse("1.0.5"): true,
-			},
-			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("1.0.1"),
-			},
-			expectedError: "broken version 1.0.5 is not present in the list of versions",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := validateBrokenVersions(tt.brokenVersions, tt.versions)
-
-			if tt.expectedError != "" {
-				assert.Error(t, err)
-				assert.Contains(t, err.Error(), tt.expectedError)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
 func TestGenerateChannels(t *testing.T) {
 	tests := []struct {
 		name             string
@@ -512,7 +439,6 @@ func TestGenerateChannelEntries(t *testing.T) {
 		name             string
 		versions         []*semver.Version
 		rootFromVersions []*semver.Version
-		skippedVersions  map[*semver.Version]bool
 		expectedEntries  int
 		validate         func(t *testing.T, entries []ChannelEntry)
 	}{
@@ -525,14 +451,12 @@ func TestGenerateChannelEntries(t *testing.T) {
 			rootFromVersions: []*semver.Version{
 				semver.MustParse("3.62.0"),
 			},
-			skippedVersions: nil,
 			expectedEntries: 2,
 			validate: func(t *testing.T, entries []ChannelEntry) {
 				// First entry should not have replaces (it's a root version)
 				assert.Equal(t, "rhacs-operator.v3.62.0", entries[0].Name)
 				assert.Empty(t, entries[0].Replaces)
 				assert.Equal(t, ">= 3.61.0 < 3.62.0", entries[0].SkipRange)
-				assert.Empty(t, entries[0].Skips)
 
 				// Second entry should have replaces and skipRange from same Y-stream (3.61.0)
 				// because previousYStreamVersion is only updated when minor changes
@@ -542,7 +466,7 @@ func TestGenerateChannelEntries(t *testing.T) {
 			},
 		},
 		{
-			name: "Version sequence with no broken versions",
+			name: "Version sequence across Y-streams",
 			versions: []*semver.Version{
 				semver.MustParse("4.0.0"),
 				semver.MustParse("4.0.1"),
@@ -552,7 +476,6 @@ func TestGenerateChannelEntries(t *testing.T) {
 			rootFromVersions: []*semver.Version{
 				semver.MustParse("4.0.0"),
 			},
-			skippedVersions: nil,
 			expectedEntries: 4,
 			validate: func(t *testing.T, entries []ChannelEntry) {
 				// 4.0.0 is root, should not have replaces
@@ -572,25 +495,6 @@ func TestGenerateChannelEntries(t *testing.T) {
 			},
 		},
 		{
-			name: "With broken/skipped version",
-			versions: (func() []*semver.Version {
-				v1 := semver.MustParse("4.0.0")
-				v2 := semver.MustParse("4.0.1")
-				v3 := semver.MustParse("4.0.2")
-				return []*semver.Version{v1, v2, v3}
-			})(),
-			rootFromVersions: []*semver.Version{
-				semver.MustParse("4.0.0"),
-			},
-			skippedVersions: nil, // Will be set in test body
-			expectedEntries: 3,
-			validate: func(t *testing.T, entries []ChannelEntry) {
-				// 4.0.2 should skip 4.0.1
-				assert.Equal(t, "rhacs-operator.v4.0.2", entries[2].Name)
-				assert.ElementsMatch(t, []string{"rhacs-operator.v4.0.1"}, entries[2].Skips)
-			},
-		},
-		{
 			name: "Major version transition - 4.0.0 is root",
 			versions: []*semver.Version{
 				semver.MustParse("3.62.0"),
@@ -601,7 +505,6 @@ func TestGenerateChannelEntries(t *testing.T) {
 				semver.MustParse("3.62.0"),
 				semver.MustParse("4.0.0"),
 			},
-			skippedVersions: nil,
 			expectedEntries: 3,
 			validate: func(t *testing.T, entries []ChannelEntry) {
 				// 3.62.0 should not have replaces (root)
@@ -619,58 +522,6 @@ func TestGenerateChannelEntries(t *testing.T) {
 			},
 		},
 		{
-			name: "Multiple broken versions in same Y-stream",
-			versions: (func() []*semver.Version {
-				v1 := semver.MustParse("4.2.0")
-				v2 := semver.MustParse("4.2.1")
-				v3 := semver.MustParse("4.2.2")
-				v4 := semver.MustParse("4.3.0")
-				return []*semver.Version{v1, v2, v3, v4}
-			})(),
-			rootFromVersions: []*semver.Version{
-				semver.MustParse("4.2.0"),
-			},
-			skippedVersions: nil, // Will be set in test body
-			expectedEntries: 4,
-			validate: func(t *testing.T, entries []ChannelEntry) {
-				// 4.3.0 should skip both 4.2.1 and 4.2.2
-				assert.Equal(t, "rhacs-operator.v4.3.0", entries[3].Name)
-				assert.ElementsMatch(t, []string{"rhacs-operator.v4.2.1", "rhacs-operator.v4.2.2"}, entries[3].Skips)
-			},
-		},
-		{
-			name: "Broken version 2 minor versions ahead should not be in skips",
-			versions: (func() []*semver.Version {
-				v1 := semver.MustParse("4.1.0")
-				v2 := semver.MustParse("4.1.1")
-				v3 := semver.MustParse("4.2.0")
-				v4 := semver.MustParse("4.3.0")
-				v5 := semver.MustParse("4.4.0")
-				v6 := semver.MustParse("4.5.0")
-				return []*semver.Version{v1, v2, v3, v4, v5, v6}
-			})(),
-			rootFromVersions: []*semver.Version{
-				semver.MustParse("4.1.0"),
-			},
-			skippedVersions: nil, // Will be set in test body
-			expectedEntries: 6,
-			validate: func(t *testing.T, entries []ChannelEntry) {
-				// brokenVersionSkippingOffset = 2
-				// skipsUntilVersion = 4.1 + 2 = 4.3.0
-				// Skips added if: version > 4.1.1 AND version < 4.3.0
-
-				// 4.2.0: 4.2.0 > 4.1.1 AND 4.2.0 < 4.3.0 ✓
-				assert.ElementsMatch(t, []string{"rhacs-operator.v4.1.1"}, entries[2].Skips) // 4.2.0
-
-				// 4.3.0: 4.3.0 > 4.1.1 AND 4.3.0 < 4.3.0 ✗ (NOT less than itself)
-				assert.Empty(t, entries[3].Skips) // 4.3.0
-
-				// 4.4.0 and beyond: version >= 4.3.0, so NOT less than 4.3.0
-				assert.Empty(t, entries[4].Skips) // 4.4.0
-				assert.Empty(t, entries[5].Skips) // 4.5.0
-			},
-		},
-		{
 			name: "SkipRange changes at Y-stream boundaries",
 			versions: []*semver.Version{
 				semver.MustParse("4.0.0"),
@@ -682,7 +533,6 @@ func TestGenerateChannelEntries(t *testing.T) {
 			rootFromVersions: []*semver.Version{
 				semver.MustParse("4.0.0"),
 			},
-			skippedVersions: nil,
 			expectedEntries: 5,
 			validate: func(t *testing.T, entries []ChannelEntry) {
 				// 4.0.0 is first, skipRange from 3.61.0
@@ -699,31 +549,32 @@ func TestGenerateChannelEntries(t *testing.T) {
 				assert.Equal(t, ">= 4.0.0 < 4.1.1", entries[4].SkipRange) // 4.1.1
 			},
 		},
+		{
+			name: "Multiple root versions",
+			versions: []*semver.Version{
+				semver.MustParse("3.62.0"),
+				semver.MustParse("4.0.0"),
+				semver.MustParse("4.1.0"),
+			},
+			rootFromVersions: []*semver.Version{
+				semver.MustParse("3.62.0"),
+				semver.MustParse("4.0.0"),
+			},
+			expectedEntries: 3,
+			validate: func(t *testing.T, entries []ChannelEntry) {
+				// Both 3.62.0 and 4.0.0 are roots, should not have replaces
+				assert.Empty(t, entries[0].Replaces) // 3.62.0
+				assert.Empty(t, entries[1].Replaces) // 4.0.0
+
+				// 4.1.0 should have replaces
+				assert.Equal(t, "rhacs-operator.v4.0.0", entries[2].Replaces) // 4.1.0
+			},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			skippedVersions := tt.skippedVersions
-
-			// Set up broken versions for specific tests
-			if tt.name == "With broken/skipped version" {
-				skippedVersions = map[*semver.Version]bool{
-					tt.versions[1]: true, // 4.0.1
-				}
-			}
-			if tt.name == "Multiple broken versions in same Y-stream" {
-				skippedVersions = map[*semver.Version]bool{
-					tt.versions[1]: true, // 4.2.1
-					tt.versions[2]: true, // 4.2.2
-				}
-			}
-			if tt.name == "Broken version 2 minor versions ahead should not be in skips" {
-				skippedVersions = map[*semver.Version]bool{
-					tt.versions[1]: true, // 4.1.1
-				}
-			}
-
-			entries := generateChannelEntries(tt.versions, tt.rootFromVersions, skippedVersions)
+			entries := generateChannelEntries(tt.versions, tt.rootFromVersions)
 
 			assert.Len(t, entries, tt.expectedEntries)
 			if tt.validate != nil {
@@ -739,7 +590,6 @@ func TestGenerateDeprecations(t *testing.T) {
 		versions               []*semver.Version
 		channels               []Channel
 		oldestSupportedVersion *semver.Version
-		brokenVersions         map[*semver.Version]bool
 		validate               func(t *testing.T, deprecations Deprecations)
 	}{
 		{
@@ -754,7 +604,6 @@ func TestGenerateDeprecations(t *testing.T) {
 				{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
 			},
 			oldestSupportedVersion: semver.MustParse("4.0.0"),
-			brokenVersions:         nil,
 			validate: func(t *testing.T, deprecations Deprecations) {
 				// Should have latest channel deprecation + old channel + old bundle
 				assert.GreaterOrEqual(t, len(deprecations.Entries), 3)
@@ -771,31 +620,6 @@ func TestGenerateDeprecations(t *testing.T) {
 			},
 		},
 		{
-			name: "Deprecate broken version",
-			versions: (func() []*semver.Version {
-				// Need to use same version instances for the map lookup to work
-				v1 := semver.MustParse("4.0.0")
-				v2 := semver.MustParse("4.1.0")
-				return []*semver.Version{v1, v2}
-			})(),
-			channels: []Channel{
-				{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
-			},
-			oldestSupportedVersion: semver.MustParse("4.0.0"),
-			brokenVersions:         nil, // Will be set below
-			validate: func(t *testing.T, deprecations Deprecations) {
-				// Check that broken version has appropriate message
-				hasBrokenDeprecation := false
-				for _, entry := range deprecations.Entries {
-					if entry.Reference.Schema == olmBundleSchema && entry.Reference.Name == "rhacs-operator.v4.1.0" {
-						hasBrokenDeprecation = true
-						assert.Contains(t, entry.Message, "known significant defects")
-					}
-				}
-				assert.True(t, hasBrokenDeprecation, "Should deprecate broken version")
-			},
-		},
-		{
 			name: "Latest channel is always deprecated",
 			versions: []*semver.Version{
 				semver.MustParse("4.0.0"),
@@ -804,7 +628,6 @@ func TestGenerateDeprecations(t *testing.T) {
 				{Name: "latest"},
 			},
 			oldestSupportedVersion: semver.MustParse("4.0.0"),
-			brokenVersions:         nil,
 			validate: func(t *testing.T, deprecations Deprecations) {
 				hasLatestDeprecation := false
 				for _, entry := range deprecations.Entries {
@@ -815,20 +638,29 @@ func TestGenerateDeprecations(t *testing.T) {
 				assert.True(t, hasLatestDeprecation, "Latest channel should be deprecated")
 			},
 		},
+		{
+			name: "No deprecations when all versions are supported",
+			versions: []*semver.Version{
+				semver.MustParse("4.0.0"),
+				semver.MustParse("4.1.0"),
+			},
+			channels: []Channel{
+				{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
+				{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
+			},
+			oldestSupportedVersion: semver.MustParse("4.0.0"),
+			validate: func(t *testing.T, deprecations Deprecations) {
+				// Should only have latest channel deprecation, no bundle deprecations
+				assert.Equal(t, 1, len(deprecations.Entries))
+				assert.Equal(t, olmChannelSchema, deprecations.Entries[0].Reference.Schema)
+				assert.Equal(t, "latest", deprecations.Entries[0].Reference.Name)
+			},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			brokenVersions := tt.brokenVersions
-			// Special handling for the "Deprecate broken version" test
-			// to ensure we use the same version instances
-			if tt.name == "Deprecate broken version" && brokenVersions == nil {
-				brokenVersions = map[*semver.Version]bool{
-					tt.versions[1]: true, // Mark 4.1.0 as broken
-				}
-			}
-
-			deprecations := generateDeprecations(tt.versions, tt.channels, tt.oldestSupportedVersion, brokenVersions)
+			deprecations := generateDeprecations(tt.versions, tt.channels, tt.oldestSupportedVersion)
 
 			assert.Equal(t, olmDeprecationsSchema, deprecations.Schema)
 			assert.Equal(t, rhacsOperator, deprecations.Package)

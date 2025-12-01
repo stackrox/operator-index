@@ -22,7 +22,6 @@ const (
 	iconFile                        = "icon.png"
 	channelDeprecationMessage       = "This version is no longer supported. Switch to the `stable` channel or a channel for a more recent version that is still supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
 	bundleDeprecationMessage        = "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
-	versionBrokenMessage            = "This product version has known significant defects and should not be used. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
 	latestChannelDeprecationMessage = "The `latest` channel is no longer supported. Use the `stable` channel."
 	latestChannelName               = "latest"
 	stableChannelName               = "stable"
@@ -68,12 +67,12 @@ func generateCatalogTemplateFile() error {
 	populateChannels(roots, emptyChannels)
 
 	rootFromVersions := []*semver.Version{latestChannelFromVersion, stableChannelFromVersion}
-	entries := generateChannelEntries(config.Versions, rootFromVersions, config.BrokenVersions)
+	entries := generateChannelEntries(config.Versions, rootFromVersions)
 	populateChannelEntries(roots, entries)
 
 	channels := flattenChannelsFromRoots(roots)
 
-	deprecations := generateDeprecations(config.Versions, channels, config.OldestSupportedVersion, config.BrokenVersions)
+	deprecations := generateDeprecations(config.Versions, channels, config.OldestSupportedVersion)
 	bundles := generateBundles(config.Images)
 
 	ct := newCatalogTemplate()
@@ -150,7 +149,6 @@ func readInputFile(filename string) (Configuration, error) {
 
 	return Configuration{
 		OldestSupportedVersion: oldest,
-		BrokenVersions:         brokens,
 		Images:                 images,
 		Versions:               versions,
 	}, nil
@@ -187,7 +185,7 @@ func generateChannels(versions []*semver.Version) []Channel {
 	return channels
 }
 
-func generateChannelEntries(versions []*semver.Version, rootFromVersions []*semver.Version, skippedVersions map[*semver.Version]bool) []ChannelEntry {
+func generateChannelEntries(versions []*semver.Version, rootFromVersions []*semver.Version) []ChannelEntry {
 	channelEntries := make([]ChannelEntry, 0)
 	// We know that our catalog begins with 3.62.0. We set previousEntryVersion to 3.61.0 in order to have 3.62.0's `skipRange` consistent with others.
 	previousEntryVersion := semver.New(3, 61, 0, "", "")
@@ -199,7 +197,7 @@ func generateChannelEntries(versions []*semver.Version, rootFromVersions []*semv
 		}
 
 		firstInRoot := slices.ContainsFunc(rootFromVersions, v.Equal)
-		e := newChannelEntry(v, skippedVersions)
+		e := newChannelEntry(v)
 		if !firstInRoot {
 			e.addReplaces(v, previousEntryVersion)
 		}
@@ -254,7 +252,7 @@ func channelShouldHaveEntry(channel Channel, entry ChannelEntry) bool {
 }
 
 // generateDeprecations creates an object with a list of deprecations based on the provided versions.
-func generateDeprecations(versions []*semver.Version, channels []Channel, oldestSupportedVersion *semver.Version, brokenVersions map[*semver.Version]bool) Deprecations {
+func generateDeprecations(versions []*semver.Version, channels []Channel, oldestSupportedVersion *semver.Version) Deprecations {
 	var deprecations []DeprecationEntry
 
 	latestChannelDeprecationEntry := newChannelDeprecationEntry(latestChannelName, latestChannelDeprecationMessage)
@@ -272,9 +270,6 @@ func generateDeprecations(versions []*semver.Version, channels []Channel, oldest
 		msg := ""
 		if v.LessThan(oldestSupportedVersion) {
 			msg = bundleDeprecationMessage
-		}
-		if brokenVersions[v] {
-			msg = versionBrokenMessage
 		}
 		if msg != "" {
 			deprecations = append(deprecations, newBundleDeprecationEntry(v, msg))

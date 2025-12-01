@@ -7,13 +7,12 @@ import (
 )
 
 const (
-	rhacsOperator               = "rhacs-operator"
-	olmTemplateSchema           = "olm.template.basic"
-	olmPackageSchema            = "olm.package"
-	olmChannelSchema            = "olm.channel"
-	olmDeprecationsSchema       = "olm.deprecations"
-	olmBundleSchema             = "olm.bundle"
-	brokenVersionSkippingOffset = 2 // The number of versions to skip in the `skips` field of the channel entry for broken versions.
+	rhacsOperator         = "rhacs-operator"
+	olmTemplateSchema     = "olm.template.basic"
+	olmPackageSchema      = "olm.package"
+	olmChannelSchema      = "olm.channel"
+	olmDeprecationsSchema = "olm.deprecations"
+	olmBundleSchema       = "olm.bundle"
 )
 
 // Describes format of the input file for catalog template generation.
@@ -35,7 +34,6 @@ type InputBundleImage struct {
 // Describes domain logic configuration for the catalog template generation.
 type Configuration struct {
 	OldestSupportedVersion *semver.Version
-	BrokenVersions         map[*semver.Version]bool
 	Images                 []BundleImage
 	Versions               []*semver.Version
 }
@@ -92,7 +90,6 @@ type ChannelEntry struct {
 	Name      string          `yaml:"name"`
 	Replaces  string          `yaml:"replaces,omitempty"`
 	SkipRange string          `yaml:"skipRange"`
-	Skips     []string        `yaml:"skips,omitempty"`
 	version   *semver.Version `yaml:"-"`
 }
 
@@ -197,15 +194,11 @@ func newChannel(version *semver.Version) Channel {
 // |  - name: rhacs-operator.v<version>
 // |    replaces: rhacs-operator.v<previousEntryVersion>
 // |    skipRange: '>= <previousYStreamVersion> < <version>'
-// |    skips:
-// |      - rhacs-operator.v<skippedVersions>
-func newChannelEntry(version *semver.Version, skippedVersions map[*semver.Version]bool) ChannelEntry {
-	entry := ChannelEntry{
+func newChannelEntry(version *semver.Version) ChannelEntry {
+	return ChannelEntry{
 		Name:    generateBundleName(version),
 		version: version,
 	}
-	entry.addSkips(version, skippedVersions)
-	return entry
 }
 
 func (e *ChannelEntry) addReplaces(version, previousEntryVersion *semver.Version) {
@@ -214,16 +207,6 @@ func (e *ChannelEntry) addReplaces(version, previousEntryVersion *semver.Version
 
 func (e *ChannelEntry) addSkipRange(skipRangeFrom, skipRangeTo *semver.Version) {
 	e.SkipRange = fmt.Sprintf(">= %s < %s", skipRangeFrom, skipRangeTo)
-}
-
-func (e *ChannelEntry) addSkips(version *semver.Version, skippedVersions map[*semver.Version]bool) {
-	for skippedVersion := range skippedVersions {
-		// for any broken X.Y.Z version add "skips" for all versions > X.Y.Z and < X.Y+brokenVersionSkippingOffset.0
-		skipsUntilVersion := semver.New(skippedVersion.Major(), skippedVersion.Minor()+brokenVersionSkippingOffset, 0, "", "")
-		if version.GreaterThan(skippedVersion) && version.LessThan(skipsUntilVersion) {
-			e.Skips = append(e.Skips, generateBundleName(skippedVersion))
-		}
-	}
 }
 
 // Create a new "olm.deprecations" object which should be added to the catalog base.
