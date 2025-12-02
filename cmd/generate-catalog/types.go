@@ -18,11 +18,9 @@ const (
 // Describes format of the input file for catalog template generation.
 // It contains:
 // - OldestSupportedVersion - the oldest supported version of the operator. All versions < OldestSupportedVersion are marked as deprecated.
-// - BrokenVersions - a list of versions which are broken and should be skipped in the catalog.
 // - Images - a list of bundle images with their versions.
 type Input struct {
 	OldestSupportedVersion string             `yaml:"oldest_supported_version"`
-	BrokenVersions         []string           `yaml:"broken_versions"`
 	Images                 []InputBundleImage `yaml:"images"`
 }
 
@@ -71,11 +69,11 @@ type Icon struct {
 	MediaType  string `yaml:"mediatype"`
 }
 
-type GraphRoot struct {
-	MainChannel  Channel // The main channel (e.g., "stable" or "latest") which contains all versions associated with this root (e.g., stable: 4.0.x, 4.1.x, etc.)
-	Channels     []Channel
-	FromVersion  *semver.Version // Inclusive lower bound of versions associated with this root.
-	UntilVersion *semver.Version // Exclusive upper bound of versions associated with this root.
+type ChannelTree struct {
+	MainChannel     Channel // The main channel (e.g., "stable" or "latest") which contains all versions associated with this root (e.g., stable: 4.0.x, 4.1.x, etc.)
+	YStreamChannels []Channel
+	FromVersion     *semver.Version // Inclusive lower bound of versions associated with this root.
+	UntilVersion    *semver.Version // Exclusive upper bound of versions associated with this root.
 }
 
 type Channel struct {
@@ -159,13 +157,13 @@ func (c *CatalogTemplate) addBundles(bundles []BundleEntry) {
 	}
 }
 
-func newRootChannel(name string, from, until *semver.Version) GraphRoot {
+func newChannelTree(name string, from, until *semver.Version) ChannelTree {
 	mainChannel := Channel{
 		Schema:  olmChannelSchema,
 		Name:    name,
 		Package: rhacsOperator,
 	}
-	return GraphRoot{
+	return ChannelTree{
 		MainChannel:  mainChannel,
 		FromVersion:  from,
 		UntilVersion: until,
@@ -201,11 +199,11 @@ func newChannelEntry(version *semver.Version) ChannelEntry {
 	}
 }
 
-func (e *ChannelEntry) addReplaces(version, previousEntryVersion *semver.Version) {
+func (e *ChannelEntry) setReplaces(previousEntryVersion *semver.Version) {
 	e.Replaces = generateBundleName(previousEntryVersion)
 }
 
-func (e *ChannelEntry) addSkipRange(skipRangeFrom, skipRangeTo *semver.Version) {
+func (e *ChannelEntry) setSkipRange(skipRangeFrom, skipRangeTo *semver.Version) {
 	e.SkipRange = fmt.Sprintf(">= %s < %s", skipRangeFrom, skipRangeTo)
 }
 
