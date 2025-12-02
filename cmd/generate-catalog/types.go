@@ -69,7 +69,7 @@ type Icon struct {
 	MediaType  string `yaml:"mediatype"`
 }
 
-type ChannelTree struct {
+type ChannelLineage struct {
 	MainChannel     Channel // The main channel (e.g., "stable" or "latest") which contains all versions associated with this root (e.g., stable: 4.0.x, 4.1.x, etc.)
 	YStreamChannels []Channel
 	FromVersion     *semver.Version // Inclusive lower bound of versions associated with this root.
@@ -157,13 +157,14 @@ func (c *CatalogTemplate) addBundles(bundles []BundleEntry) {
 	}
 }
 
-func newChannelTree(name string, from, until *semver.Version) ChannelTree {
+// Create a new ChannelLineage structure which groups channels together (e.g., all "stable" channels).
+func newChannelLineage(name string, from, until *semver.Version) ChannelLineage {
 	mainChannel := Channel{
 		Schema:  olmChannelSchema,
 		Name:    name,
 		Package: rhacsOperator,
 	}
-	return ChannelTree{
+	return ChannelLineage{
 		MainChannel:  mainChannel,
 		FromVersion:  from,
 		UntilVersion: until,

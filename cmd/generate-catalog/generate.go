@@ -60,18 +60,18 @@ func generateCatalogTemplateFile() error {
 		return fmt.Errorf("failed to generate package object with icon: %v", err)
 	}
 
-	latestTree := newChannelTree(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
-	stableTree := newChannelTree(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
-	trees := []*ChannelTree{&latestTree, &stableTree}
+	latestLineage := newChannelLineage(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
+	stableLineage := newChannelLineage(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
+	lineages := []ChannelLineage{latestLineage, stableLineage}
 
 	emptyChannels := generateChannels(config.Versions)
-	populateChannels(trees, emptyChannels)
+	populateChannels(lineages, emptyChannels)
 
 	startingVersions := []*semver.Version{latestChannelFromVersion, stableChannelFromVersion}
 	entries := generateChannelEntries(config.Versions, startingVersions)
-	populateChannelEntries(trees, entries)
+	populateChannelEntries(lineages, entries)
 
-	channels := flattenChannelsFromTrees(trees)
+	channels := flattenChannels(lineages)
 
 	deprecations := generateDeprecations(config.Versions, channels, config.OldestSupportedVersion)
 	bundles := generateBundles(config.Images)
@@ -198,37 +198,37 @@ func generateChannelEntries(versions []*semver.Version, startingVersions []*semv
 	return channelEntries
 }
 
-func populateChannels(trees []*ChannelTree, channels []Channel) {
+func populateChannels(lineages []ChannelLineage, channels []Channel) {
 	for _, ch := range channels {
-		for _, tree := range trees {
-			if versionBelongsToChannelTree(ch.yStreamVersion, tree) {
-				tree.YStreamChannels = append(tree.YStreamChannels, ch)
+		for i := range lineages {
+			if versionBelongsToChannelLineage(ch.yStreamVersion, lineages[i]) {
+				lineages[i].YStreamChannels = append(lineages[i].YStreamChannels, ch)
 			}
 		}
 	}
 }
 
-func populateChannelEntries(trees []*ChannelTree, entries []ChannelEntry) {
+func populateChannelEntries(lineages []ChannelLineage, entries []ChannelEntry) {
 	for _, entry := range entries {
-		for _, tree := range trees {
-			if versionBelongsToChannelTree(entry.version, tree) {
-				for i := range tree.YStreamChannels {
-					if channelShouldHaveEntry(tree.YStreamChannels[i], entry) {
-						tree.YStreamChannels[i].Entries = append(tree.YStreamChannels[i].Entries, entry)
+		for i := range lineages {
+			if versionBelongsToChannelLineage(entry.version, lineages[i]) {
+				for j := range lineages[i].YStreamChannels {
+					if channelShouldHaveEntry(lineages[i].YStreamChannels[j], entry) {
+						lineages[i].YStreamChannels[j].Entries = append(lineages[i].YStreamChannels[j].Entries, entry)
 					}
 				}
-				tree.MainChannel.Entries = append(tree.MainChannel.Entries, entry)
+				lineages[i].MainChannel.Entries = append(lineages[i].MainChannel.Entries, entry)
 			}
 		}
 	}
 }
 
-// flattenChannelsFromTrees flattens channels from multiple ChannelTrees into a single slice.
-func flattenChannelsFromTrees(trees []*ChannelTree) []Channel {
+// flattenChannels flattens channels from multiple ChannelLineages into a single slice.
+func flattenChannels(lineages []ChannelLineage) []Channel {
 	var channels []Channel
-	for _, tree := range trees {
-		channels = append(channels, tree.YStreamChannels...)
-		channels = append(channels, tree.MainChannel)
+	for _, lineage := range lineages {
+		channels = append(channels, lineage.YStreamChannels...)
+		channels = append(channels, lineage.MainChannel)
 	}
 	return channels
 }
@@ -363,7 +363,7 @@ func validateImageReference(imageRef string) error {
 	if !ok || canonical.Digest() == "" {
 		return fmt.Errorf("image reference %s does not include a digest", imageRef)
 	}
-	if ok && canonical.Digest().Algorithm() != digest.SHA256 {
+	if canonical.Digest().Algorithm() != digest.SHA256 {
 		return fmt.Errorf("image reference %s digest algorithm is not sha256", imageRef)
 	}
 
@@ -377,6 +377,6 @@ func validateImageReference(imageRef string) error {
 	return nil
 }
 
-func versionBelongsToChannelTree(version *semver.Version, tree *ChannelTree) bool {
-	return tree.FromVersion.LessThanEqual(version) && tree.UntilVersion.GreaterThan(version)
+func versionBelongsToChannelLineage(version *semver.Version, lineage ChannelLineage) bool {
+	return lineage.FromVersion.LessThanEqual(version) && lineage.UntilVersion.GreaterThan(version)
 }

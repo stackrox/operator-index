@@ -547,11 +547,9 @@ func TestGenerateChannelEntries(t *testing.T) {
 			},
 			expectedEntries: 3,
 			validate: func(t *testing.T, entries []ChannelEntry) {
-				// Both 3.62.0 and 4.0.0 are starting versions, should not have replaces
 				assert.Empty(t, entries[0].Replaces) // 3.62.0
 				assert.Empty(t, entries[1].Replaces) // 4.0.0
 
-				// 4.1.0 should have replaces
 				assert.Equal(t, "rhacs-operator.v4.0.0", entries[2].Replaces) // 4.1.0
 			},
 		},
@@ -590,10 +588,8 @@ func TestGenerateDeprecations(t *testing.T) {
 			},
 			oldestSupportedVersion: semver.MustParse("4.0.0"),
 			validate: func(t *testing.T, deprecations Deprecations) {
-				// Should have latest channel deprecation + old channel + old bundle
 				assert.GreaterOrEqual(t, len(deprecations.Entries), 3)
 
-				// Check that 3.62.0 is deprecated as a bundle
 				hasOldBundleDeprecation := false
 				for _, entry := range deprecations.Entries {
 					if entry.Reference.Schema == olmBundleSchema && entry.Reference.Name == "rhacs-operator.v3.62.0" {
@@ -670,9 +666,9 @@ func TestGenerateBundles(t *testing.T) {
 }
 
 func TestPopulateChannels(t *testing.T) {
-	latestTree := newChannelTree("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
-	stableTree := newChannelTree("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
-	trees := []*ChannelTree{&latestTree, &stableTree}
+	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
+	stableLineage := newChannelLineage("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
+	lineages := []ChannelLineage{latestLineage, stableLineage}
 
 	channels := []Channel{
 		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
@@ -680,24 +676,27 @@ func TestPopulateChannels(t *testing.T) {
 		{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
 	}
 
-	populateChannels(trees, channels)
+	populateChannels(lineages, channels)
 
-	assert.Len(t, latestTree.YStreamChannels, 1)
-	assert.Equal(t, "rhacs-3.62", latestTree.YStreamChannels[0].Name)
+	latestLineage = lineages[0]
+	stableLineage = lineages[1]
 
-	assert.Len(t, stableTree.YStreamChannels, 2)
-	assert.Equal(t, "rhacs-4.0", stableTree.YStreamChannels[0].Name)
-	assert.Equal(t, "rhacs-4.1", stableTree.YStreamChannels[1].Name)
+	assert.Len(t, latestLineage.YStreamChannels, 1)
+	assert.Equal(t, "rhacs-3.62", latestLineage.YStreamChannels[0].Name)
+
+	assert.Len(t, stableLineage.YStreamChannels, 2)
+	assert.Equal(t, "rhacs-4.0", stableLineage.YStreamChannels[0].Name)
+	assert.Equal(t, "rhacs-4.1", stableLineage.YStreamChannels[1].Name)
 }
 
 func TestPopulateChannelEntries(t *testing.T) {
-	latestTree := newChannelTree("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
-	latestTree.YStreamChannels = []Channel{
+	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
+	latestLineage.YStreamChannels = []Channel{
 		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
 	}
 
-	stableTree := newChannelTree("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
-	stableTree.YStreamChannels = []Channel{
+	stableLineage := newChannelLineage("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
+	stableLineage.YStreamChannels = []Channel{
 		{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
 		{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
 		{Name: "rhacs-5.0", yStreamVersion: semver.MustParse("5.0.0")},
@@ -713,65 +712,68 @@ func TestPopulateChannelEntries(t *testing.T) {
 		{Name: "rhacs-operator.v5.0.1", version: semver.MustParse("5.0.1")},
 	}
 
-	trees := []*ChannelTree{&latestTree, &stableTree}
-	populateChannelEntries(trees, entries)
+	lineages := []ChannelLineage{latestLineage, stableLineage}
+	populateChannelEntries(lineages, entries)
 
-	assert.Len(t, latestTree.YStreamChannels, 1)
-	assert.Equal(t, "rhacs-3.62", latestTree.YStreamChannels[0].Name)
+	latestLineage = lineages[0]
+	stableLineage = lineages[1]
 
-	assert.Len(t, latestTree.YStreamChannels[0].Entries, 2)
-	assert.Equal(t, "rhacs-operator.v3.62.0", latestTree.YStreamChannels[0].Entries[0].Name)
-	assert.Equal(t, "rhacs-operator.v3.62.1", latestTree.YStreamChannels[0].Entries[1].Name)
+	assert.Len(t, latestLineage.YStreamChannels, 1)
+	assert.Equal(t, "rhacs-3.62", latestLineage.YStreamChannels[0].Name)
 
-	assert.Len(t, latestTree.MainChannel.Entries, 2)
-	assert.Equal(t, "rhacs-operator.v3.62.0", latestTree.MainChannel.Entries[0].Name)
-	assert.Equal(t, "rhacs-operator.v3.62.1", latestTree.MainChannel.Entries[1].Name)
+	assert.Len(t, latestLineage.YStreamChannels[0].Entries, 2)
+	assert.Equal(t, "rhacs-operator.v3.62.0", latestLineage.YStreamChannels[0].Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v3.62.1", latestLineage.YStreamChannels[0].Entries[1].Name)
 
-	assert.Len(t, stableTree.YStreamChannels, 3)
+	assert.Len(t, latestLineage.MainChannel.Entries, 2)
+	assert.Equal(t, "rhacs-operator.v3.62.0", latestLineage.MainChannel.Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v3.62.1", latestLineage.MainChannel.Entries[1].Name)
 
-	assert.Equal(t, "rhacs-4.0", stableTree.YStreamChannels[0].Name)
-	assert.Len(t, stableTree.YStreamChannels[0].Entries, 2)
-	assert.Equal(t, "rhacs-operator.v4.0.0", stableTree.YStreamChannels[0].Entries[0].Name)
-	assert.Equal(t, "rhacs-operator.v4.0.1", stableTree.YStreamChannels[0].Entries[1].Name)
+	assert.Len(t, stableLineage.YStreamChannels, 3)
 
-	assert.Equal(t, "rhacs-4.1", stableTree.YStreamChannels[1].Name)
-	assert.Len(t, stableTree.YStreamChannels[1].Entries, 3)
-	assert.Equal(t, "rhacs-operator.v4.0.0", stableTree.YStreamChannels[1].Entries[0].Name)
-	assert.Equal(t, "rhacs-operator.v4.0.1", stableTree.YStreamChannels[1].Entries[1].Name)
-	assert.Equal(t, "rhacs-operator.v4.1.0", stableTree.YStreamChannels[1].Entries[2].Name)
+	assert.Equal(t, "rhacs-4.0", stableLineage.YStreamChannels[0].Name)
+	assert.Len(t, stableLineage.YStreamChannels[0].Entries, 2)
+	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.YStreamChannels[0].Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v4.0.1", stableLineage.YStreamChannels[0].Entries[1].Name)
 
-	assert.Equal(t, "rhacs-5.0", stableTree.YStreamChannels[2].Name)
-	assert.Len(t, stableTree.YStreamChannels[2].Entries, 5)
-	assert.Equal(t, "rhacs-operator.v4.0.0", stableTree.YStreamChannels[2].Entries[0].Name)
-	assert.Equal(t, "rhacs-operator.v4.0.1", stableTree.YStreamChannels[2].Entries[1].Name)
-	assert.Equal(t, "rhacs-operator.v4.1.0", stableTree.YStreamChannels[2].Entries[2].Name)
-	assert.Equal(t, "rhacs-operator.v5.0.0", stableTree.YStreamChannels[2].Entries[3].Name)
-	assert.Equal(t, "rhacs-operator.v5.0.1", stableTree.YStreamChannels[2].Entries[4].Name)
+	assert.Equal(t, "rhacs-4.1", stableLineage.YStreamChannels[1].Name)
+	assert.Len(t, stableLineage.YStreamChannels[1].Entries, 3)
+	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.YStreamChannels[1].Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v4.0.1", stableLineage.YStreamChannels[1].Entries[1].Name)
+	assert.Equal(t, "rhacs-operator.v4.1.0", stableLineage.YStreamChannels[1].Entries[2].Name)
 
-	assert.Len(t, stableTree.MainChannel.Entries, 5)
-	assert.Equal(t, "rhacs-operator.v4.0.0", stableTree.MainChannel.Entries[0].Name)
-	assert.Equal(t, "rhacs-operator.v4.0.1", stableTree.MainChannel.Entries[1].Name)
-	assert.Equal(t, "rhacs-operator.v4.1.0", stableTree.MainChannel.Entries[2].Name)
-	assert.Equal(t, "rhacs-operator.v5.0.0", stableTree.MainChannel.Entries[3].Name)
-	assert.Equal(t, "rhacs-operator.v5.0.1", stableTree.MainChannel.Entries[4].Name)
+	assert.Equal(t, "rhacs-5.0", stableLineage.YStreamChannels[2].Name)
+	assert.Len(t, stableLineage.YStreamChannels[2].Entries, 5)
+	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.YStreamChannels[2].Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v4.0.1", stableLineage.YStreamChannels[2].Entries[1].Name)
+	assert.Equal(t, "rhacs-operator.v4.1.0", stableLineage.YStreamChannels[2].Entries[2].Name)
+	assert.Equal(t, "rhacs-operator.v5.0.0", stableLineage.YStreamChannels[2].Entries[3].Name)
+	assert.Equal(t, "rhacs-operator.v5.0.1", stableLineage.YStreamChannels[2].Entries[4].Name)
+
+	assert.Len(t, stableLineage.MainChannel.Entries, 5)
+	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.MainChannel.Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v4.0.1", stableLineage.MainChannel.Entries[1].Name)
+	assert.Equal(t, "rhacs-operator.v4.1.0", stableLineage.MainChannel.Entries[2].Name)
+	assert.Equal(t, "rhacs-operator.v5.0.0", stableLineage.MainChannel.Entries[3].Name)
+	assert.Equal(t, "rhacs-operator.v5.0.1", stableLineage.MainChannel.Entries[4].Name)
 }
 
-func TestFlattenChannelsFromTrees(t *testing.T) {
-	latestTree := newChannelTree("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
-	latestTree.YStreamChannels = []Channel{
+func TestFlattenChannelsFromLineages(t *testing.T) {
+	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
+	latestLineage.YStreamChannels = []Channel{
 		{Name: "rhacs-3.62"},
 	}
 
-	stableTree := newChannelTree("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
-	stableTree.YStreamChannels = []Channel{
+	stableLineage := newChannelLineage("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
+	stableLineage.YStreamChannels = []Channel{
 		{Name: "rhacs-4.0"},
 		{Name: "rhacs-4.1"},
 	}
 
-	trees := []*ChannelTree{&latestTree, &stableTree}
-	channels := flattenChannelsFromTrees(trees)
+	lineages := []ChannelLineage{latestLineage, stableLineage}
+	channels := flattenChannels(lineages)
 
-	// Should have 4 channels total: rhacs-3.62, latest, rhacs-4.0, rhacs-4.1, stable
+	// Should have 5 channels total: rhacs-3.62, latest, rhacs-4.0, rhacs-4.1, stable
 	assert.Len(t, channels, 5)
 }
 
