@@ -25,11 +25,9 @@ func TestReadInputFile(t *testing.T) {
 				assert.Len(t, config.Images, 4)
 				assert.Len(t, config.Versions, 4)
 
-				// Verify images
 				assert.Equal(t, "example.com/image@sha256:6cdcf20771f9c46640b466f804190d00eaf2e59caee6d420436e78b283d177bf", config.Images[0].Image)
 				assert.Equal(t, "3.62.0", config.Images[0].Version.String())
 
-				// Verify versions are extracted correctly
 				assert.Equal(t, "3.62.0", config.Versions[0].String())
 				assert.Equal(t, "4.0.0", config.Versions[1].String())
 				assert.Equal(t, "4.1.0", config.Versions[2].String())
@@ -128,6 +126,11 @@ func TestValidateImageReference(t *testing.T) {
 			name:          "Image reference with invalid sha256 digest",
 			image:         "example.com/image@sha256:invaliddigest",
 			expectedError: "invalid reference format",
+		},
+		{
+			name:          "Image reference with not sha256 digest algorithm",
+			image:         "example.com/image@sha384:fdbd8e75a67f29f701a4e040385e2e23986303ea10239211af907fcbb83578b3e417cb71ce646efd0819dd8c088de1bd",
+			expectedError: "digest algorithm is not sha256",
 		},
 		{
 			name:          "Image reference without registry",
@@ -438,28 +441,26 @@ func TestGenerateChannelEntries(t *testing.T) {
 	tests := []struct {
 		name             string
 		versions         []*semver.Version
-		rootFromVersions []*semver.Version
+		startingVersions []*semver.Version
 		expectedEntries  int
 		validate         func(t *testing.T, entries []ChannelEntry)
 	}{
 		{
-			name: "Simple version sequence with first version at root",
+			name: "Simple version sequence with first version at the start",
 			versions: []*semver.Version{
 				semver.MustParse("3.62.0"),
 				semver.MustParse("3.62.1"),
 			},
-			rootFromVersions: []*semver.Version{
+			startingVersions: []*semver.Version{
 				semver.MustParse("3.62.0"),
 			},
 			expectedEntries: 2,
 			validate: func(t *testing.T, entries []ChannelEntry) {
-				// First entry should not have replaces (it's a root version)
+				// First entry should not have replaces
 				assert.Equal(t, "rhacs-operator.v3.62.0", entries[0].Name)
 				assert.Empty(t, entries[0].Replaces)
 				assert.Equal(t, ">= 3.61.0 < 3.62.0", entries[0].SkipRange)
 
-				// Second entry should have replaces and skipRange from same Y-stream (3.61.0)
-				// because previousYStreamVersion is only updated when minor changes
 				assert.Equal(t, "rhacs-operator.v3.62.1", entries[1].Name)
 				assert.Equal(t, "rhacs-operator.v3.62.0", entries[1].Replaces)
 				assert.Equal(t, ">= 3.61.0 < 3.62.1", entries[1].SkipRange)
@@ -473,49 +474,43 @@ func TestGenerateChannelEntries(t *testing.T) {
 				semver.MustParse("4.0.2"),
 				semver.MustParse("4.1.0"),
 			},
-			rootFromVersions: []*semver.Version{
+			startingVersions: []*semver.Version{
 				semver.MustParse("4.0.0"),
 			},
 			expectedEntries: 4,
 			validate: func(t *testing.T, entries []ChannelEntry) {
-				// 4.0.0 is root, should not have replaces
 				assert.Equal(t, "rhacs-operator.v4.0.0", entries[0].Name)
 				assert.Empty(t, entries[0].Replaces)
 				assert.Equal(t, ">= 3.61.0 < 4.0.0", entries[0].SkipRange)
 
-				// 4.0.1 should have replaces, skipRange still from 3.61.0 (previousYStreamVersion not updated yet)
 				assert.Equal(t, "rhacs-operator.v4.0.1", entries[1].Name)
 				assert.Equal(t, "rhacs-operator.v4.0.0", entries[1].Replaces)
 				assert.Equal(t, ">= 3.61.0 < 4.0.1", entries[1].SkipRange)
 
-				// 4.1.0 is new Y-stream, skipRange should start from previous Y-stream (4.0.0)
 				assert.Equal(t, "rhacs-operator.v4.1.0", entries[3].Name)
 				assert.Equal(t, "rhacs-operator.v4.0.2", entries[3].Replaces)
 				assert.Equal(t, ">= 4.0.0 < 4.1.0", entries[3].SkipRange)
 			},
 		},
 		{
-			name: "Major version transition - 4.0.0 is root",
+			name: "Major version transition - 4.0.0 is starting version",
 			versions: []*semver.Version{
 				semver.MustParse("3.62.0"),
 				semver.MustParse("3.62.1"),
 				semver.MustParse("4.0.0"),
 			},
-			rootFromVersions: []*semver.Version{
+			startingVersions: []*semver.Version{
 				semver.MustParse("3.62.0"),
 				semver.MustParse("4.0.0"),
 			},
 			expectedEntries: 3,
 			validate: func(t *testing.T, entries []ChannelEntry) {
-				// 3.62.0 should not have replaces (root)
 				assert.Equal(t, "rhacs-operator.v3.62.0", entries[0].Name)
 				assert.Empty(t, entries[0].Replaces)
 
-				// 3.62.1 should have replaces
 				assert.Equal(t, "rhacs-operator.v3.62.1", entries[1].Name)
 				assert.Equal(t, "rhacs-operator.v3.62.0", entries[1].Replaces)
 
-				// 4.0.0 should not have replaces (it's a root version)
 				assert.Equal(t, "rhacs-operator.v4.0.0", entries[2].Name)
 				assert.Empty(t, entries[2].Replaces)
 				assert.Equal(t, ">= 3.62.0 < 4.0.0", entries[2].SkipRange)
@@ -530,39 +525,29 @@ func TestGenerateChannelEntries(t *testing.T) {
 				semver.MustParse("4.1.0"),
 				semver.MustParse("4.1.1"),
 			},
-			rootFromVersions: []*semver.Version{
+			startingVersions: []*semver.Version{
 				semver.MustParse("4.0.0"),
 			},
 			expectedEntries: 5,
 			validate: func(t *testing.T, entries []ChannelEntry) {
-				// 4.0.0 is first, skipRange from 3.61.0
-				assert.Equal(t, ">= 3.61.0 < 4.0.0", entries[0].SkipRange) // 4.0.0
-
-				// Within 4.0.x, skipRange stays at 3.61.0 until minor changes
-				assert.Equal(t, ">= 3.61.0 < 4.0.1", entries[1].SkipRange) // 4.0.1
-				assert.Equal(t, ">= 3.61.0 < 4.0.2", entries[2].SkipRange) // 4.0.2
-
-				// At 4.1.0 (new Y-stream), previousYStreamVersion gets updated to 4.0.0
-				assert.Equal(t, ">= 4.0.0 < 4.1.0", entries[3].SkipRange) // 4.1.0
-
-				// Within 4.1.x, skipRange stays from 4.0.0
-				assert.Equal(t, ">= 4.0.0 < 4.1.1", entries[4].SkipRange) // 4.1.1
+				assert.Equal(t, ">= 4.0.0 < 4.1.0", entries[3].SkipRange)
+				assert.Equal(t, ">= 4.0.0 < 4.1.1", entries[4].SkipRange)
 			},
 		},
 		{
-			name: "Multiple root versions",
+			name: "Multiple starting versions",
 			versions: []*semver.Version{
 				semver.MustParse("3.62.0"),
 				semver.MustParse("4.0.0"),
 				semver.MustParse("4.1.0"),
 			},
-			rootFromVersions: []*semver.Version{
+			startingVersions: []*semver.Version{
 				semver.MustParse("3.62.0"),
 				semver.MustParse("4.0.0"),
 			},
 			expectedEntries: 3,
 			validate: func(t *testing.T, entries []ChannelEntry) {
-				// Both 3.62.0 and 4.0.0 are roots, should not have replaces
+				// Both 3.62.0 and 4.0.0 are starting versions, should not have replaces
 				assert.Empty(t, entries[0].Replaces) // 3.62.0
 				assert.Empty(t, entries[1].Replaces) // 4.0.0
 
@@ -574,7 +559,7 @@ func TestGenerateChannelEntries(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			entries := generateChannelEntries(tt.versions, tt.rootFromVersions)
+			entries := generateChannelEntries(tt.versions, tt.startingVersions)
 
 			assert.Len(t, entries, tt.expectedEntries)
 			if tt.validate != nil {
@@ -650,7 +635,6 @@ func TestGenerateDeprecations(t *testing.T) {
 			},
 			oldestSupportedVersion: semver.MustParse("4.0.0"),
 			validate: func(t *testing.T, deprecations Deprecations) {
-				// Should only have latest channel deprecation, no bundle deprecations
 				assert.Equal(t, 1, len(deprecations.Entries))
 				assert.Equal(t, olmChannelSchema, deprecations.Entries[0].Reference.Schema)
 				assert.Equal(t, "latest", deprecations.Entries[0].Reference.Name)
@@ -686,9 +670,9 @@ func TestGenerateBundles(t *testing.T) {
 }
 
 func TestPopulateChannels(t *testing.T) {
-	latestRoot := newRootChannel("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
-	stableRoot := newRootChannel("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
-	roots := []*GraphRoot{&latestRoot, &stableRoot}
+	latestTree := newChannelTree("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
+	stableTree := newChannelTree("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
+	trees := []*ChannelTree{&latestTree, &stableTree}
 
 	channels := []Channel{
 		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
@@ -696,55 +680,96 @@ func TestPopulateChannels(t *testing.T) {
 		{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
 	}
 
-	populateChannels(roots, channels)
+	populateChannels(trees, channels)
 
-	// Latest root should have rhacs-3.62
-	assert.Len(t, latestRoot.Channels, 1)
-	assert.Equal(t, "rhacs-3.62", latestRoot.Channels[0].Name)
+	assert.Len(t, latestTree.YStreamChannels, 1)
+	assert.Equal(t, "rhacs-3.62", latestTree.YStreamChannels[0].Name)
 
-	// Stable root should have rhacs-4.0 and rhacs-4.1
-	assert.Len(t, stableRoot.Channels, 2)
-	assert.Equal(t, "rhacs-4.0", stableRoot.Channels[0].Name)
-	assert.Equal(t, "rhacs-4.1", stableRoot.Channels[1].Name)
+	assert.Len(t, stableTree.YStreamChannels, 2)
+	assert.Equal(t, "rhacs-4.0", stableTree.YStreamChannels[0].Name)
+	assert.Equal(t, "rhacs-4.1", stableTree.YStreamChannels[1].Name)
 }
 
 func TestPopulateChannelEntries(t *testing.T) {
-	latestRoot := newRootChannel("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
-	latestRoot.Channels = []Channel{
+	latestTree := newChannelTree("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
+	latestTree.YStreamChannels = []Channel{
 		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
+	}
+
+	stableTree := newChannelTree("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
+	stableTree.YStreamChannels = []Channel{
+		{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
+		{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
+		{Name: "rhacs-5.0", yStreamVersion: semver.MustParse("5.0.0")},
 	}
 
 	entries := []ChannelEntry{
 		{Name: "rhacs-operator.v3.62.0", version: semver.MustParse("3.62.0")},
 		{Name: "rhacs-operator.v3.62.1", version: semver.MustParse("3.62.1")},
+		{Name: "rhacs-operator.v4.0.0", version: semver.MustParse("4.0.0")},
+		{Name: "rhacs-operator.v4.0.1", version: semver.MustParse("4.0.1")},
+		{Name: "rhacs-operator.v4.1.0", version: semver.MustParse("4.1.0")},
+		{Name: "rhacs-operator.v5.0.0", version: semver.MustParse("5.0.0")},
+		{Name: "rhacs-operator.v5.0.1", version: semver.MustParse("5.0.1")},
 	}
 
-	roots := []*GraphRoot{&latestRoot}
-	populateChannelEntries(roots, entries)
+	trees := []*ChannelTree{&latestTree, &stableTree}
+	populateChannelEntries(trees, entries)
 
-	// Channel should have both entries
-	assert.Len(t, latestRoot.Channels[0].Entries, 2)
-	assert.Equal(t, "rhacs-operator.v3.62.0", latestRoot.Channels[0].Entries[0].Name)
-	assert.Equal(t, "rhacs-operator.v3.62.1", latestRoot.Channels[0].Entries[1].Name)
+	assert.Len(t, latestTree.YStreamChannels, 1)
+	assert.Equal(t, "rhacs-3.62", latestTree.YStreamChannels[0].Name)
 
-	// Main channel should also have both entries
-	assert.Len(t, latestRoot.MainChannel.Entries, 2)
+	assert.Len(t, latestTree.YStreamChannels[0].Entries, 2)
+	assert.Equal(t, "rhacs-operator.v3.62.0", latestTree.YStreamChannels[0].Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v3.62.1", latestTree.YStreamChannels[0].Entries[1].Name)
+
+	assert.Len(t, latestTree.MainChannel.Entries, 2)
+	assert.Equal(t, "rhacs-operator.v3.62.0", latestTree.MainChannel.Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v3.62.1", latestTree.MainChannel.Entries[1].Name)
+
+	assert.Len(t, stableTree.YStreamChannels, 3)
+
+	assert.Equal(t, "rhacs-4.0", stableTree.YStreamChannels[0].Name)
+	assert.Len(t, stableTree.YStreamChannels[0].Entries, 2)
+	assert.Equal(t, "rhacs-operator.v4.0.0", stableTree.YStreamChannels[0].Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v4.0.1", stableTree.YStreamChannels[0].Entries[1].Name)
+
+	assert.Equal(t, "rhacs-4.1", stableTree.YStreamChannels[1].Name)
+	assert.Len(t, stableTree.YStreamChannels[1].Entries, 3)
+	assert.Equal(t, "rhacs-operator.v4.0.0", stableTree.YStreamChannels[1].Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v4.0.1", stableTree.YStreamChannels[1].Entries[1].Name)
+	assert.Equal(t, "rhacs-operator.v4.1.0", stableTree.YStreamChannels[1].Entries[2].Name)
+
+	assert.Equal(t, "rhacs-5.0", stableTree.YStreamChannels[2].Name)
+	assert.Len(t, stableTree.YStreamChannels[2].Entries, 5)
+	assert.Equal(t, "rhacs-operator.v4.0.0", stableTree.YStreamChannels[2].Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v4.0.1", stableTree.YStreamChannels[2].Entries[1].Name)
+	assert.Equal(t, "rhacs-operator.v4.1.0", stableTree.YStreamChannels[2].Entries[2].Name)
+	assert.Equal(t, "rhacs-operator.v5.0.0", stableTree.YStreamChannels[2].Entries[3].Name)
+	assert.Equal(t, "rhacs-operator.v5.0.1", stableTree.YStreamChannels[2].Entries[4].Name)
+
+	assert.Len(t, stableTree.MainChannel.Entries, 5)
+	assert.Equal(t, "rhacs-operator.v4.0.0", stableTree.MainChannel.Entries[0].Name)
+	assert.Equal(t, "rhacs-operator.v4.0.1", stableTree.MainChannel.Entries[1].Name)
+	assert.Equal(t, "rhacs-operator.v4.1.0", stableTree.MainChannel.Entries[2].Name)
+	assert.Equal(t, "rhacs-operator.v5.0.0", stableTree.MainChannel.Entries[3].Name)
+	assert.Equal(t, "rhacs-operator.v5.0.1", stableTree.MainChannel.Entries[4].Name)
 }
 
-func TestFlattenChannelsFromRoots(t *testing.T) {
-	latestRoot := newRootChannel("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
-	latestRoot.Channels = []Channel{
+func TestFlattenChannelsFromTrees(t *testing.T) {
+	latestTree := newChannelTree("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
+	latestTree.YStreamChannels = []Channel{
 		{Name: "rhacs-3.62"},
 	}
 
-	stableRoot := newRootChannel("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
-	stableRoot.Channels = []Channel{
+	stableTree := newChannelTree("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
+	stableTree.YStreamChannels = []Channel{
 		{Name: "rhacs-4.0"},
 		{Name: "rhacs-4.1"},
 	}
 
-	roots := []*GraphRoot{&latestRoot, &stableRoot}
-	channels := flattenChannelsFromRoots(roots)
+	trees := []*ChannelTree{&latestTree, &stableTree}
+	channels := flattenChannelsFromTrees(trees)
 
 	// Should have 4 channels total: rhacs-3.62, latest, rhacs-4.0, rhacs-4.1, stable
 	assert.Len(t, channels, 5)
@@ -776,12 +801,6 @@ func TestChannelShouldHaveEntry(t *testing.T) {
 			expected: false,
 		},
 		{
-			name:     "Entry is from different major version",
-			channel:  Channel{yStreamVersion: semver.MustParse("4.0.0")},
-			entry:    ChannelEntry{version: semver.MustParse("3.62.0")},
-			expected: false,
-		},
-		{
 			name:     "Entry minor equals channel minor",
 			channel:  Channel{yStreamVersion: semver.MustParse("4.1.0")},
 			entry:    ChannelEntry{version: semver.MustParse("4.1.5")},
@@ -798,11 +817,9 @@ func TestChannelShouldHaveEntry(t *testing.T) {
 }
 
 func TestWriteToFile(t *testing.T) {
-	// Create a temporary directory for test
 	tempDir := t.TempDir()
 	outputPath := filepath.Join(tempDir, "test_output.yaml")
 
-	// Create a simple catalog template
 	ct := newCatalogTemplate()
 	pkg := Package{
 		Schema:         olmPackageSchema,
@@ -812,37 +829,16 @@ func TestWriteToFile(t *testing.T) {
 	}
 	ct.addPackage(pkg)
 
-	// Write to file
 	err := writeToFile(outputPath, ct)
 	require.NoError(t, err)
 
-	// Verify file exists
 	_, err = os.Stat(outputPath)
 	assert.NoError(t, err)
 
-	// Read file and verify content
 	content, err := os.ReadFile(outputPath)
 	require.NoError(t, err)
 
-	// Verify it's valid YAML and contains expected content
 	assert.Contains(t, string(content), "DO NOT EDIT")
 	assert.Contains(t, string(content), olmTemplateSchema)
 	assert.Contains(t, string(content), rhacsOperator)
-}
-
-func TestGeneratePackageWithIcon(t *testing.T) {
-	// This test requires the icon.png file to exist
-	// We'll skip if it doesn't exist to make tests more portable
-	if _, err := os.Stat(iconFile); os.IsNotExist(err) {
-		t.Skip("icon.png not found, skipping test")
-	}
-
-	pkg, err := generatePackageWithIcon()
-
-	require.NoError(t, err)
-	assert.Equal(t, olmPackageSchema, pkg.Schema)
-	assert.Equal(t, rhacsOperator, pkg.Name)
-	assert.Equal(t, stableChannelName, pkg.DefaultChannel)
-	assert.NotEmpty(t, pkg.Icon.Base64data)
-	assert.Equal(t, "image/png", pkg.Icon.MediaType)
 }
