@@ -12,6 +12,7 @@ import (
 
 	semver "github.com/Masterminds/semver/v3"
 	"github.com/goccy/go-yaml"
+	"github.com/opencontainers/go-digest"
 
 	"github.com/distribution/reference"
 )
@@ -59,18 +60,18 @@ func generateCatalogTemplateFile() error {
 		return fmt.Errorf("failed to generate package object with icon: %v", err)
 	}
 
-	latestRoot := newRootChannel(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
-	stableRoot := newRootChannel(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
-	roots := []*GraphRoot{&latestRoot, &stableRoot}
+	latestTree := newChannelTree(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
+	stableTree := newChannelTree(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
+	trees := []*ChannelTree{&latestTree, &stableTree}
 
 	emptyChannels := generateChannels(config.Versions)
-	populateChannels(roots, emptyChannels)
+	populateChannels(trees, emptyChannels)
 
-	rootFromVersions := []*semver.Version{latestChannelFromVersion, stableChannelFromVersion}
-	entries := generateChannelEntries(config.Versions, rootFromVersions)
-	populateChannelEntries(roots, entries)
+	startingVersions := []*semver.Version{latestChannelFromVersion, stableChannelFromVersion}
+	entries := generateChannelEntries(config.Versions, startingVersions)
+	populateChannelEntries(trees, entries)
 
-	channels := flattenChannelsFromRoots(roots)
+	channels := flattenChannelsFromTrees(trees)
 
 	deprecations := generateDeprecations(config.Versions, channels, config.OldestSupportedVersion)
 	bundles := generateBundles(config.Images)
@@ -107,15 +108,6 @@ func readInputFile(filename string) (Configuration, error) {
 		return Configuration{}, fmt.Errorf("invalid oldest_supported_version %q: %v", input.OldestSupportedVersion, err)
 	}
 
-	brokens := make(map[*semver.Version]bool, len(input.BrokenVersions))
-	for _, s := range input.BrokenVersions {
-		v, err := semver.StrictNewVersion(s)
-		if err != nil {
-			return Configuration{}, fmt.Errorf("invalid item in broken_versions %q: %v", s, err)
-		}
-		brokens[v] = true
-	}
-
 	var images []BundleImage
 	for _, img := range input.Images {
 		v, err := semver.StrictNewVersion(img.Version)
@@ -128,7 +120,6 @@ func readInputFile(filename string) (Configuration, error) {
 		})
 	}
 
-	// TODO: ROX-30604 check that image reference is associated with the provided version.
 	if err = validateImageReferences(images); err != nil {
 		return Configuration{}, err
 	}
@@ -138,9 +129,6 @@ func readInputFile(filename string) (Configuration, error) {
 		return Configuration{}, err
 	}
 	if err = hasGapInVersions(versions); err != nil {
-		return Configuration{}, err
-	}
-	if err = validateBrokenVersions(brokens, versions); err != nil {
 		return Configuration{}, err
 	}
 	if !slices.ContainsFunc(versions, oldest.Equal) {
@@ -173,7 +161,7 @@ func generateChannels(versions []*semver.Version) []Channel {
 	for _, v := range versions {
 		yStream := makeYStreamVersion(v)
 		if yStream.Equal(previousYStream) {
-			// Skip channel creation for not new Y-Stream versions
+			// If we saw the same Y-Stream version, we already created a channel for it.
 			continue
 		}
 
@@ -185,7 +173,7 @@ func generateChannels(versions []*semver.Version) []Channel {
 	return channels
 }
 
-func generateChannelEntries(versions []*semver.Version, rootFromVersions []*semver.Version) []ChannelEntry {
+func generateChannelEntries(versions []*semver.Version, startingVersions []*semver.Version) []ChannelEntry {
 	channelEntries := make([]ChannelEntry, 0)
 	// We know that our catalog begins with 3.62.0. We set previousEntryVersion to 3.61.0 in order to have 3.62.0's `skipRange` consistent with others.
 	previousEntryVersion := semver.New(3, 61, 0, "", "")
@@ -196,12 +184,12 @@ func generateChannelEntries(versions []*semver.Version, rootFromVersions []*semv
 			previousYStreamVersion = makeYStreamVersion(previousEntryVersion)
 		}
 
-		firstInRoot := slices.ContainsFunc(rootFromVersions, v.Equal)
+		isStartingVersion := slices.ContainsFunc(startingVersions, v.Equal)
 		e := newChannelEntry(v)
-		if !firstInRoot {
-			e.addReplaces(v, previousEntryVersion)
+		if !isStartingVersion {
+			e.setReplaces(previousEntryVersion)
 		}
-		e.addSkipRange(previousYStreamVersion, v)
+		e.setSkipRange(previousYStreamVersion, v)
 		channelEntries = append(channelEntries, e)
 
 		previousEntryVersion = v
@@ -210,45 +198,46 @@ func generateChannelEntries(versions []*semver.Version, rootFromVersions []*semv
 	return channelEntries
 }
 
-func populateChannels(roots []*GraphRoot, channels []Channel) {
+func populateChannels(trees []*ChannelTree, channels []Channel) {
 	for _, ch := range channels {
-		for i := range roots {
-			if ch.yStreamVersion.GreaterThanEqual(roots[i].FromVersion) && ch.yStreamVersion.LessThan(roots[i].UntilVersion) {
-				roots[i].Channels = append(roots[i].Channels, ch)
+		for _, tree := range trees {
+			if versionBelongsToChannelTree(ch.yStreamVersion, tree) {
+				tree.YStreamChannels = append(tree.YStreamChannels, ch)
 			}
 		}
 	}
 }
 
-func populateChannelEntries(roots []*GraphRoot, entries []ChannelEntry) {
+func populateChannelEntries(trees []*ChannelTree, entries []ChannelEntry) {
 	for _, entry := range entries {
-		for _, root := range roots {
-			if entry.version.GreaterThanEqual(root.FromVersion) && entry.version.LessThan(root.UntilVersion) {
-				for i := range root.Channels {
-					if channelShouldHaveEntry(root.Channels[i], entry) {
-						root.Channels[i].Entries = append(root.Channels[i].Entries, entry)
+		for _, tree := range trees {
+			if versionBelongsToChannelTree(entry.version, tree) {
+				for i := range tree.YStreamChannels {
+					if channelShouldHaveEntry(tree.YStreamChannels[i], entry) {
+						tree.YStreamChannels[i].Entries = append(tree.YStreamChannels[i].Entries, entry)
 					}
 				}
-				root.MainChannel.Entries = append(root.MainChannel.Entries, entry)
+				tree.MainChannel.Entries = append(tree.MainChannel.Entries, entry)
 			}
 		}
 	}
 }
 
-// flattenChannelsFromRoots flattens channels from multiple GraphRoots into a single slice.
-func flattenChannelsFromRoots(roots []*GraphRoot) []Channel {
+// flattenChannelsFromTrees flattens channels from multiple ChannelTrees into a single slice.
+func flattenChannelsFromTrees(trees []*ChannelTree) []Channel {
 	var channels []Channel
-	for _, root := range roots {
-		channels = append(channels, root.Channels...)
-		channels = append(channels, root.MainChannel)
+	for _, tree := range trees {
+		channels = append(channels, tree.YStreamChannels...)
+		channels = append(channels, tree.MainChannel)
 	}
 	return channels
 }
 
 func channelShouldHaveEntry(channel Channel, entry ChannelEntry) bool {
+	lesserX := entry.version.Major() < channel.yStreamVersion.Major()
 	sameXVersion := entry.version.Major() == channel.yStreamVersion.Major()
 	belongsToYStream := entry.version.Minor() <= channel.yStreamVersion.Minor()
-	return sameXVersion && belongsToYStream
+	return lesserX || (sameXVersion && belongsToYStream)
 }
 
 // generateDeprecations creates an object with a list of deprecations based on the provided versions.
@@ -352,15 +341,6 @@ func hasGapInVersions(versions []*semver.Version) error {
 	return nil
 }
 
-func validateBrokenVersions(brokenVersions map[*semver.Version]bool, versions []*semver.Version) error {
-	for brokenVersion := range brokenVersions {
-		if !slices.ContainsFunc(versions, brokenVersion.Equal) {
-			return fmt.Errorf("broken version %s is not present in the list of versions", brokenVersion)
-		}
-	}
-	return nil
-}
-
 // validateImageReferences checks that all images in the input bundle have valid container image references with a digest.
 func validateImageReferences(images []BundleImage) error {
 	for _, img := range images {
@@ -379,24 +359,24 @@ func validateImageReference(imageRef string) error {
 		return fmt.Errorf("cannot parse string as container image reference %s: %w", imageRef, err)
 	}
 
-	// check that digest is provided
-	if _, ok := ref.(reference.Canonical); !ok {
+	canonical, ok := ref.(reference.Canonical)
+	if !ok || canonical.Digest() == "" {
 		return fmt.Errorf("image reference %s does not include a digest", imageRef)
 	}
-
-	named, ok := ref.(reference.Named)
-	if !ok {
-		return fmt.Errorf("image reference %s has invalid format", imageRef)
+	if ok && canonical.Digest().Algorithm() != digest.SHA256 {
+		return fmt.Errorf("image reference %s digest algorithm is not sha256", imageRef)
 	}
-	// check that registry is provided
-	domain := reference.Domain(named)
-	if domain == "" {
+
+	if reference.Domain(canonical) == "" {
 		return fmt.Errorf("image reference %s needs the registry to be explicitly defined", imageRef)
 	}
-	tagged, ok := ref.(reference.Tagged)
-	if ok && tagged.Tag() != "" {
+	if tagged, ok := ref.(reference.Tagged); ok && tagged.Tag() != "" {
 		return fmt.Errorf("image reference %s should not contain a tag", imageRef)
 	}
 
 	return nil
+}
+
+func versionBelongsToChannelTree(version *semver.Version, tree *ChannelTree) bool {
+	return tree.FromVersion.LessThanEqual(version) && tree.UntilVersion.GreaterThan(version)
 }
