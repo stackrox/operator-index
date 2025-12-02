@@ -62,7 +62,7 @@ func generateCatalogTemplateFile() error {
 
 	latestTree := newChannelTree(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
 	stableTree := newChannelTree(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
-	trees := []*ChannelTree{&latestTree, &stableTree}
+	trees := []ChannelTree{latestTree, stableTree}
 
 	emptyChannels := generateChannels(config.Versions)
 	populateChannels(trees, emptyChannels)
@@ -198,33 +198,33 @@ func generateChannelEntries(versions []*semver.Version, startingVersions []*semv
 	return channelEntries
 }
 
-func populateChannels(trees []*ChannelTree, channels []Channel) {
+func populateChannels(trees []ChannelTree, channels []Channel) {
 	for _, ch := range channels {
-		for _, tree := range trees {
-			if versionBelongsToChannelTree(ch.yStreamVersion, tree) {
-				tree.YStreamChannels = append(tree.YStreamChannels, ch)
+		for i := range trees {
+			if versionBelongsToChannelTree(ch.yStreamVersion, trees[i]) {
+				trees[i].YStreamChannels = append(trees[i].YStreamChannels, ch)
 			}
 		}
 	}
 }
 
-func populateChannelEntries(trees []*ChannelTree, entries []ChannelEntry) {
+func populateChannelEntries(trees []ChannelTree, entries []ChannelEntry) {
 	for _, entry := range entries {
-		for _, tree := range trees {
-			if versionBelongsToChannelTree(entry.version, tree) {
-				for i := range tree.YStreamChannels {
-					if channelShouldHaveEntry(tree.YStreamChannels[i], entry) {
-						tree.YStreamChannels[i].Entries = append(tree.YStreamChannels[i].Entries, entry)
+		for j := range trees {
+			if versionBelongsToChannelTree(entry.version, trees[j]) {
+				for i := range trees[j].YStreamChannels {
+					if channelShouldHaveEntry(trees[j].YStreamChannels[i], entry) {
+						trees[j].YStreamChannels[i].Entries = append(trees[j].YStreamChannels[i].Entries, entry)
 					}
 				}
-				tree.MainChannel.Entries = append(tree.MainChannel.Entries, entry)
+				trees[j].MainChannel.Entries = append(trees[j].MainChannel.Entries, entry)
 			}
 		}
 	}
 }
 
 // flattenChannelsFromTrees flattens channels from multiple ChannelTrees into a single slice.
-func flattenChannelsFromTrees(trees []*ChannelTree) []Channel {
+func flattenChannelsFromTrees(trees []ChannelTree) []Channel {
 	var channels []Channel
 	for _, tree := range trees {
 		channels = append(channels, tree.YStreamChannels...)
@@ -377,6 +377,6 @@ func validateImageReference(imageRef string) error {
 	return nil
 }
 
-func versionBelongsToChannelTree(version *semver.Version, tree *ChannelTree) bool {
+func versionBelongsToChannelTree(version *semver.Version, tree ChannelTree) bool {
 	return tree.FromVersion.LessThanEqual(version) && tree.UntilVersion.GreaterThan(version)
 }

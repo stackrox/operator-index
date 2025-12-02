@@ -672,7 +672,7 @@ func TestGenerateBundles(t *testing.T) {
 func TestPopulateChannels(t *testing.T) {
 	latestTree := newChannelTree("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
 	stableTree := newChannelTree("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
-	trees := []*ChannelTree{&latestTree, &stableTree}
+	trees := []ChannelTree{latestTree, stableTree}
 
 	channels := []Channel{
 		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
@@ -682,6 +682,8 @@ func TestPopulateChannels(t *testing.T) {
 
 	populateChannels(trees, channels)
 
+	latestTree = trees[0]
+	stableTree = trees[1]
 	assert.Len(t, latestTree.YStreamChannels, 1)
 	assert.Equal(t, "rhacs-3.62", latestTree.YStreamChannels[0].Name)
 
@@ -713,8 +715,11 @@ func TestPopulateChannelEntries(t *testing.T) {
 		{Name: "rhacs-operator.v5.0.1", version: semver.MustParse("5.0.1")},
 	}
 
-	trees := []*ChannelTree{&latestTree, &stableTree}
+	trees := []ChannelTree{latestTree, stableTree}
 	populateChannelEntries(trees, entries)
+
+	latestTree = trees[0]
+	stableTree = trees[1]
 
 	assert.Len(t, latestTree.YStreamChannels, 1)
 	assert.Equal(t, "rhacs-3.62", latestTree.YStreamChannels[0].Name)
@@ -768,7 +773,7 @@ func TestFlattenChannelsFromTrees(t *testing.T) {
 		{Name: "rhacs-4.1"},
 	}
 
-	trees := []*ChannelTree{&latestTree, &stableTree}
+	trees := []ChannelTree{latestTree, stableTree}
 	channels := flattenChannelsFromTrees(trees)
 
 	// Should have 4 channels total: rhacs-3.62, latest, rhacs-4.0, rhacs-4.1, stable
