@@ -60,19 +60,7 @@ func generateCatalogTemplateFile() error {
 		return fmt.Errorf("failed to generate package object with icon: %v", err)
 	}
 
-	latestLineage := newChannelLineage(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
-	stableLineage := newChannelLineage(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
-	lineages := []ChannelLineage{latestLineage, stableLineage}
-
-	emptyChannels := generateChannels(config.Versions)
-	populateChannels(lineages, emptyChannels)
-
-	startingVersions := []*semver.Version{latestChannelFromVersion, stableChannelFromVersion}
-	entries := generateChannelEntries(config.Versions, startingVersions)
-	populateChannelEntries(lineages, entries)
-
-	channels := flattenChannels(lineages)
-
+	channels := generateChannels(config.Versions)
 	deprecations := generateDeprecations(config.Versions, channels, config.OldestSupportedVersion)
 	bundles := generateBundles(config.Images)
 
@@ -154,7 +142,25 @@ func generatePackageWithIcon() (Package, error) {
 	return pkg, nil
 }
 
+// generateChannels creates channels based on the provided versions.
 func generateChannels(versions []*semver.Version) []Channel {
+	latestLineage := newChannelLineage(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
+	stableLineage := newChannelLineage(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
+	lineages := []ChannelLineage{latestLineage, stableLineage}
+
+	emptyChannels := generateEmptyChannels(versions)
+	assignChannels(lineages, emptyChannels)
+
+	startingVersions := []*semver.Version{latestChannelFromVersion, stableChannelFromVersion}
+	entries := generateChannelEntries(versions, startingVersions)
+	assignChannelEntries(lineages, entries)
+
+	channels := flattenChannels(lineages)
+	return channels
+}
+
+// generateEmptyChannels creates empty (without []ChannelEntry) channels for each unique Y-Stream version found in the provided versions.
+func generateEmptyChannels(versions []*semver.Version) []Channel {
 	channels := make([]Channel, 0)
 	var previousYStream *semver.Version
 
@@ -173,6 +179,7 @@ func generateChannels(versions []*semver.Version) []Channel {
 	return channels
 }
 
+// generateChannelEntries creates channel entries for each version, setting the appropriate `replaces` and `skipRange` fields.
 func generateChannelEntries(versions []*semver.Version, startingVersions []*semver.Version) []ChannelEntry {
 	channelEntries := make([]ChannelEntry, 0)
 	// We know that our catalog begins with 3.62.0. We set previousEntryVersion to 3.61.0 in order to have 3.62.0's `skipRange` consistent with others.
@@ -198,7 +205,8 @@ func generateChannelEntries(versions []*semver.Version, startingVersions []*semv
 	return channelEntries
 }
 
-func populateChannels(lineages []ChannelLineage, channels []Channel) {
+// assignChannels assigns channels to the appropriate channel lineages based on their Y-Stream versions.
+func assignChannels(lineages []ChannelLineage, channels []Channel) {
 	for _, ch := range channels {
 		for i := range lineages {
 			if versionBelongsToChannelLineage(ch.yStreamVersion, lineages[i]) {
@@ -208,7 +216,8 @@ func populateChannels(lineages []ChannelLineage, channels []Channel) {
 	}
 }
 
-func populateChannelEntries(lineages []ChannelLineage, entries []ChannelEntry) {
+// assignChannelEntries assigns channel entries to the appropriate channels within each lineage.
+func assignChannelEntries(lineages []ChannelLineage, entries []ChannelEntry) {
 	for _, entry := range entries {
 		for i := range lineages {
 			if versionBelongsToChannelLineage(entry.version, lineages[i]) {

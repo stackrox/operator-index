@@ -369,7 +369,7 @@ func TestHasGapInVersions(t *testing.T) {
 	}
 }
 
-func TestGenerateChannels(t *testing.T) {
+func TestGenerateEmptyChannels(t *testing.T) {
 	tests := []struct {
 		name             string
 		versions         []*semver.Version
@@ -427,7 +427,7 @@ func TestGenerateChannels(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			channels := generateChannels(tt.versions)
+			channels := generateEmptyChannels(tt.versions)
 
 			assert.Len(t, channels, tt.expectedChannels)
 			if tt.validate != nil {
@@ -665,7 +665,7 @@ func TestGenerateBundles(t *testing.T) {
 	assert.Equal(t, "registry.io/bundle2@sha256:def456", bundles[1].Image)
 }
 
-func TestPopulateChannels(t *testing.T) {
+func TestAssignChannels(t *testing.T) {
 	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
 	stableLineage := newChannelLineage("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
 	lineages := []ChannelLineage{latestLineage, stableLineage}
@@ -676,7 +676,7 @@ func TestPopulateChannels(t *testing.T) {
 		{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
 	}
 
-	populateChannels(lineages, channels)
+	assignChannels(lineages, channels)
 
 	latestLineage = lineages[0]
 	stableLineage = lineages[1]
@@ -689,7 +689,7 @@ func TestPopulateChannels(t *testing.T) {
 	assert.Equal(t, "rhacs-4.1", stableLineage.YStreamChannels[1].Name)
 }
 
-func TestPopulateChannelEntries(t *testing.T) {
+func TestAssignChannelEntries(t *testing.T) {
 	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
 	latestLineage.YStreamChannels = []Channel{
 		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
@@ -713,7 +713,7 @@ func TestPopulateChannelEntries(t *testing.T) {
 	}
 
 	lineages := []ChannelLineage{latestLineage, stableLineage}
-	populateChannelEntries(lineages, entries)
+	assignChannelEntries(lineages, entries)
 
 	latestLineage = lineages[0]
 	stableLineage = lineages[1]
@@ -758,7 +758,7 @@ func TestPopulateChannelEntries(t *testing.T) {
 	assert.Equal(t, "rhacs-operator.v5.0.1", stableLineage.MainChannel.Entries[4].Name)
 }
 
-func TestFlattenChannelsFromLineages(t *testing.T) {
+func TestFlattenChannels(t *testing.T) {
 	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
 	latestLineage.YStreamChannels = []Channel{
 		{Name: "rhacs-3.62"},
