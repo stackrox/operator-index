@@ -1537,6 +1537,9 @@ entries:
   - name: rhacs-operator.v4.6.9
     replaces: rhacs-operator.v4.6.8
     skipRange: ">= 4.5.0 < 4.6.9"
+  - name: rhacs-operator.v4.6.10
+    replaces: rhacs-operator.v4.6.9
+    skipRange: ">= 4.5.0 < 4.6.10"
 - schema: olm.channel
   name: rhacs-4.7
   package: rhacs-operator
@@ -1711,8 +1714,11 @@ entries:
   - name: rhacs-operator.v4.6.9
     replaces: rhacs-operator.v4.6.8
     skipRange: ">= 4.5.0 < 4.6.9"
-  - name: rhacs-operator.v4.7.0
+  - name: rhacs-operator.v4.6.10
     replaces: rhacs-operator.v4.6.9
+    skipRange: ">= 4.5.0 < 4.6.10"
+  - name: rhacs-operator.v4.7.0
+    replaces: rhacs-operator.v4.6.10
     skipRange: ">= 4.6.0 < 4.7.0"
   - name: rhacs-operator.v4.7.1
     replaces: rhacs-operator.v4.7.0
@@ -1912,8 +1918,11 @@ entries:
   - name: rhacs-operator.v4.6.9
     replaces: rhacs-operator.v4.6.8
     skipRange: ">= 4.5.0 < 4.6.9"
-  - name: rhacs-operator.v4.7.0
+  - name: rhacs-operator.v4.6.10
     replaces: rhacs-operator.v4.6.9
+    skipRange: ">= 4.5.0 < 4.6.10"
+  - name: rhacs-operator.v4.7.0
+    replaces: rhacs-operator.v4.6.10
     skipRange: ">= 4.6.0 < 4.7.0"
   - name: rhacs-operator.v4.7.1
     replaces: rhacs-operator.v4.7.0
@@ -2134,8 +2143,11 @@ entries:
   - name: rhacs-operator.v4.6.9
     replaces: rhacs-operator.v4.6.8
     skipRange: ">= 4.5.0 < 4.6.9"
-  - name: rhacs-operator.v4.7.0
+  - name: rhacs-operator.v4.6.10
     replaces: rhacs-operator.v4.6.9
+    skipRange: ">= 4.5.0 < 4.6.10"
+  - name: rhacs-operator.v4.7.0
+    replaces: rhacs-operator.v4.6.10
     skipRange: ">= 4.6.0 < 4.7.0"
   - name: rhacs-operator.v4.7.1
     replaces: rhacs-operator.v4.7.0
@@ -2362,8 +2374,11 @@ entries:
   - name: rhacs-operator.v4.6.9
     replaces: rhacs-operator.v4.6.8
     skipRange: ">= 4.5.0 < 4.6.9"
-  - name: rhacs-operator.v4.7.0
+  - name: rhacs-operator.v4.6.10
     replaces: rhacs-operator.v4.6.9
+    skipRange: ">= 4.5.0 < 4.6.10"
+  - name: rhacs-operator.v4.7.0
+    replaces: rhacs-operator.v4.6.10
     skipRange: ">= 4.6.0 < 4.7.0"
   - name: rhacs-operator.v4.7.1
     replaces: rhacs-operator.v4.7.0
@@ -3077,6 +3092,8 @@ entries:
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:adb6c303305804dc46759f6561971c5bf484c76c773997237dae9b902d08d982
 - schema: olm.bundle
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:eee21ee829be000db4a804aa7d0dded1a42767c37f56ac6ef4b4df6d9ab026f2
+- schema: olm.bundle
+  image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:6d6b2696a12d49cf3403e338a0e028187473b6f43ef2b0bd72c7701200ac8e2e
 - schema: olm.bundle
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:6937beffd348474d4d9b06f14fabfeb74efb69cf7bc60e6e12eb5b45b03014d5
 - schema: olm.bundle
