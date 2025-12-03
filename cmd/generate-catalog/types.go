@@ -204,6 +204,10 @@ func (e *ChannelEntry) setReplaces(previousEntryVersion *semver.Version) {
 	e.Replaces = generateBundleName(previousEntryVersion)
 }
 
+func (e *ChannelEntry) clearReplaces() {
+	e.Replaces = ""
+}
+
 func (e *ChannelEntry) setSkipRange(skipRangeFrom, skipRangeTo *semver.Version) {
 	e.SkipRange = fmt.Sprintf(">= %s < %s", skipRangeFrom, skipRangeTo)
 }

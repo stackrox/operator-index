@@ -151,8 +151,7 @@ func generateChannels(versions []*semver.Version) []Channel {
 	emptyChannels := generateEmptyChannels(versions)
 	assignChannels(lineages, emptyChannels)
 
-	startingVersions := []*semver.Version{latestChannelFromVersion, stableChannelFromVersion}
-	entries := generateChannelEntries(versions, startingVersions)
+	entries := generateChannelEntries(versions)
 	assignChannelEntries(lineages, entries)
 
 	channels := flattenChannels(lineages)
@@ -180,7 +179,7 @@ func generateEmptyChannels(versions []*semver.Version) []Channel {
 }
 
 // generateChannelEntries creates channel entries for each version, setting the appropriate `replaces` and `skipRange` fields.
-func generateChannelEntries(versions []*semver.Version, startingVersions []*semver.Version) []ChannelEntry {
+func generateChannelEntries(versions []*semver.Version) []ChannelEntry {
 	channelEntries := make([]ChannelEntry, 0)
 	// We know that our catalog begins with 3.62.0. We set previousEntryVersion to 3.61.0 in order to have 3.62.0's `skipRange` consistent with others.
 	previousEntryVersion := semver.New(3, 61, 0, "", "")
@@ -191,11 +190,8 @@ func generateChannelEntries(versions []*semver.Version, startingVersions []*semv
 			previousYStreamVersion = makeYStreamVersion(previousEntryVersion)
 		}
 
-		isStartingVersion := slices.ContainsFunc(startingVersions, v.Equal)
 		e := newChannelEntry(v)
-		if !isStartingVersion {
-			e.setReplaces(previousEntryVersion)
-		}
+		e.setReplaces(previousEntryVersion)
 		e.setSkipRange(previousYStreamVersion, v)
 		channelEntries = append(channelEntries, e)
 
@@ -220,6 +216,10 @@ func assignChannels(lineages []ChannelLineage, channels []Channel) {
 func assignChannelEntries(lineages []ChannelLineage, entries []ChannelEntry) {
 	for _, entry := range entries {
 		for i := range lineages {
+			if entry.version.Equal(lineages[i].FromVersion) {
+				// Clear replaces for the first entry in the lineage
+				entry.clearReplaces()
+			}
 			if versionBelongsToChannelLineage(entry.version, lineages[i]) {
 				for j := range lineages[i].YStreamChannels {
 					if channelShouldHaveEntry(lineages[i].YStreamChannels[j], entry) {
