@@ -257,22 +257,22 @@ func generateBundleName(version *semver.Version) string {
 	return fmt.Sprintf("%s.v%s", rhacsOperator, version)
 }
 
-// ChannelLineage is a helper struct for the generation time.
+// channelLineage is a helper struct for the generation time.
 // It groups channels together. There's a main one, it's the most complete including all versions in this lineage, and there are Y-Stream channels that are subsets of the main one.
-type ChannelLineage struct {
+type channelLineage struct {
 	MainChannel     Channel // The main channel (e.g., "stable" or "latest") which contains all versions associated with this channel lineage (e.g., stable: 4.0.x, 4.1.x, etc.)
 	YStreamChannels []Channel
 	FromVersion     *semver.Version // Inclusive lower bound of versions associated with this channel lineage.
 	UntilVersion    *semver.Version // Exclusive upper bound of versions associated with this channel lineage.
 }
 
-func newChannelLineage(name string, from, until *semver.Version) ChannelLineage {
+func newChannelLineage(name string, from, until *semver.Version) channelLineage {
 	mainChannel := Channel{
 		Schema:  olmChannelSchema,
 		Name:    name,
 		Package: rhacsOperator,
 	}
-	return ChannelLineage{
+	return channelLineage{
 		MainChannel:  mainChannel,
 		FromVersion:  from,
 		UntilVersion: until,

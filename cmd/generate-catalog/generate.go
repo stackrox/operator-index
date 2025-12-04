@@ -228,7 +228,7 @@ func generatePackageWithIcon() (Package, error) {
 func generateChannels(versions []*semver.Version) []Channel {
 	latestLineage := newChannelLineage(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
 	stableLineage := newChannelLineage(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
-	lineages := []ChannelLineage{latestLineage, stableLineage}
+	lineages := []channelLineage{latestLineage, stableLineage}
 
 	emptyChannels := generateEmptyChannels(versions)
 	assignChannels(lineages, emptyChannels)
@@ -262,7 +262,7 @@ func generateEmptyChannels(versions []*semver.Version) []Channel {
 }
 
 // assignChannels assigns channels to the appropriate channel lineages based on their Y-Stream versions.
-func assignChannels(lineages []ChannelLineage, channels []Channel) {
+func assignChannels(lineages []channelLineage, channels []Channel) {
 	for _, ch := range channels {
 		for i := range lineages {
 			if versionBelongsToChannelLineage(ch.yStreamVersion, lineages[i]) {
@@ -296,7 +296,7 @@ func generateChannelEntries(versions []*semver.Version) []ChannelEntry {
 }
 
 // assignChannelEntries assigns channel entries to the appropriate channels within each lineage.
-func assignChannelEntries(lineages []ChannelLineage, entries []ChannelEntry) {
+func assignChannelEntries(lineages []channelLineage, entries []ChannelEntry) {
 	for _, entry := range entries {
 		for i := range lineages {
 			if versionBelongsToChannelLineage(entry.version, lineages[i]) {
@@ -311,7 +311,7 @@ func assignChannelEntries(lineages []ChannelLineage, entries []ChannelEntry) {
 	}
 }
 
-func versionBelongsToChannelLineage(version *semver.Version, lineage ChannelLineage) bool {
+func versionBelongsToChannelLineage(version *semver.Version, lineage channelLineage) bool {
 	return lineage.FromVersion.LessThanEqual(version) && lineage.UntilVersion.GreaterThan(version)
 }
 
@@ -323,7 +323,7 @@ func channelShouldHaveEntry(channel Channel, entry ChannelEntry) bool {
 }
 
 // flattenChannels flattens channels from multiple ChannelLineages into a single slice.
-func flattenChannels(lineages []ChannelLineage) []Channel {
+func flattenChannels(lineages []channelLineage) []Channel {
 	var channels []Channel
 	for _, lineage := range lineages {
 		channels = append(channels, lineage.YStreamChannels...)
