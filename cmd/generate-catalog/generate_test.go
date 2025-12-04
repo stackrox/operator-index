@@ -443,7 +443,7 @@ func TestGenerateBundles(t *testing.T) {
 func TestAssignChannels(t *testing.T) {
 	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
 	stableLineage := newChannelLineage("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
-	lineages := []ChannelLineage{latestLineage, stableLineage}
+	lineages := []channelLineage{latestLineage, stableLineage}
 
 	channels := []Channel{
 		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
@@ -487,7 +487,7 @@ func TestAssignChannelEntries(t *testing.T) {
 		{Name: "rhacs-operator.v5.0.1", Replaces: "rhacs-operator.v5.0.0", version: semver.MustParse("5.0.1")},
 	}
 
-	lineages := []ChannelLineage{latestLineage, stableLineage}
+	lineages := []channelLineage{latestLineage, stableLineage}
 	assignChannelEntries(lineages, entries)
 
 	latestLineage = lineages[0]
@@ -564,7 +564,7 @@ func TestFlattenChannels(t *testing.T) {
 		{Name: "rhacs-4.1"},
 	}
 
-	lineages := []ChannelLineage{latestLineage, stableLineage}
+	lineages := []channelLineage{latestLineage, stableLineage}
 	channels := flattenChannels(lineages)
 
 	// Should have 5 channels total: rhacs-3.62, latest, rhacs-4.0, rhacs-4.1, stable
