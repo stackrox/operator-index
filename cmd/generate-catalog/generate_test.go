@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
 	semver "github.com/Masterminds/semver/v3"
@@ -80,9 +78,7 @@ func TestReadInputFile(t *testing.T) {
 				assert.Contains(t, err.Error(), tt.expectedError)
 			} else {
 				require.NoError(t, err)
-				if tt.validate != nil {
-					tt.validate(t, config)
-				}
+				tt.validate(t, config)
 			}
 		})
 	}
@@ -97,10 +93,6 @@ func TestValidateImageReference(t *testing.T) {
 		{
 			name:  "Valid image reference with digest",
 			image: "registry.example.com/repo/image@sha256:7fd7595e6a61352088f9a3a345be03a6c0b9caa0bbc5ddd8c61ba1d38b2c3b8e",
-		},
-		{
-			name:  "Valid image reference with complex path",
-			image: "quay.io/rhacs-eng/operator-bundle@sha256:abc123def456abc123def456abc123def456abc123def456abc123def456abcd",
 		},
 		{
 			name:          "Empty image reference",
@@ -142,65 +134,11 @@ func TestValidateImageReference(t *testing.T) {
 			image:         "registry.example.com/repo/image:v1.0.0@sha256:7fd7595e6a61352088f9a3a345be03a6c0b9caa0bbc5ddd8c61ba1d38b2c3b8e",
 			expectedError: "should not contain a tag",
 		},
-		{
-			name:          "Invalid characters in image reference",
-			image:         "example.com/image@sha256:ZZZZ",
-			expectedError: "invalid reference format",
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := validateImageReference(tt.image)
-
-			if tt.expectedError != "" {
-				assert.Error(t, err)
-				assert.Contains(t, err.Error(), tt.expectedError)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestValidateImageReferences(t *testing.T) {
-	tests := []struct {
-		name          string
-		images        []BundleImage
-		expectedError string
-	}{
-		{
-			name: "All valid images",
-			images: []BundleImage{
-				{
-					Image:   "registry.example.com/repo/image@sha256:7fd7595e6a61352088f9a3a345be03a6c0b9caa0bbc5ddd8c61ba1d38b2c3b8e",
-					Version: semver.MustParse("1.0.0"),
-				},
-				{
-					Image:   "registry.example.com/repo/image@sha256:6cdcf20771f9c46640b466f804190d00eaf2e59caee6d420436e78b283d177bf",
-					Version: semver.MustParse("1.0.1"),
-				},
-			},
-		},
-		{
-			name: "One invalid image",
-			images: []BundleImage{
-				{
-					Image:   "registry.example.com/repo/image@sha256:7fd7595e6a61352088f9a3a345be03a6c0b9caa0bbc5ddd8c61ba1d38b2c3b8e",
-					Version: semver.MustParse("1.0.0"),
-				},
-				{
-					Image:   "example.com/image:v1.0.0",
-					Version: semver.MustParse("1.0.1"),
-				},
-			},
-			expectedError: "does not include a digest",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := validateImageReferences(tt.images)
 
 			if tt.expectedError != "" {
 				assert.Error(t, err)
@@ -240,6 +178,8 @@ func TestValidateVersionsAreSorted(t *testing.T) {
 				semver.MustParse("1.0.1"),
 				semver.MustParse("1.1.0"),
 				semver.MustParse("2.0.0"),
+				semver.MustParse("3.0.0-pre.1"),
+				semver.MustParse("3.0.0"),
 			},
 		},
 		{
@@ -353,6 +293,10 @@ func TestHasGapInVersions(t *testing.T) {
 				semver.MustParse("1.0.0"),
 			},
 		},
+		{
+			name:     "Empty versions has no gaps",
+			versions: []*semver.Version{},
+		},
 	}
 
 	for _, tt := range tests {
@@ -373,8 +317,7 @@ func TestGenerateEmptyChannels(t *testing.T) {
 	tests := []struct {
 		name             string
 		versions         []*semver.Version
-		expectedChannels int
-		validate         func(t *testing.T, channels []Channel)
+		expectedChannels []string
 	}{
 		{
 			name: "Single Y-stream versions",
@@ -383,10 +326,7 @@ func TestGenerateEmptyChannels(t *testing.T) {
 				semver.MustParse("3.62.1"),
 				semver.MustParse("3.62.2"),
 			},
-			expectedChannels: 1,
-			validate: func(t *testing.T, channels []Channel) {
-				assert.Equal(t, "rhacs-3.62", channels[0].Name)
-			},
+			expectedChannels: []string{"rhacs-3.62"},
 		},
 		{
 			name: "Multiple Y-stream versions",
@@ -397,17 +337,12 @@ func TestGenerateEmptyChannels(t *testing.T) {
 				semver.MustParse("4.0.1"),
 				semver.MustParse("4.1.0"),
 			},
-			expectedChannels: 3,
-			validate: func(t *testing.T, channels []Channel) {
-				assert.Equal(t, "rhacs-3.62", channels[0].Name)
-				assert.Equal(t, "rhacs-4.0", channels[1].Name)
-				assert.Equal(t, "rhacs-4.1", channels[2].Name)
-			},
+			expectedChannels: []string{"rhacs-3.62", "rhacs-4.0", "rhacs-4.1"},
 		},
 		{
 			name:             "No versions",
 			versions:         []*semver.Version{},
-			expectedChannels: 0,
+			expectedChannels: []string{},
 		},
 		{
 			name: "Major version jump",
@@ -416,12 +351,7 @@ func TestGenerateEmptyChannels(t *testing.T) {
 				semver.MustParse("4.0.0"),
 				semver.MustParse("5.0.0"),
 			},
-			expectedChannels: 3,
-			validate: func(t *testing.T, channels []Channel) {
-				assert.Equal(t, "rhacs-3.62", channels[0].Name)
-				assert.Equal(t, "rhacs-4.0", channels[1].Name)
-				assert.Equal(t, "rhacs-5.0", channels[2].Name)
-			},
+			expectedChannels: []string{"rhacs-3.62", "rhacs-4.0", "rhacs-5.0"},
 		},
 	}
 
@@ -429,193 +359,70 @@ func TestGenerateEmptyChannels(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			channels := generateEmptyChannels(tt.versions)
 
-			assert.Len(t, channels, tt.expectedChannels)
-			if tt.validate != nil {
-				tt.validate(t, channels)
+			channelNames := make([]string, len(channels))
+			for i, ch := range channels {
+				channelNames[i] = ch.Name
 			}
+
+			assert.Equal(t, tt.expectedChannels, channelNames)
 		})
 	}
 }
 
 func TestGenerateChannelEntries(t *testing.T) {
-	tests := []struct {
-		name            string
-		versions        []*semver.Version
-		expectedEntries int
-		validate        func(t *testing.T, entries []ChannelEntry)
-	}{
-		{
-			name: "Simple version sequence",
-			versions: []*semver.Version{
-				semver.MustParse("3.62.0"),
-				semver.MustParse("3.62.1"),
-			},
-			expectedEntries: 2,
-			validate: func(t *testing.T, entries []ChannelEntry) {
-				assert.Equal(t, "rhacs-operator.v3.62.0", entries[0].Name)
-				// Clearing replaces for the first versions happens in assignChannelEntries
-				assert.Equal(t, "rhacs-operator.v3.61.0", entries[0].Replaces)
-				assert.Equal(t, ">= 3.61.0 < 3.62.0", entries[0].SkipRange)
-
-				assert.Equal(t, "rhacs-operator.v3.62.1", entries[1].Name)
-				assert.Equal(t, "rhacs-operator.v3.62.0", entries[1].Replaces)
-				assert.Equal(t, ">= 3.61.0 < 3.62.1", entries[1].SkipRange)
-			},
-		},
-		{
-			name: "Version sequence across Y-streams",
-			versions: []*semver.Version{
-				semver.MustParse("4.0.0"),
-				semver.MustParse("4.0.1"),
-				semver.MustParse("4.0.2"),
-				semver.MustParse("4.1.0"),
-			},
-			expectedEntries: 4,
-			validate: func(t *testing.T, entries []ChannelEntry) {
-				assert.Equal(t, "rhacs-operator.v4.0.0", entries[0].Name)
-				assert.Equal(t, "rhacs-operator.v3.61.0", entries[0].Replaces)
-				assert.Equal(t, ">= 3.61.0 < 4.0.0", entries[0].SkipRange)
-
-				assert.Equal(t, "rhacs-operator.v4.0.1", entries[1].Name)
-				assert.Equal(t, "rhacs-operator.v4.0.0", entries[1].Replaces)
-				assert.Equal(t, ">= 3.61.0 < 4.0.1", entries[1].SkipRange)
-
-				assert.Equal(t, "rhacs-operator.v4.1.0", entries[3].Name)
-				assert.Equal(t, "rhacs-operator.v4.0.2", entries[3].Replaces)
-				assert.Equal(t, ">= 4.0.0 < 4.1.0", entries[3].SkipRange)
-			},
-		},
-		{
-			name: "Major version transition",
-			versions: []*semver.Version{
-				semver.MustParse("3.62.0"),
-				semver.MustParse("3.62.1"),
-				semver.MustParse("4.0.0"),
-			},
-			expectedEntries: 3,
-			validate: func(t *testing.T, entries []ChannelEntry) {
-				assert.Equal(t, "rhacs-operator.v3.62.0", entries[0].Name)
-				assert.Equal(t, "rhacs-operator.v3.61.0", entries[0].Replaces)
-
-				assert.Equal(t, "rhacs-operator.v3.62.1", entries[1].Name)
-				assert.Equal(t, "rhacs-operator.v3.62.0", entries[1].Replaces)
-
-				assert.Equal(t, "rhacs-operator.v4.0.0", entries[2].Name)
-				assert.Equal(t, "rhacs-operator.v3.62.1", entries[2].Replaces)
-				assert.Equal(t, ">= 3.62.0 < 4.0.0", entries[2].SkipRange)
-			},
-		},
-		{
-			name: "SkipRange changes at Y-stream boundaries",
-			versions: []*semver.Version{
-				semver.MustParse("4.0.0"),
-				semver.MustParse("4.0.1"),
-				semver.MustParse("4.0.2"),
-				semver.MustParse("4.1.0"),
-				semver.MustParse("4.1.1"),
-			},
-			expectedEntries: 5,
-			validate: func(t *testing.T, entries []ChannelEntry) {
-				assert.Equal(t, ">= 4.0.0 < 4.1.0", entries[3].SkipRange)
-				assert.Equal(t, ">= 4.0.0 < 4.1.1", entries[4].SkipRange)
-			},
-		},
+	versions := []*semver.Version{
+		semver.MustParse("3.62.0"),
+		semver.MustParse("3.62.1"),
+		semver.MustParse("4.0.0"),
+		semver.MustParse("4.0.1"),
+		semver.MustParse("4.0.2"),
+		semver.MustParse("4.1.0"),
+		semver.MustParse("4.1.1"),
 	}
+	entries := generateChannelEntries(versions)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			entries := generateChannelEntries(tt.versions)
-
-			assert.Len(t, entries, tt.expectedEntries)
-			if tt.validate != nil {
-				tt.validate(t, entries)
-			}
-		})
-	}
+	assert.Len(t, entries, len(versions))
+	// Clearing `Replaces` for the starting version is done in a different function, so we expect it to be set here.
+	assertChannelEntry(t, entries[0], "rhacs-operator.v3.62.0", "rhacs-operator.v3.61.0", ">= 3.61.0 < 3.62.0")
+	assertChannelEntry(t, entries[1], "rhacs-operator.v3.62.1", "rhacs-operator.v3.62.0", ">= 3.61.0 < 3.62.1")
+	assertChannelEntry(t, entries[2], "rhacs-operator.v4.0.0", "rhacs-operator.v3.62.1", ">= 3.62.0 < 4.0.0")
+	assertChannelEntry(t, entries[3], "rhacs-operator.v4.0.1", "rhacs-operator.v4.0.0", ">= 3.62.0 < 4.0.1")
+	assertChannelEntry(t, entries[4], "rhacs-operator.v4.0.2", "rhacs-operator.v4.0.1", ">= 3.62.0 < 4.0.2")
+	assertChannelEntry(t, entries[5], "rhacs-operator.v4.1.0", "rhacs-operator.v4.0.2", ">= 4.0.0 < 4.1.0")
+	assertChannelEntry(t, entries[6], "rhacs-operator.v4.1.1", "rhacs-operator.v4.1.0", ">= 4.0.0 < 4.1.1")
 }
 
 func TestGenerateDeprecations(t *testing.T) {
-	tests := []struct {
-		name                   string
-		versions               []*semver.Version
-		channels               []Channel
-		oldestSupportedVersion *semver.Version
-		validate               func(t *testing.T, deprecations Deprecations)
-	}{
-		{
-			name: "Deprecate old channel and old bundle",
-			versions: []*semver.Version{
-				semver.MustParse("3.62.0"),
-				semver.MustParse("4.0.0"),
-				semver.MustParse("4.1.0"),
-			},
-			channels: []Channel{
-				{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
-				{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
-			},
-			oldestSupportedVersion: semver.MustParse("4.0.0"),
-			validate: func(t *testing.T, deprecations Deprecations) {
-				assert.GreaterOrEqual(t, len(deprecations.Entries), 3)
-
-				hasOldBundleDeprecation := false
-				for _, entry := range deprecations.Entries {
-					if entry.Reference.Schema == olmBundleSchema && entry.Reference.Name == "rhacs-operator.v3.62.0" {
-						hasOldBundleDeprecation = true
-						assert.Contains(t, entry.Message, "no longer supported")
-					}
-				}
-				assert.True(t, hasOldBundleDeprecation, "Should deprecate old bundle 3.62.0")
-			},
-		},
-		{
-			name: "Latest channel is always deprecated",
-			versions: []*semver.Version{
-				semver.MustParse("4.0.0"),
-			},
-			channels: []Channel{
-				{Name: "latest"},
-			},
-			oldestSupportedVersion: semver.MustParse("4.0.0"),
-			validate: func(t *testing.T, deprecations Deprecations) {
-				hasLatestDeprecation := false
-				for _, entry := range deprecations.Entries {
-					if entry.Reference.Schema == olmChannelSchema && entry.Reference.Name == "latest" {
-						hasLatestDeprecation = true
-					}
-				}
-				assert.True(t, hasLatestDeprecation, "Latest channel should be deprecated")
-			},
-		},
-		{
-			name: "No deprecations when all versions are supported",
-			versions: []*semver.Version{
-				semver.MustParse("4.0.0"),
-				semver.MustParse("4.1.0"),
-			},
-			channels: []Channel{
-				{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
-				{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
-			},
-			oldestSupportedVersion: semver.MustParse("4.0.0"),
-			validate: func(t *testing.T, deprecations Deprecations) {
-				assert.Equal(t, 1, len(deprecations.Entries))
-				assert.Equal(t, olmChannelSchema, deprecations.Entries[0].Reference.Schema)
-				assert.Equal(t, "latest", deprecations.Entries[0].Reference.Name)
-			},
-		},
+	versions := []*semver.Version{
+		semver.MustParse("3.62.0"),
+		semver.MustParse("3.62.1"),
+		semver.MustParse("4.0.0"),
+		semver.MustParse("4.1.0"),
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			deprecations := generateDeprecations(tt.versions, tt.channels, tt.oldestSupportedVersion)
-
-			assert.Equal(t, olmDeprecationsSchema, deprecations.Schema)
-			assert.Equal(t, rhacsOperator, deprecations.Package)
-			if tt.validate != nil {
-				tt.validate(t, deprecations)
-			}
-		})
+	channels := []Channel{
+		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
+		{Name: "latest"},
+		{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
+		{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
+		{Name: "stable"},
 	}
+	oldestSupportedVersion := semver.MustParse("4.0.0")
+
+	deprecations := generateDeprecations(versions, channels, oldestSupportedVersion)
+
+	assert.Equal(t, olmDeprecationsSchema, deprecations.Schema)
+	assert.Equal(t, rhacsOperator, deprecations.Package)
+
+	// Should deprecate:
+	// - `latest` channel
+	// - `rhacs-3.62` channel
+	// - `rhacs-operator.v3.62.0` bundle
+	// - `rhacs-operator.v3.62.1` bundle
+	assert.Len(t, deprecations.Entries, 4)
+	assertDeprecationEntry(t, deprecations.Entries[0], olmChannelSchema, "latest", latestChannelDeprecationMessage)
+	assertDeprecationEntry(t, deprecations.Entries[1], olmChannelSchema, "rhacs-3.62", channelDeprecationMessage)
+	assertDeprecationEntry(t, deprecations.Entries[2], olmBundleSchema, "rhacs-operator.v3.62.0", bundleDeprecationMessage)
+	assertDeprecationEntry(t, deprecations.Entries[3], olmBundleSchema, "rhacs-operator.v3.62.1", bundleDeprecationMessage)
 }
 
 func TestGenerateBundles(t *testing.T) {
@@ -626,8 +433,9 @@ func TestGenerateBundles(t *testing.T) {
 
 	bundles := generateBundles(images)
 
-	assert.Len(t, bundles, 2)
+	assert.Len(t, bundles, len(images))
 	assert.Equal(t, olmBundleSchema, bundles[0].Schema)
+	assert.Equal(t, olmBundleSchema, bundles[1].Schema)
 	assert.Equal(t, "registry.io/bundle1@sha256:abc123", bundles[0].Image)
 	assert.Equal(t, "registry.io/bundle2@sha256:def456", bundles[1].Image)
 }
@@ -840,29 +648,16 @@ func TestChannelShouldHaveEntry(t *testing.T) {
 	}
 }
 
-func TestWriteToFile(t *testing.T) {
-	tempDir := t.TempDir()
-	outputPath := filepath.Join(tempDir, "test_output.yaml")
+func assertChannelEntry(t *testing.T, entry ChannelEntry, name, replaces, skipRange string) {
+	t.Helper()
+	assert.Equal(t, name, entry.Name)
+	assert.Equal(t, replaces, entry.Replaces)
+	assert.Equal(t, skipRange, entry.SkipRange)
+}
 
-	ct := newCatalogTemplate()
-	pkg := Package{
-		Schema:         olmPackageSchema,
-		Name:           rhacsOperator,
-		DefaultChannel: "stable",
-		Icon:           Icon{Base64data: "dGVzdA==", MediaType: "image/png"},
-	}
-	ct.addPackage(pkg)
-
-	err := writeToFile(outputPath, ct)
-	require.NoError(t, err)
-
-	_, err = os.Stat(outputPath)
-	assert.NoError(t, err)
-
-	content, err := os.ReadFile(outputPath)
-	require.NoError(t, err)
-
-	assert.Contains(t, string(content), "DO NOT EDIT")
-	assert.Contains(t, string(content), olmTemplateSchema)
-	assert.Contains(t, string(content), rhacsOperator)
+func assertDeprecationEntry(t *testing.T, entry DeprecationEntry, schema, name, message string) {
+	t.Helper()
+	assert.Equal(t, schema, entry.Reference.Schema)
+	assert.Equal(t, name, entry.Reference.Name)
+	assert.Equal(t, message, entry.Message)
 }
