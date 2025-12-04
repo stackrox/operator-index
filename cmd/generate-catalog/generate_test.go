@@ -690,13 +690,13 @@ func TestAssignChannelEntries(t *testing.T) {
 
 	assert.Len(t, latestLineage.YStreamChannels[0].Entries, 2)
 	assert.Equal(t, "rhacs-operator.v3.62.0", latestLineage.YStreamChannels[0].Entries[0].Name)
-	assert.Empty(t, latestLineage.YStreamChannels[0].Entries[0].Replaces)
+	assert.Equal(t, "rhacs-operator.v3.61.0", latestLineage.YStreamChannels[0].Entries[0].Replaces)
 	assert.Equal(t, "rhacs-operator.v3.62.1", latestLineage.YStreamChannels[0].Entries[1].Name)
 	assert.Equal(t, "rhacs-operator.v3.62.0", latestLineage.YStreamChannels[0].Entries[1].Replaces)
 
 	assert.Len(t, latestLineage.MainChannel.Entries, 2)
 	assert.Equal(t, "rhacs-operator.v3.62.0", latestLineage.MainChannel.Entries[0].Name)
-	assert.Empty(t, latestLineage.MainChannel.Entries[0].Replaces)
+	assert.Equal(t, "rhacs-operator.v3.61.0", latestLineage.MainChannel.Entries[0].Replaces)
 	assert.Equal(t, "rhacs-operator.v3.62.1", latestLineage.MainChannel.Entries[1].Name)
 	assert.Equal(t, "rhacs-operator.v3.62.0", latestLineage.MainChannel.Entries[1].Replaces)
 
@@ -705,14 +705,14 @@ func TestAssignChannelEntries(t *testing.T) {
 	assert.Equal(t, "rhacs-4.0", stableLineage.YStreamChannels[0].Name)
 	assert.Len(t, stableLineage.YStreamChannels[0].Entries, 2)
 	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.YStreamChannels[0].Entries[0].Name)
-	assert.Empty(t, stableLineage.YStreamChannels[0].Entries[0].Replaces)
+	assert.Equal(t, "rhacs-operator.v3.62.1", stableLineage.YStreamChannels[0].Entries[0].Replaces)
 	assert.Equal(t, "rhacs-operator.v4.0.1", stableLineage.YStreamChannels[0].Entries[1].Name)
 	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.YStreamChannels[0].Entries[1].Replaces)
 
 	assert.Equal(t, "rhacs-4.1", stableLineage.YStreamChannels[1].Name)
 	assert.Len(t, stableLineage.YStreamChannels[1].Entries, 3)
 	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.YStreamChannels[1].Entries[0].Name)
-	assert.Empty(t, stableLineage.YStreamChannels[1].Entries[0].Replaces)
+	assert.Equal(t, "rhacs-operator.v3.62.1", stableLineage.YStreamChannels[1].Entries[0].Replaces)
 	assert.Equal(t, "rhacs-operator.v4.0.1", stableLineage.YStreamChannels[1].Entries[1].Name)
 	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.YStreamChannels[1].Entries[1].Replaces)
 	assert.Equal(t, "rhacs-operator.v4.1.0", stableLineage.YStreamChannels[1].Entries[2].Name)
@@ -721,7 +721,7 @@ func TestAssignChannelEntries(t *testing.T) {
 	assert.Equal(t, "rhacs-5.0", stableLineage.YStreamChannels[2].Name)
 	assert.Len(t, stableLineage.YStreamChannels[2].Entries, 5)
 	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.YStreamChannels[2].Entries[0].Name)
-	assert.Empty(t, stableLineage.YStreamChannels[2].Entries[0].Replaces)
+	assert.Equal(t, "rhacs-operator.v3.62.1", stableLineage.YStreamChannels[2].Entries[0].Replaces)
 	assert.Equal(t, "rhacs-operator.v4.0.1", stableLineage.YStreamChannels[2].Entries[1].Name)
 	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.YStreamChannels[2].Entries[1].Replaces)
 	assert.Equal(t, "rhacs-operator.v4.1.0", stableLineage.YStreamChannels[2].Entries[2].Name)
@@ -733,7 +733,7 @@ func TestAssignChannelEntries(t *testing.T) {
 
 	assert.Len(t, stableLineage.MainChannel.Entries, 5)
 	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.MainChannel.Entries[0].Name)
-	assert.Empty(t, stableLineage.MainChannel.Entries[0].Replaces)
+	assert.Equal(t, "rhacs-operator.v3.62.1", stableLineage.MainChannel.Entries[0].Replaces)
 	assert.Equal(t, "rhacs-operator.v4.0.1", stableLineage.MainChannel.Entries[1].Name)
 	assert.Equal(t, "rhacs-operator.v4.0.0", stableLineage.MainChannel.Entries[1].Replaces)
 	assert.Equal(t, "rhacs-operator.v4.1.0", stableLineage.MainChannel.Entries[2].Name)
@@ -761,6 +761,42 @@ func TestFlattenChannels(t *testing.T) {
 
 	// Should have 5 channels total: rhacs-3.62, latest, rhacs-4.0, rhacs-4.1, stable
 	assert.Len(t, channels, 5)
+}
+
+func TestClearReplacesForStartingEntries(t *testing.T) {
+	channels := []Channel{
+		{
+			Name:           "rhacs-3.62",
+			yStreamVersion: semver.MustParse("3.62.0"),
+			Entries: []ChannelEntry{
+				{Name: "rhacs-operator.v3.62.0", Replaces: "rhacs-operator.v3.61.0", version: semver.MustParse("3.62.0")},
+			},
+		},
+		{
+			Name:           "rhacs-4.0",
+			yStreamVersion: semver.MustParse("4.0.0"),
+			Entries: []ChannelEntry{
+				{Name: "rhacs-operator.v4.0.0", Replaces: "rhacs-operator.v3.62.1", version: semver.MustParse("4.0.0")},
+				{Name: "rhacs-operator.v4.0.1", Replaces: "rhacs-operator.v4.0.0", version: semver.MustParse("4.0.1")},
+				{Name: "rhacs-operator.v4.0.2", Replaces: "rhacs-operator.v4.0.1", version: semver.MustParse("4.0.2")},
+			},
+		},
+		{
+			Name:           "rhacs-4.1",
+			yStreamVersion: semver.MustParse("4.1.0"),
+			Entries:        []ChannelEntry{},
+		},
+	}
+
+	clearReplacesForStartingEntries(channels)
+
+	assert.Empty(t, channels[0].Entries[0].Replaces)
+
+	assert.Empty(t, channels[1].Entries[0].Replaces)
+	assert.Equal(t, "rhacs-operator.v4.0.0", channels[1].Entries[1].Replaces)
+	assert.Equal(t, "rhacs-operator.v4.0.1", channels[1].Entries[2].Replaces)
+
+	assert.Len(t, channels[2].Entries, 0)
 }
 
 func TestChannelShouldHaveEntry(t *testing.T) {

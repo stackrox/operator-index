@@ -155,6 +155,7 @@ func generateChannels(versions []*semver.Version) []Channel {
 	assignChannelEntries(lineages, entries)
 
 	channels := flattenChannels(lineages)
+	clearReplacesForStartingEntries(channels)
 	return channels
 }
 
@@ -216,10 +217,6 @@ func assignChannels(lineages []ChannelLineage, channels []Channel) {
 func assignChannelEntries(lineages []ChannelLineage, entries []ChannelEntry) {
 	for _, entry := range entries {
 		for i := range lineages {
-			if entry.version.Equal(lineages[i].FromVersion) {
-				// Clear replaces for the first entry in the lineage
-				entry.clearReplaces()
-			}
 			if versionBelongsToChannelLineage(entry.version, lineages[i]) {
 				for j := range lineages[i].YStreamChannels {
 					if channelShouldHaveEntry(lineages[i].YStreamChannels[j], entry) {
@@ -240,6 +237,15 @@ func flattenChannels(lineages []ChannelLineage) []Channel {
 		channels = append(channels, lineage.MainChannel)
 	}
 	return channels
+}
+
+// clearReplacesForStartingEntries clears the `replaces` field for the first entry in each channel according to OLM requirements.
+func clearReplacesForStartingEntries(channels []Channel) {
+	for i := range channels {
+		if len(channels[i].Entries) > 0 {
+			channels[i].Entries[0].clearReplaces()
+		}
+	}
 }
 
 func channelShouldHaveEntry(channel Channel, entry ChannelEntry) bool {
