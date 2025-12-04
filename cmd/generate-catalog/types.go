@@ -70,10 +70,10 @@ type Icon struct {
 }
 
 type ChannelLineage struct {
-	MainChannel     Channel // The main channel (e.g., "stable" or "latest") which contains all versions associated with this root (e.g., stable: 4.0.x, 4.1.x, etc.)
+	MainChannel     Channel // The main channel (e.g., "stable" or "latest") which contains all versions associated with this channel lineage (e.g., stable: 4.0.x, 4.1.x, etc.)
 	YStreamChannels []Channel
-	FromVersion     *semver.Version // Inclusive lower bound of versions associated with this root.
-	UntilVersion    *semver.Version // Exclusive upper bound of versions associated with this root.
+	FromVersion     *semver.Version // Inclusive lower bound of versions associated with this channel lineage.
+	UntilVersion    *semver.Version // Exclusive upper bound of versions associated with this channel lineage.
 }
 
 type Channel struct {
