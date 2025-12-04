@@ -15,7 +15,7 @@ const (
 	olmBundleSchema       = "olm.bundle"
 )
 
-// Describes format of the input file for catalog template generation.
+// Input describes format of the input file for catalog template generation.
 // It contains:
 // - OldestSupportedVersion - the oldest supported version of the operator. All versions < OldestSupportedVersion are marked as deprecated.
 // - Images - a list of bundle images with their versions.
@@ -29,7 +29,7 @@ type InputBundleImage struct {
 	Version string `yaml:"version"`
 }
 
-// Describes domain logic configuration for the catalog template generation.
+// Configuration describes domain logic configuration for the catalog template generation.
 type Configuration struct {
 	OldestSupportedVersion *semver.Version
 	Images                 []BundleImage
@@ -41,7 +41,8 @@ type BundleImage struct {
 	Version *semver.Version
 }
 
-// Describes catalog template structure which is used to generate the catalog YAML file.
+// CatalogTemplate describes catalog template structure which is used to generate the catalog YAML file.
+// It has to contain entries with schema equal to: "olm.package", "olm.channel", "olm.deprecations" or "olm.bundle".
 // See OLM catalog template documentation for more details: https://olm.operatorframework.io/docs/reference/catalog-templates/
 type CatalogTemplate struct {
 	Schema  string         `yaml:"schema"`
@@ -67,13 +68,6 @@ type Package struct {
 type Icon struct {
 	Base64data string `yaml:"base64data"`
 	MediaType  string `yaml:"mediatype"`
-}
-
-type ChannelLineage struct {
-	MainChannel     Channel // The main channel (e.g., "stable" or "latest") which contains all versions associated with this channel lineage (e.g., stable: 4.0.x, 4.1.x, etc.)
-	YStreamChannels []Channel
-	FromVersion     *semver.Version // Inclusive lower bound of versions associated with this channel lineage.
-	UntilVersion    *semver.Version // Exclusive upper bound of versions associated with this channel lineage.
 }
 
 type Channel struct {
@@ -112,8 +106,6 @@ type BundleEntry struct {
 	Image  string `yaml:"image"`
 }
 
-// Create base catalog template block.
-// It has to contain objects with schema equal to: "olm.package", "olm.channel", "olm.deprecations" or "olm.bundle".
 func newCatalogTemplate() CatalogTemplate {
 	return CatalogTemplate{
 		Schema: olmTemplateSchema,
@@ -138,7 +130,7 @@ func (c *CatalogTemplate) addPackage(pkg Package) {
 	c.Entries = append(c.Entries, CatalogEntry(pkg))
 }
 
-// addChannels adds a list of "olm.channel" objects to the base catalog.
+// addChannels adds a slice of "olm.channel" objects to the base catalog.
 func (c *CatalogTemplate) addChannels(channels []Channel) {
 	for _, channel := range channels {
 		c.Entries = append(c.Entries, CatalogEntry(channel))
@@ -157,22 +149,8 @@ func (c *CatalogTemplate) addBundles(bundles []BundleEntry) {
 	}
 }
 
-// Create a new ChannelLineage structure which groups channels together (e.g., all "stable" channels).
-func newChannelLineage(name string, from, until *semver.Version) ChannelLineage {
-	mainChannel := Channel{
-		Schema:  olmChannelSchema,
-		Name:    name,
-		Package: rhacsOperator,
-	}
-	return ChannelLineage{
-		MainChannel:  mainChannel,
-		FromVersion:  from,
-		UntilVersion: until,
-	}
-}
-
-// Create a new "olm.channel" object.
-// it will be represented in YAML like this:
+// newChannel creates a new "olm.channel" object.
+// It will be represented in YAML like this:
 // |  - schema: olm.channel
 // |    name: rhacs-3.64
 // |    package: rhacs-operator
@@ -187,9 +165,13 @@ func newChannel(version *semver.Version) Channel {
 	}
 }
 
+func makeYStreamVersion(v *semver.Version) *semver.Version {
+	return semver.New(v.Major(), v.Minor(), 0, "", "")
+}
+
 // newChannelEntry creates an object to be added to Channel entries list.
 // Channel entries effectively form the upgrade graph within the channel telling OLM from which versions it's allowed to upgrade to a particular one.
-// it will be represented in YAML like this:
+// It will be represented in YAML like this:
 // |  - name: rhacs-operator.v<version>
 // |    replaces: rhacs-operator.v<previousEntryVersion>
 // |    skipRange: '>= <previousYStreamVersion> < <version>'
@@ -212,7 +194,7 @@ func (e *ChannelEntry) setSkipRange(skipRangeFrom, skipRangeTo *semver.Version) 
 	e.SkipRange = fmt.Sprintf(">= %s < %s", skipRangeFrom, skipRangeTo)
 }
 
-// Create a new "olm.deprecations" object which should be added to the catalog base.
+// newDeprecations creates a new "olm.deprecations" object which should be added to the catalog base.
 // It will be represented in YAML like this:
 // |  - schema: olm.deprecations
 // |    package: rhacs-operator
@@ -226,8 +208,8 @@ func newDeprecations(entries []DeprecationEntry) Deprecations {
 	}
 }
 
-// Create a new channel DeprecationEntry reference object which should be added to Deprecation reference list.
-// it will be represented in YAML like this:
+// newChannelDeprecationEntry creates a new channel DeprecationEntry reference object which should be added to Deprecation reference list.
+// It will be represented in YAML like this:
 // |  - reference:
 // |    schema: olm.channel
 // |    name: <name>
@@ -243,8 +225,8 @@ func newChannelDeprecationEntry(name string, message string) DeprecationEntry {
 	}
 }
 
-// Create a new bundle DeprecationEntry reference object which should be added to Deprecation reference list.
-// it will be represented in YAML like this:
+// newBundleDeprecationEntry creates a new bundle DeprecationEntry reference object which should be added to Deprecation reference list.
+// It will be represented in YAML like this:
 // |  - reference:
 // |    schema: olm.bundle
 // |    name: rhacs-operator.v<version>
@@ -260,8 +242,8 @@ func newBundleDeprecationEntry(version *semver.Version, message string) Deprecat
 	}
 }
 
-// Create a new "olm.bundle" object which should be added to the catalog base.
-// it will be represented in YAML like this:
+// newBundleEntry creates a new "olm.bundle" object which should be added to the catalog base.
+// It will be represented in YAML like this:
 // |  - image: <bundle_image_reference>
 // |    schema: olm.bundle
 func newBundleEntry(image string) BundleEntry {
@@ -275,6 +257,24 @@ func generateBundleName(version *semver.Version) string {
 	return fmt.Sprintf("%s.v%s", rhacsOperator, version)
 }
 
-func makeYStreamVersion(v *semver.Version) *semver.Version {
-	return semver.New(v.Major(), v.Minor(), 0, "", "")
+// ChannelLineage is a helper struct for the generation time.
+// It groups channels together. There's a main one, it's the most complete including all versions in this lineage, and there are Y-Stream channels that are subsets of the main one.
+type ChannelLineage struct {
+	MainChannel     Channel // The main channel (e.g., "stable" or "latest") which contains all versions associated with this channel lineage (e.g., stable: 4.0.x, 4.1.x, etc.)
+	YStreamChannels []Channel
+	FromVersion     *semver.Version // Inclusive lower bound of versions associated with this channel lineage.
+	UntilVersion    *semver.Version // Exclusive upper bound of versions associated with this channel lineage.
+}
+
+func newChannelLineage(name string, from, until *semver.Version) ChannelLineage {
+	mainChannel := Channel{
+		Schema:  olmChannelSchema,
+		Name:    name,
+		Package: rhacsOperator,
+	}
+	return ChannelLineage{
+		MainChannel:  mainChannel,
+		FromVersion:  from,
+		UntilVersion: until,
+	}
 }
