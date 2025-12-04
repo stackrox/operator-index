@@ -130,186 +130,6 @@ func readInputFile(filename string) (Configuration, error) {
 	}, nil
 }
 
-// generatePackageWithIcon creates a new "olm.package" object with an operator icon.
-func generatePackageWithIcon() (Package, error) {
-	data, err := os.ReadFile(iconFile)
-	if err != nil {
-		return Package{}, fmt.Errorf("failed to read %s: %v", iconFile, err)
-	}
-	iconBase64 := base64.StdEncoding.EncodeToString(data)
-	pkg := newPackage(stableChannelName, iconBase64)
-
-	return pkg, nil
-}
-
-// generateChannels creates channels based on the provided versions.
-func generateChannels(versions []*semver.Version) []Channel {
-	latestLineage := newChannelLineage(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
-	stableLineage := newChannelLineage(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
-	lineages := []ChannelLineage{latestLineage, stableLineage}
-
-	emptyChannels := generateEmptyChannels(versions)
-	assignChannels(lineages, emptyChannels)
-
-	entries := generateChannelEntries(versions)
-	assignChannelEntries(lineages, entries)
-
-	channels := flattenChannels(lineages)
-	clearReplacesForStartingEntries(channels)
-	return channels
-}
-
-// generateEmptyChannels creates empty (without []ChannelEntry) channels for each unique Y-Stream version found in the provided versions.
-func generateEmptyChannels(versions []*semver.Version) []Channel {
-	channels := make([]Channel, 0)
-	var previousYStream *semver.Version
-
-	for _, v := range versions {
-		yStream := makeYStreamVersion(v)
-		if yStream.Equal(previousYStream) {
-			// If we saw the same Y-Stream version, we already created a channel for it.
-			continue
-		}
-
-		channel := newChannel(yStream)
-		channels = append(channels, channel)
-
-		previousYStream = yStream
-	}
-	return channels
-}
-
-// generateChannelEntries creates channel entries for each version, setting the appropriate `replaces` and `skipRange` fields.
-func generateChannelEntries(versions []*semver.Version) []ChannelEntry {
-	channelEntries := make([]ChannelEntry, 0)
-	// We know that our catalog begins with 3.62.0. We set previousEntryVersion to 3.61.0 in order to have 3.62.0's `skipRange` consistent with others.
-	previousEntryVersion := semver.New(3, 61, 0, "", "")
-	var previousYStreamVersion *semver.Version
-
-	for _, v := range versions {
-		if v.Minor() != previousEntryVersion.Minor() {
-			previousYStreamVersion = makeYStreamVersion(previousEntryVersion)
-		}
-
-		e := newChannelEntry(v)
-		e.setReplaces(previousEntryVersion)
-		e.setSkipRange(previousYStreamVersion, v)
-		channelEntries = append(channelEntries, e)
-
-		previousEntryVersion = v
-	}
-
-	return channelEntries
-}
-
-// assignChannels assigns channels to the appropriate channel lineages based on their Y-Stream versions.
-func assignChannels(lineages []ChannelLineage, channels []Channel) {
-	for _, ch := range channels {
-		for i := range lineages {
-			if versionBelongsToChannelLineage(ch.yStreamVersion, lineages[i]) {
-				lineages[i].YStreamChannels = append(lineages[i].YStreamChannels, ch)
-			}
-		}
-	}
-}
-
-// assignChannelEntries assigns channel entries to the appropriate channels within each lineage.
-func assignChannelEntries(lineages []ChannelLineage, entries []ChannelEntry) {
-	for _, entry := range entries {
-		for i := range lineages {
-			if versionBelongsToChannelLineage(entry.version, lineages[i]) {
-				for j := range lineages[i].YStreamChannels {
-					if channelShouldHaveEntry(lineages[i].YStreamChannels[j], entry) {
-						lineages[i].YStreamChannels[j].Entries = append(lineages[i].YStreamChannels[j].Entries, entry)
-					}
-				}
-				lineages[i].MainChannel.Entries = append(lineages[i].MainChannel.Entries, entry)
-			}
-		}
-	}
-}
-
-// flattenChannels flattens channels from multiple ChannelLineages into a single slice.
-func flattenChannels(lineages []ChannelLineage) []Channel {
-	var channels []Channel
-	for _, lineage := range lineages {
-		channels = append(channels, lineage.YStreamChannels...)
-		channels = append(channels, lineage.MainChannel)
-	}
-	return channels
-}
-
-// clearReplacesForStartingEntries clears the `replaces` field for the first entry in each channel according to OLM requirements.
-func clearReplacesForStartingEntries(channels []Channel) {
-	for i := range channels {
-		if len(channels[i].Entries) > 0 {
-			channels[i].Entries[0].clearReplaces()
-		}
-	}
-}
-
-func channelShouldHaveEntry(channel Channel, entry ChannelEntry) bool {
-	lesserX := entry.version.Major() < channel.yStreamVersion.Major()
-	sameXVersion := entry.version.Major() == channel.yStreamVersion.Major()
-	belongsToYStream := entry.version.Minor() <= channel.yStreamVersion.Minor()
-	return lesserX || (sameXVersion && belongsToYStream)
-}
-
-// generateDeprecations creates an object with a list of deprecations based on the provided versions.
-func generateDeprecations(versions []*semver.Version, channels []Channel, oldestSupportedVersion *semver.Version) Deprecations {
-	var deprecations []DeprecationEntry
-
-	latestChannelDeprecationEntry := newChannelDeprecationEntry(latestChannelName, latestChannelDeprecationMessage)
-	deprecations = append(deprecations, latestChannelDeprecationEntry)
-
-	for _, channel := range channels {
-		if channel.yStreamVersion != nil && channel.yStreamVersion.LessThan(oldestSupportedVersion) {
-			channelDeprecation := newChannelDeprecationEntry(channel.Name, channelDeprecationMessage)
-			deprecations = append(deprecations, channelDeprecation)
-		}
-	}
-
-	// deprecate all bundles that are older than the oldest supported version
-	for _, v := range versions {
-		msg := ""
-		if v.LessThan(oldestSupportedVersion) {
-			msg = bundleDeprecationMessage
-		}
-		if msg != "" {
-			deprecations = append(deprecations, newBundleDeprecationEntry(v, msg))
-		}
-	}
-
-	return newDeprecations(deprecations)
-}
-
-// generateBundles creates a list of bundle entries based on their corresponding images.
-func generateBundles(images []BundleImage) []BundleEntry {
-	var bundleEntries []BundleEntry
-	for _, img := range images {
-		bundleEntries = append(bundleEntries, newBundleEntry(img.Image))
-	}
-	return bundleEntries
-}
-
-// writeToFile writes the resulting catalog template to the output YAML file.
-func writeToFile(filename string, ct CatalogTemplate) error {
-	comment := yaml.HeadComment(headComment...)
-	comments := yaml.CommentMap{
-		"$": []*yaml.Comment{comment}, // "$" means top-level comment
-	}
-
-	out, err := yaml.MarshalWithOptions(ct, yaml.WithComment(comments))
-	if err != nil {
-		return fmt.Errorf("failed to marshal catalog template: %v", err)
-	}
-	if err := os.WriteFile(filename, out, 0644); err != nil {
-		return fmt.Errorf("failed to write output: %v", err)
-	}
-
-	return nil
-}
-
 // getAllVersions extracts all operator versions from the input images.
 func getAllVersions(images []BundleImage) []*semver.Version {
 	versions := make([]*semver.Version, 0, len(images))
@@ -392,6 +212,186 @@ func validateImageReference(imageRef string) error {
 	return nil
 }
 
+// generatePackageWithIcon creates a new "olm.package" object with an operator icon.
+func generatePackageWithIcon() (Package, error) {
+	data, err := os.ReadFile(iconFile)
+	if err != nil {
+		return Package{}, fmt.Errorf("failed to read %s: %v", iconFile, err)
+	}
+	iconBase64 := base64.StdEncoding.EncodeToString(data)
+	pkg := newPackage(stableChannelName, iconBase64)
+
+	return pkg, nil
+}
+
+// generateChannels creates channels based on the provided versions.
+func generateChannels(versions []*semver.Version) []Channel {
+	latestLineage := newChannelLineage(latestChannelName, latestChannelFromVersion, latestChannelUntilVersion)
+	stableLineage := newChannelLineage(stableChannelName, stableChannelFromVersion, stableChannelUntilVersion)
+	lineages := []ChannelLineage{latestLineage, stableLineage}
+
+	emptyChannels := generateEmptyChannels(versions)
+	assignChannels(lineages, emptyChannels)
+
+	entries := generateChannelEntries(versions)
+	assignChannelEntries(lineages, entries)
+
+	channels := flattenChannels(lineages)
+	clearReplacesForStartingEntries(channels)
+	return channels
+}
+
+// generateEmptyChannels creates empty (without []ChannelEntry) channels for each unique Y-Stream version found in the provided versions.
+func generateEmptyChannels(versions []*semver.Version) []Channel {
+	channels := make([]Channel, 0)
+	var previousYStream *semver.Version
+
+	for _, v := range versions {
+		yStream := makeYStreamVersion(v)
+		if yStream.Equal(previousYStream) {
+			// If we saw the same Y-Stream version, we already created a channel for it.
+			continue
+		}
+
+		channel := newChannel(yStream)
+		channels = append(channels, channel)
+
+		previousYStream = yStream
+	}
+	return channels
+}
+
+// assignChannels assigns channels to the appropriate channel lineages based on their Y-Stream versions.
+func assignChannels(lineages []ChannelLineage, channels []Channel) {
+	for _, ch := range channels {
+		for i := range lineages {
+			if versionBelongsToChannelLineage(ch.yStreamVersion, lineages[i]) {
+				lineages[i].YStreamChannels = append(lineages[i].YStreamChannels, ch)
+			}
+		}
+	}
+}
+
+// generateChannelEntries creates channel entries for each version, setting the appropriate `replaces` and `skipRange` fields.
+func generateChannelEntries(versions []*semver.Version) []ChannelEntry {
+	channelEntries := make([]ChannelEntry, 0)
+	// We know that our catalog begins with 3.62.0. We set previousEntryVersion to 3.61.0 in order to have 3.62.0's `skipRange` consistent with others.
+	previousEntryVersion := semver.New(3, 61, 0, "", "")
+	var previousYStreamVersion *semver.Version
+
+	for _, v := range versions {
+		if v.Minor() != previousEntryVersion.Minor() {
+			previousYStreamVersion = makeYStreamVersion(previousEntryVersion)
+		}
+
+		e := newChannelEntry(v)
+		e.setReplaces(previousEntryVersion)
+		e.setSkipRange(previousYStreamVersion, v)
+		channelEntries = append(channelEntries, e)
+
+		previousEntryVersion = v
+	}
+
+	return channelEntries
+}
+
+// assignChannelEntries assigns channel entries to the appropriate channels within each lineage.
+func assignChannelEntries(lineages []ChannelLineage, entries []ChannelEntry) {
+	for _, entry := range entries {
+		for i := range lineages {
+			if versionBelongsToChannelLineage(entry.version, lineages[i]) {
+				for j := range lineages[i].YStreamChannels {
+					if channelShouldHaveEntry(lineages[i].YStreamChannels[j], entry) {
+						lineages[i].YStreamChannels[j].Entries = append(lineages[i].YStreamChannels[j].Entries, entry)
+					}
+				}
+				lineages[i].MainChannel.Entries = append(lineages[i].MainChannel.Entries, entry)
+			}
+		}
+	}
+}
+
 func versionBelongsToChannelLineage(version *semver.Version, lineage ChannelLineage) bool {
 	return lineage.FromVersion.LessThanEqual(version) && lineage.UntilVersion.GreaterThan(version)
+}
+
+func channelShouldHaveEntry(channel Channel, entry ChannelEntry) bool {
+	lesserX := entry.version.Major() < channel.yStreamVersion.Major()
+	sameXVersion := entry.version.Major() == channel.yStreamVersion.Major()
+	belongsToYStream := entry.version.Minor() <= channel.yStreamVersion.Minor()
+	return lesserX || (sameXVersion && belongsToYStream)
+}
+
+// flattenChannels flattens channels from multiple ChannelLineages into a single slice.
+func flattenChannels(lineages []ChannelLineage) []Channel {
+	var channels []Channel
+	for _, lineage := range lineages {
+		channels = append(channels, lineage.YStreamChannels...)
+		channels = append(channels, lineage.MainChannel)
+	}
+	return channels
+}
+
+// clearReplacesForStartingEntries clears the `replaces` field for the first entry in each channel according to OLM requirements.
+func clearReplacesForStartingEntries(channels []Channel) {
+	for i := range channels {
+		if len(channels[i].Entries) > 0 {
+			channels[i].Entries[0].clearReplaces()
+		}
+	}
+}
+
+// generateDeprecations creates an object with a list of deprecations based on the provided versions.
+func generateDeprecations(versions []*semver.Version, channels []Channel, oldestSupportedVersion *semver.Version) Deprecations {
+	var deprecations []DeprecationEntry
+
+	latestChannelDeprecationEntry := newChannelDeprecationEntry(latestChannelName, latestChannelDeprecationMessage)
+	deprecations = append(deprecations, latestChannelDeprecationEntry)
+
+	for _, channel := range channels {
+		if channel.yStreamVersion != nil && channel.yStreamVersion.LessThan(oldestSupportedVersion) {
+			channelDeprecation := newChannelDeprecationEntry(channel.Name, channelDeprecationMessage)
+			deprecations = append(deprecations, channelDeprecation)
+		}
+	}
+
+	// deprecate all bundles that are older than the oldest supported version
+	for _, v := range versions {
+		msg := ""
+		if v.LessThan(oldestSupportedVersion) {
+			msg = bundleDeprecationMessage
+		}
+		if msg != "" {
+			deprecations = append(deprecations, newBundleDeprecationEntry(v, msg))
+		}
+	}
+
+	return newDeprecations(deprecations)
+}
+
+// generateBundles creates a list of bundle entries based on their corresponding images.
+func generateBundles(images []BundleImage) []BundleEntry {
+	var bundleEntries []BundleEntry
+	for _, img := range images {
+		bundleEntries = append(bundleEntries, newBundleEntry(img.Image))
+	}
+	return bundleEntries
+}
+
+// writeToFile writes the resulting catalog template to the output YAML file.
+func writeToFile(filename string, ct CatalogTemplate) error {
+	comment := yaml.HeadComment(headComment...)
+	comments := yaml.CommentMap{
+		"$": []*yaml.Comment{comment}, // "$" means top-level comment
+	}
+
+	out, err := yaml.MarshalWithOptions(ct, yaml.WithComment(comments))
+	if err != nil {
+		return fmt.Errorf("failed to marshal catalog template: %v", err)
+	}
+	if err := os.WriteFile(filename, out, 0644); err != nil {
+		return fmt.Errorf("failed to write output: %v", err)
+	}
+
+	return nil
 }
