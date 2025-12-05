@@ -14,10 +14,10 @@ See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everyth
 ### <a name="add-bundle"></a> Adding new ACS operator version
 
 1. Open `bundles.yaml` file.
-2. Add a new operator bundle image with version:
+2. Add a new operator bundle image with version. It would look like this:
    ```yaml
-      - image: brew.registry.redhat.io/rh-osbs/rhacs-operator-bundle@sha256:c82e8330c257e56eb43cb5fa7b0c842a7f7f0414e32e26a792ef36817cb5ca02
-        version: X.Y.Z
+      - image: quay.io/rhacs-eng/release-operator-bundle@sha256:c82e8330c257e56eb43cb5fa7b0c842a7f7f0414e32e26a792ef36817cb5ca02
+        version: 4.7.9
    ```
    * Note that the image must be referenced by digest, not by tag.
    * Keep entries sorted by version.
@@ -26,17 +26,11 @@ See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everyth
       `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle` repo because this is where customers expect
       to find them. There's a CI check which should make it impossible to push to `master` if there's any bundle from
       a different repo.
-   * If you're adding a bundle as part of downstream release, you will find bundle image's digest in
-      `[CVP] (SUCCESS) cvp-redhatadvancedclustersecurity: rhacs-operator-bundle-container-4.Y.Z-x` email. Open the
-      link in `Brew Build Info` and find the digest of the
-      `registry-proxy.engineering.redhat.com/rh-osbs/rhacs-operator-bundle` image. Take that image and replace
-      `registry-proxy.engineering.redhat.com` with `brew.registry.redhat.io`.
 3. Update `oldest_supported_version` value:
    * Check `Life Cycle Dates` table in [Red Hat Advanced Cluster Security for Kubernetes Support Policy](https://access.redhat.com/support/policy/updates/rhacs).
    * Set `oldest_supported_version` to be the oldest Y-Stream version still in support according to that table, including Maintenance Support. Patch number should always be `.0`. For example, if 4.6 is the oldest in support (maintenance phase), set `oldest_supported_version: 4.6.0`.
-4. Run `make catalog-template.yaml`. This step should update `catalog-template.yaml` with the new version.
-5. Update catalogs (follow [updating catalogs steps](#updating-catalogs))
-6. Open a PR with `Add 4.Y.Z version` title.
+4. Update catalogs (follow [updating catalogs steps](#updating-catalogs))
+5. Open a PR with `Add 4.Y.Z version` title.
 
 
 
