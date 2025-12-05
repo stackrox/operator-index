@@ -394,10 +394,10 @@ func TestGenerateDeprecations(t *testing.T) {
 		v("4.1.0"),
 	}
 	channels := []Channel{
-		channel("3.62.0"),
+		channel(t, "3.62"),
 		{Name: "latest"},
-		channel("4.0.0"),
-		channel("4.1.0"),
+		channel(t, "4.0"),
+		channel(t, "4.1"),
 		{Name: "stable"},
 	}
 	oldestSupportedVersion := v("4.0.0")
@@ -435,9 +435,9 @@ func TestAssignChannels(t *testing.T) {
 	lineages := []channelLineage{latestLineage, stableLineage}
 
 	channels := []Channel{
-		channel("3.62.0"),
-		channel("4.0.0"),
-		channel("4.1.0"),
+		channel(t, "3.62"),
+		channel(t, "4.0"),
+		channel(t, "4.1"),
 	}
 
 	assignChannels(lineages, channels)
@@ -455,14 +455,14 @@ func TestAssignChannels(t *testing.T) {
 func TestAssignChannelEntries(t *testing.T) {
 	latestLineage := newChannelLineage("latest", v("3.62.0"), v("4.0.0"))
 	latestLineage.YStreamChannels = []Channel{
-		channel("3.62.0"),
+		channel(t, "3.62"),
 	}
 
 	stableLineage := newChannelLineage("stable", v("4.0.0"), v("9999.0.0"))
 	stableLineage.YStreamChannels = []Channel{
-		channel("4.0.0"),
-		channel("4.1.0"),
-		channel("5.0.0"),
+		channel(t, "4.0"),
+		channel(t, "4.1"),
+		channel(t, "5.0"),
 	}
 
 	entries := []ChannelEntry{
@@ -516,15 +516,14 @@ func TestFlattenChannels(t *testing.T) {
 
 	stableLineage := newChannelLineage("stable", v("4.0.0"), v("9999.0.0"))
 	stableLineage.YStreamChannels = []Channel{
-		channel("4.0"),
-		channel("4.1"),
+		channel(t, "4.0"),
+		channel(t, "4.1"),
 	}
 
 	lineages := []channelLineage{latestLineage, stableLineage}
 	channels := flattenChannels(lineages)
 
 	expectedChannels := []string{"rhacs-3.62", "latest", "rhacs-4.0", "rhacs-4.1", "stable"}
-	assert.Len(t, channels, len(expectedChannels))
 	assert.Equal(t, expectedChannels, collectChannelNames(channels))
 }
 
@@ -573,37 +572,37 @@ func TestChannelShouldHaveEntry(t *testing.T) {
 	}{
 		{
 			name:           "Entry belongs to channel",
-			channelVersion: "4.0.0",
+			channelVersion: "4.0",
 			entryVersion:   "4.0.1",
 			expectedToHave: true,
 		},
 		{
 			name:           "Entry is exact Y-stream version",
-			channelVersion: "4.0.0",
+			channelVersion: "4.0",
 			entryVersion:   "4.0.0",
 			expectedToHave: true,
 		},
 		{
 			name:           "Entry is from newer Y-stream",
-			channelVersion: "4.0.0",
+			channelVersion: "4.0",
 			entryVersion:   "4.1.0",
 			expectedToHave: false,
 		},
 		{
 			name:           "Entry is from older Major version",
-			channelVersion: "5.0.0",
+			channelVersion: "5.0",
 			entryVersion:   "4.0.0",
 			expectedToHave: true,
 		},
 		{
 			name:           "Entry is from older Y-stream",
-			channelVersion: "4.1.0",
+			channelVersion: "4.1",
 			entryVersion:   "4.0.6",
 			expectedToHave: true,
 		},
 		{
 			name:           "Entry minor equals channel minor",
-			channelVersion: "4.1.0",
+			channelVersion: "4.1",
 			entryVersion:   "4.1.5",
 			expectedToHave: true,
 		},
@@ -611,7 +610,7 @@ func TestChannelShouldHaveEntry(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			channel := channel(tt.channelVersion)
+			channel := channel(t, tt.channelVersion)
 			entry := ChannelEntry{version: v(tt.entryVersion)}
 
 			result := channelShouldHaveEntry(channel, entry)
@@ -626,7 +625,9 @@ func v(version string) *semver.Version {
 	return semver.MustParse(version)
 }
 
-func channel(yStreamVersion string) Channel {
+func channel(t *testing.T, yStreamVersion string) Channel {
+	t.Helper()
+	assert.Regexp(t, `^\d+\.\d+$`, yStreamVersion)
 	return newChannel(v(yStreamVersion))
 }
 
