@@ -152,9 +152,9 @@ func TestValidateImageReference(t *testing.T) {
 
 func TestGetAllVersions(t *testing.T) {
 	images := []BundleImage{
-		{Image: "img1", Version: v(t, "1.0.0")},
-		{Image: "img2", Version: v(t, "2.0.0")},
-		{Image: "img3", Version: v(t, "3.0.0")},
+		{Image: "img1", Version: v("1.0.0")},
+		{Image: "img2", Version: v("2.0.0")},
+		{Image: "img3", Version: v("3.0.0")},
 	}
 
 	versions := getAllVersions(images)
@@ -174,18 +174,18 @@ func TestValidateVersionsAreSorted(t *testing.T) {
 		{
 			name: "Sorted versions",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
-				v(t, "1.0.1"),
-				v(t, "1.1.0"),
-				v(t, "2.0.0"),
-				v(t, "3.0.0-pre.1"),
-				v(t, "3.0.0"),
+				v("1.0.0"),
+				v("1.0.1"),
+				v("1.1.0"),
+				v("2.0.0"),
+				v("3.0.0-pre.1"),
+				v("3.0.0"),
 			},
 		},
 		{
 			name: "Single version",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
+				v("1.0.0"),
 			},
 		},
 		{
@@ -195,16 +195,16 @@ func TestValidateVersionsAreSorted(t *testing.T) {
 		{
 			name: "Unsorted versions",
 			versions: []*semver.Version{
-				v(t, "2.0.0"),
-				v(t, "1.0.0"),
+				v("2.0.0"),
+				v("1.0.0"),
 			},
 			expectedError: "versions are not sorted in ascending order",
 		},
 		{
 			name: "Duplicate versions",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
-				v(t, "1.0.0"),
+				v("1.0.0"),
+				v("1.0.0"),
 			},
 			expectedError: "versions are not sorted in ascending order",
 		},
@@ -233,64 +233,64 @@ func TestHasGapInVersions(t *testing.T) {
 		{
 			name: "No gaps in patch versions",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
-				v(t, "1.0.1"),
-				v(t, "1.0.2"),
+				v("1.0.0"),
+				v("1.0.1"),
+				v("1.0.2"),
 			},
 		},
 		{
 			name: "No gaps in minor versions",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
-				v(t, "1.1.0"),
-				v(t, "1.2.0"),
+				v("1.0.0"),
+				v("1.1.0"),
+				v("1.2.0"),
 			},
 		},
 		{
 			name: "No gaps in major versions",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
-				v(t, "2.0.0"),
-				v(t, "3.0.0"),
+				v("1.0.0"),
+				v("2.0.0"),
+				v("3.0.0"),
 			},
 		},
 		{
 			name: "Mixed version increments without gaps",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
-				v(t, "1.0.1"),
-				v(t, "1.1.0"),
-				v(t, "2.0.0"),
+				v("1.0.0"),
+				v("1.0.1"),
+				v("1.1.0"),
+				v("2.0.0"),
 			},
 		},
 		{
 			name: "Gap in patch versions",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
-				v(t, "1.0.2"),
+				v("1.0.0"),
+				v("1.0.2"),
 			},
 			expectedError: "unexpected version sequence",
 		},
 		{
 			name: "Gap in minor versions",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
-				v(t, "1.2.0"),
+				v("1.0.0"),
+				v("1.2.0"),
 			},
 			expectedError: "unexpected version sequence",
 		},
 		{
 			name: "Gap in major versions",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
-				v(t, "3.0.0"),
+				v("1.0.0"),
+				v("3.0.0"),
 			},
 			expectedError: "unexpected version sequence",
 		},
 		{
 			name: "Single version has no gaps",
 			versions: []*semver.Version{
-				v(t, "1.0.0"),
+				v("1.0.0"),
 			},
 		},
 		{
@@ -322,20 +322,20 @@ func TestGenerateEmptyChannels(t *testing.T) {
 		{
 			name: "Single Y-stream versions",
 			versions: []*semver.Version{
-				v(t, "3.62.0"),
-				v(t, "3.62.1"),
-				v(t, "3.62.2"),
+				v("3.62.0"),
+				v("3.62.1"),
+				v("3.62.2"),
 			},
 			expectedChannels: []string{"rhacs-3.62"},
 		},
 		{
 			name: "Multiple Y-stream versions",
 			versions: []*semver.Version{
-				v(t, "3.62.0"),
-				v(t, "3.62.1"),
-				v(t, "4.0.0"),
-				v(t, "4.0.1"),
-				v(t, "4.1.0"),
+				v("3.62.0"),
+				v("3.62.1"),
+				v("4.0.0"),
+				v("4.0.1"),
+				v("4.1.0"),
 			},
 			expectedChannels: []string{"rhacs-3.62", "rhacs-4.0", "rhacs-4.1"},
 		},
@@ -347,9 +347,9 @@ func TestGenerateEmptyChannels(t *testing.T) {
 		{
 			name: "Major version jump",
 			versions: []*semver.Version{
-				v(t, "3.62.0"),
-				v(t, "4.0.0"),
-				v(t, "5.0.0"),
+				v("3.62.0"),
+				v("4.0.0"),
+				v("5.0.0"),
 			},
 			expectedChannels: []string{"rhacs-3.62", "rhacs-4.0", "rhacs-5.0"},
 		},
@@ -358,20 +358,20 @@ func TestGenerateEmptyChannels(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			channels := generateEmptyChannels(tt.versions)
-			assert.Equal(t, tt.expectedChannels, collectChannelNames(t, channels))
+			assert.Equal(t, tt.expectedChannels, collectChannelNames(channels))
 		})
 	}
 }
 
 func TestGenerateChannelEntries(t *testing.T) {
 	versions := []*semver.Version{
-		v(t, "3.62.0"),
-		v(t, "3.62.1"),
-		v(t, "4.0.0"),
-		v(t, "4.0.1"),
-		v(t, "4.0.2"),
-		v(t, "4.1.0"),
-		v(t, "4.1.1"),
+		v("3.62.0"),
+		v("3.62.1"),
+		v("4.0.0"),
+		v("4.0.1"),
+		v("4.0.2"),
+		v("4.1.0"),
+		v("4.1.1"),
 	}
 	entries := generateChannelEntries(versions)
 
@@ -388,19 +388,19 @@ func TestGenerateChannelEntries(t *testing.T) {
 
 func TestGenerateDeprecations(t *testing.T) {
 	versions := []*semver.Version{
-		v(t, "3.62.0"),
-		v(t, "3.62.1"),
-		v(t, "4.0.0"),
-		v(t, "4.1.0"),
+		v("3.62.0"),
+		v("3.62.1"),
+		v("4.0.0"),
+		v("4.1.0"),
 	}
 	channels := []Channel{
-		channel(t, "3.62.0"),
+		channel("3.62.0"),
 		{Name: "latest"},
-		channel(t, "4.0.0"),
-		channel(t, "4.1.0"),
+		channel("4.0.0"),
+		channel("4.1.0"),
 		{Name: "stable"},
 	}
-	oldestSupportedVersion := v(t, "4.0.0")
+	oldestSupportedVersion := v("4.0.0")
 
 	deprecations := generateDeprecations(versions, channels, oldestSupportedVersion)
 
@@ -416,8 +416,8 @@ func TestGenerateDeprecations(t *testing.T) {
 
 func TestGenerateBundles(t *testing.T) {
 	images := []BundleImage{
-		{Image: "registry.io/bundle1@sha256:abc123", Version: v(t, "1.0.0")},
-		{Image: "registry.io/bundle2@sha256:def456", Version: v(t, "2.0.0")},
+		{Image: "registry.io/bundle1@sha256:abc123", Version: v("1.0.0")},
+		{Image: "registry.io/bundle2@sha256:def456", Version: v("2.0.0")},
 	}
 
 	bundles := generateBundles(images)
@@ -430,14 +430,14 @@ func TestGenerateBundles(t *testing.T) {
 }
 
 func TestAssignChannels(t *testing.T) {
-	latestLineage := newChannelLineage("latest", v(t, "3.62.0"), v(t, "4.0.0"))
-	stableLineage := newChannelLineage("stable", v(t, "4.0.0"), v(t, "9999.0.0"))
+	latestLineage := newChannelLineage("latest", v("3.62.0"), v("4.0.0"))
+	stableLineage := newChannelLineage("stable", v("4.0.0"), v("9999.0.0"))
 	lineages := []channelLineage{latestLineage, stableLineage}
 
 	channels := []Channel{
-		channel(t, "3.62.0"),
-		channel(t, "4.0.0"),
-		channel(t, "4.1.0"),
+		channel("3.62.0"),
+		channel("4.0.0"),
+		channel("4.1.0"),
 	}
 
 	assignChannels(lineages, channels)
@@ -453,28 +453,28 @@ func TestAssignChannels(t *testing.T) {
 }
 
 func TestAssignChannelEntries(t *testing.T) {
-	latestLineage := newChannelLineage("latest", v(t, "3.62.0"), v(t, "4.0.0"))
+	latestLineage := newChannelLineage("latest", v("3.62.0"), v("4.0.0"))
 	latestLineage.YStreamChannels = []Channel{
-		channel(t, "3.62.0"),
+		channel("3.62.0"),
 	}
 
-	stableLineage := newChannelLineage("stable", v(t, "4.0.0"), v(t, "9999.0.0"))
+	stableLineage := newChannelLineage("stable", v("4.0.0"), v("9999.0.0"))
 	stableLineage.YStreamChannels = []Channel{
-		channel(t, "4.0.0"),
-		channel(t, "4.1.0"),
-		channel(t, "5.0.0"),
+		channel("4.0.0"),
+		channel("4.1.0"),
+		channel("5.0.0"),
 	}
 
 	entries := []ChannelEntry{
 		// "latest" Entries
-		{version: v(t, "3.62.0")},
-		{version: v(t, "3.62.1")},
+		{version: v("3.62.0")},
+		{version: v("3.62.1")},
 		// "stable" Entries
-		{version: v(t, "4.0.0")},
-		{version: v(t, "4.0.1")},
-		{version: v(t, "4.1.0")},
-		{version: v(t, "5.0.0")},
-		{version: v(t, "5.0.1")},
+		{version: v("4.0.0")},
+		{version: v("4.0.1")},
+		{version: v("4.1.0")},
+		{version: v("5.0.0")},
+		{version: v("5.0.1")},
 	}
 
 	lineages := []channelLineage{latestLineage, stableLineage}
@@ -505,15 +505,15 @@ func TestAssignChannelEntries(t *testing.T) {
 }
 
 func TestFlattenChannels(t *testing.T) {
-	latestLineage := newChannelLineage("latest", v(t, "3.62.0"), v(t, "4.0.0"))
+	latestLineage := newChannelLineage("latest", v("3.62.0"), v("4.0.0"))
 	latestLineage.YStreamChannels = []Channel{
 		{Name: "rhacs-3.62"},
 	}
 
-	stableLineage := newChannelLineage("stable", v(t, "4.0.0"), v(t, "9999.0.0"))
+	stableLineage := newChannelLineage("stable", v("4.0.0"), v("9999.0.0"))
 	stableLineage.YStreamChannels = []Channel{
-		channel(t, "4.0"),
-		channel(t, "4.1"),
+		channel("4.0"),
+		channel("4.1"),
 	}
 
 	lineages := []channelLineage{latestLineage, stableLineage}
@@ -521,30 +521,30 @@ func TestFlattenChannels(t *testing.T) {
 
 	expectedChannels := []string{"rhacs-3.62", "latest", "rhacs-4.0", "rhacs-4.1", "stable"}
 	assert.Len(t, channels, len(expectedChannels))
-	assert.Equal(t, expectedChannels, collectChannelNames(t, channels))
+	assert.Equal(t, expectedChannels, collectChannelNames(channels))
 }
 
 func TestClearReplacesForStartingEntries(t *testing.T) {
 	channels := []Channel{
 		{
 			Name:           "rhacs-3.62",
-			yStreamVersion: v(t, "3.62.0"),
+			yStreamVersion: v("3.62.0"),
 			Entries: []ChannelEntry{
-				{Name: "rhacs-operator.v3.62.0", Replaces: "rhacs-operator.v3.61.0", version: v(t, "3.62.0")},
+				{Name: "rhacs-operator.v3.62.0", Replaces: "rhacs-operator.v3.61.0", version: v("3.62.0")},
 			},
 		},
 		{
 			Name:           "rhacs-4.0",
-			yStreamVersion: v(t, "4.0.0"),
+			yStreamVersion: v("4.0.0"),
 			Entries: []ChannelEntry{
-				{Name: "rhacs-operator.v4.0.0", Replaces: "rhacs-operator.v3.62.1", version: v(t, "4.0.0")},
-				{Name: "rhacs-operator.v4.0.1", Replaces: "rhacs-operator.v4.0.0", version: v(t, "4.0.1")},
-				{Name: "rhacs-operator.v4.0.2", Replaces: "rhacs-operator.v4.0.1", version: v(t, "4.0.2")},
+				{Name: "rhacs-operator.v4.0.0", Replaces: "rhacs-operator.v3.62.1", version: v("4.0.0")},
+				{Name: "rhacs-operator.v4.0.1", Replaces: "rhacs-operator.v4.0.0", version: v("4.0.1")},
+				{Name: "rhacs-operator.v4.0.2", Replaces: "rhacs-operator.v4.0.1", version: v("4.0.2")},
 			},
 		},
 		{
 			Name:           "rhacs-4.1",
-			yStreamVersion: v(t, "4.1.0"),
+			yStreamVersion: v("4.1.0"),
 			Entries:        []ChannelEntry{},
 		},
 	}
@@ -607,8 +607,8 @@ func TestChannelShouldHaveEntry(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			channel := channel(t, tt.channelVersion)
-			entry := ChannelEntry{version: v(t, tt.entryVersion)}
+			channel := channel(tt.channelVersion)
+			entry := ChannelEntry{version: v(tt.entryVersion)}
 
 			result := channelShouldHaveEntry(channel, entry)
 
@@ -618,18 +618,15 @@ func TestChannelShouldHaveEntry(t *testing.T) {
 }
 
 // v is a shorthand for semver.MustParse
-func v(t *testing.T, version string) *semver.Version {
-	t.Helper()
+func v(version string) *semver.Version {
 	return semver.MustParse(version)
 }
 
-func channel(t *testing.T, yStreamVersion string) Channel {
-	t.Helper()
-	return newChannel(v(t, yStreamVersion))
+func channel(yStreamVersion string) Channel {
+	return newChannel(v(yStreamVersion))
 }
 
-func collectChannelNames(t *testing.T, channels []Channel) []string {
-	t.Helper()
+func collectChannelNames(channels []Channel) []string {
 	names := make([]string, len(channels))
 	for i, ch := range channels {
 		names[i] = ch.Name
