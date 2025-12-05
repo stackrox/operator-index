@@ -9,7 +9,7 @@ OperatorHub.
 ### Restarting Konflux pipeline
 
 If some pipeline failed, you can restart it by commenting in the PR `/test <pipeline-name>` (e.g. `/test operator-index-ocp-v4-16-on-push`).
-See more in [our docs](https://spaces.redhat.com/display/StackRox/How+to+everything+Konflux+for+RHACS#HowtoeverythingKonfluxforRHACS-Howtore-runpipelines).
+See more in [our docs](https://spaces.redhat.com/spaces/StackRox/pages/702155579/How+to+re-run+Konflux+pipelines).
 
 ### <a name="add-bundle"></a> Adding new ACS operator version
 
@@ -42,7 +42,7 @@ make clean && make valid-catalogs
 ```
 Note: this will take a while.
 
-If a new bundle was added then you should see that `catalog-bundle-object/rhacs-operator/catalog.json` and `catalog-csv-metadata/rhacs-operator/catalog.json` files are changed.
+If a new bundle was added then you should see that `catalog-template.yaml`, `catalog-bundle-object/rhacs-operator/catalog.json` and `catalog-csv-metadata/rhacs-operator/catalog.json` files are changed.
 
 #### Historical note
 
