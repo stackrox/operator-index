@@ -152,9 +152,9 @@ func TestValidateImageReference(t *testing.T) {
 
 func TestGetAllVersions(t *testing.T) {
 	images := []BundleImage{
-		{Image: "img1", Version: semver.MustParse("1.0.0")},
-		{Image: "img2", Version: semver.MustParse("2.0.0")},
-		{Image: "img3", Version: semver.MustParse("3.0.0")},
+		{Image: "img1", Version: v(t, "1.0.0")},
+		{Image: "img2", Version: v(t, "2.0.0")},
+		{Image: "img3", Version: v(t, "3.0.0")},
 	}
 
 	versions := getAllVersions(images)
@@ -174,18 +174,18 @@ func TestValidateVersionsAreSorted(t *testing.T) {
 		{
 			name: "Sorted versions",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("1.0.1"),
-				semver.MustParse("1.1.0"),
-				semver.MustParse("2.0.0"),
-				semver.MustParse("3.0.0-pre.1"),
-				semver.MustParse("3.0.0"),
+				v(t, "1.0.0"),
+				v(t, "1.0.1"),
+				v(t, "1.1.0"),
+				v(t, "2.0.0"),
+				v(t, "3.0.0-pre.1"),
+				v(t, "3.0.0"),
 			},
 		},
 		{
 			name: "Single version",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
+				v(t, "1.0.0"),
 			},
 		},
 		{
@@ -195,16 +195,16 @@ func TestValidateVersionsAreSorted(t *testing.T) {
 		{
 			name: "Unsorted versions",
 			versions: []*semver.Version{
-				semver.MustParse("2.0.0"),
-				semver.MustParse("1.0.0"),
+				v(t, "2.0.0"),
+				v(t, "1.0.0"),
 			},
 			expectedError: "versions are not sorted in ascending order",
 		},
 		{
 			name: "Duplicate versions",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("1.0.0"),
+				v(t, "1.0.0"),
+				v(t, "1.0.0"),
 			},
 			expectedError: "versions are not sorted in ascending order",
 		},
@@ -233,64 +233,64 @@ func TestHasGapInVersions(t *testing.T) {
 		{
 			name: "No gaps in patch versions",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("1.0.1"),
-				semver.MustParse("1.0.2"),
+				v(t, "1.0.0"),
+				v(t, "1.0.1"),
+				v(t, "1.0.2"),
 			},
 		},
 		{
 			name: "No gaps in minor versions",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("1.1.0"),
-				semver.MustParse("1.2.0"),
+				v(t, "1.0.0"),
+				v(t, "1.1.0"),
+				v(t, "1.2.0"),
 			},
 		},
 		{
 			name: "No gaps in major versions",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("2.0.0"),
-				semver.MustParse("3.0.0"),
+				v(t, "1.0.0"),
+				v(t, "2.0.0"),
+				v(t, "3.0.0"),
 			},
 		},
 		{
 			name: "Mixed version increments without gaps",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("1.0.1"),
-				semver.MustParse("1.1.0"),
-				semver.MustParse("2.0.0"),
+				v(t, "1.0.0"),
+				v(t, "1.0.1"),
+				v(t, "1.1.0"),
+				v(t, "2.0.0"),
 			},
 		},
 		{
 			name: "Gap in patch versions",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("1.0.2"),
+				v(t, "1.0.0"),
+				v(t, "1.0.2"),
 			},
 			expectedError: "unexpected version sequence",
 		},
 		{
 			name: "Gap in minor versions",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("1.2.0"),
+				v(t, "1.0.0"),
+				v(t, "1.2.0"),
 			},
 			expectedError: "unexpected version sequence",
 		},
 		{
 			name: "Gap in major versions",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
-				semver.MustParse("3.0.0"),
+				v(t, "1.0.0"),
+				v(t, "3.0.0"),
 			},
 			expectedError: "unexpected version sequence",
 		},
 		{
 			name: "Single version has no gaps",
 			versions: []*semver.Version{
-				semver.MustParse("1.0.0"),
+				v(t, "1.0.0"),
 			},
 		},
 		{
@@ -322,20 +322,20 @@ func TestGenerateEmptyChannels(t *testing.T) {
 		{
 			name: "Single Y-stream versions",
 			versions: []*semver.Version{
-				semver.MustParse("3.62.0"),
-				semver.MustParse("3.62.1"),
-				semver.MustParse("3.62.2"),
+				v(t, "3.62.0"),
+				v(t, "3.62.1"),
+				v(t, "3.62.2"),
 			},
 			expectedChannels: []string{"rhacs-3.62"},
 		},
 		{
 			name: "Multiple Y-stream versions",
 			versions: []*semver.Version{
-				semver.MustParse("3.62.0"),
-				semver.MustParse("3.62.1"),
-				semver.MustParse("4.0.0"),
-				semver.MustParse("4.0.1"),
-				semver.MustParse("4.1.0"),
+				v(t, "3.62.0"),
+				v(t, "3.62.1"),
+				v(t, "4.0.0"),
+				v(t, "4.0.1"),
+				v(t, "4.1.0"),
 			},
 			expectedChannels: []string{"rhacs-3.62", "rhacs-4.0", "rhacs-4.1"},
 		},
@@ -347,9 +347,9 @@ func TestGenerateEmptyChannels(t *testing.T) {
 		{
 			name: "Major version jump",
 			versions: []*semver.Version{
-				semver.MustParse("3.62.0"),
-				semver.MustParse("4.0.0"),
-				semver.MustParse("5.0.0"),
+				v(t, "3.62.0"),
+				v(t, "4.0.0"),
+				v(t, "5.0.0"),
 			},
 			expectedChannels: []string{"rhacs-3.62", "rhacs-4.0", "rhacs-5.0"},
 		},
@@ -358,26 +358,20 @@ func TestGenerateEmptyChannels(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			channels := generateEmptyChannels(tt.versions)
-
-			channelNames := make([]string, len(channels))
-			for i, ch := range channels {
-				channelNames[i] = ch.Name
-			}
-
-			assert.Equal(t, tt.expectedChannels, channelNames)
+			assert.Equal(t, tt.expectedChannels, collectChannelNames(t, channels))
 		})
 	}
 }
 
 func TestGenerateChannelEntries(t *testing.T) {
 	versions := []*semver.Version{
-		semver.MustParse("3.62.0"),
-		semver.MustParse("3.62.1"),
-		semver.MustParse("4.0.0"),
-		semver.MustParse("4.0.1"),
-		semver.MustParse("4.0.2"),
-		semver.MustParse("4.1.0"),
-		semver.MustParse("4.1.1"),
+		v(t, "3.62.0"),
+		v(t, "3.62.1"),
+		v(t, "4.0.0"),
+		v(t, "4.0.1"),
+		v(t, "4.0.2"),
+		v(t, "4.1.0"),
+		v(t, "4.1.1"),
 	}
 	entries := generateChannelEntries(versions)
 
@@ -394,19 +388,19 @@ func TestGenerateChannelEntries(t *testing.T) {
 
 func TestGenerateDeprecations(t *testing.T) {
 	versions := []*semver.Version{
-		semver.MustParse("3.62.0"),
-		semver.MustParse("3.62.1"),
-		semver.MustParse("4.0.0"),
-		semver.MustParse("4.1.0"),
+		v(t, "3.62.0"),
+		v(t, "3.62.1"),
+		v(t, "4.0.0"),
+		v(t, "4.1.0"),
 	}
 	channels := []Channel{
-		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
+		channel(t, "3.62.0"),
 		{Name: "latest"},
-		{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
-		{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
+		channel(t, "4.0.0"),
+		channel(t, "4.1.0"),
 		{Name: "stable"},
 	}
-	oldestSupportedVersion := semver.MustParse("4.0.0")
+	oldestSupportedVersion := v(t, "4.0.0")
 
 	deprecations := generateDeprecations(versions, channels, oldestSupportedVersion)
 
@@ -422,8 +416,8 @@ func TestGenerateDeprecations(t *testing.T) {
 
 func TestGenerateBundles(t *testing.T) {
 	images := []BundleImage{
-		{Image: "registry.io/bundle1@sha256:abc123", Version: semver.MustParse("1.0.0")},
-		{Image: "registry.io/bundle2@sha256:def456", Version: semver.MustParse("2.0.0")},
+		{Image: "registry.io/bundle1@sha256:abc123", Version: v(t, "1.0.0")},
+		{Image: "registry.io/bundle2@sha256:def456", Version: v(t, "2.0.0")},
 	}
 
 	bundles := generateBundles(images)
@@ -436,14 +430,14 @@ func TestGenerateBundles(t *testing.T) {
 }
 
 func TestAssignChannels(t *testing.T) {
-	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
-	stableLineage := newChannelLineage("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
+	latestLineage := newChannelLineage("latest", v(t, "3.62.0"), v(t, "4.0.0"))
+	stableLineage := newChannelLineage("stable", v(t, "4.0.0"), v(t, "9999.0.0"))
 	lineages := []channelLineage{latestLineage, stableLineage}
 
 	channels := []Channel{
-		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
-		{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
-		{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
+		channel(t, "3.62.0"),
+		channel(t, "4.0.0"),
+		channel(t, "4.1.0"),
 	}
 
 	assignChannels(lineages, channels)
@@ -459,28 +453,28 @@ func TestAssignChannels(t *testing.T) {
 }
 
 func TestAssignChannelEntries(t *testing.T) {
-	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
+	latestLineage := newChannelLineage("latest", v(t, "3.62.0"), v(t, "4.0.0"))
 	latestLineage.YStreamChannels = []Channel{
-		{Name: "rhacs-3.62", yStreamVersion: semver.MustParse("3.62.0")},
+		channel(t, "3.62.0"),
 	}
 
-	stableLineage := newChannelLineage("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
+	stableLineage := newChannelLineage("stable", v(t, "4.0.0"), v(t, "9999.0.0"))
 	stableLineage.YStreamChannels = []Channel{
-		{Name: "rhacs-4.0", yStreamVersion: semver.MustParse("4.0.0")},
-		{Name: "rhacs-4.1", yStreamVersion: semver.MustParse("4.1.0")},
-		{Name: "rhacs-5.0", yStreamVersion: semver.MustParse("5.0.0")},
+		channel(t, "4.0.0"),
+		channel(t, "4.1.0"),
+		channel(t, "5.0.0"),
 	}
 
 	entries := []ChannelEntry{
 		// "latest" Entries
-		{version: semver.MustParse("3.62.0")},
-		{version: semver.MustParse("3.62.1")},
+		{version: v(t, "3.62.0")},
+		{version: v(t, "3.62.1")},
 		// "stable" Entries
-		{version: semver.MustParse("4.0.0")},
-		{version: semver.MustParse("4.0.1")},
-		{version: semver.MustParse("4.1.0")},
-		{version: semver.MustParse("5.0.0")},
-		{version: semver.MustParse("5.0.1")},
+		{version: v(t, "4.0.0")},
+		{version: v(t, "4.0.1")},
+		{version: v(t, "4.1.0")},
+		{version: v(t, "5.0.0")},
+		{version: v(t, "5.0.1")},
 	}
 
 	lineages := []channelLineage{latestLineage, stableLineage}
@@ -494,14 +488,8 @@ func TestAssignChannelEntries(t *testing.T) {
 	assert.Equal(t, "rhacs-3.62", latestLineage.YStreamChannels[0].Name)
 	assert.Equal(t, latestChannelName, latestLineage.MainChannel.Name)
 
-	y362ChannelVersions := []string{
-		"3.62.0",
-		"3.62.1",
-	}
-	assertChannelContents(t, latestLineage.YStreamChannels[0], y362ChannelVersions...)
-
-	latestMainChannelVersions := y362ChannelVersions
-	assertChannelContents(t, latestLineage.MainChannel, latestMainChannelVersions...)
+	assertChannelContents(t, latestLineage.YStreamChannels[0], "3.62.0", "3.62.1")
+	assertChannelContents(t, latestLineage.MainChannel, "3.62.0", "3.62.1")
 
 	// Verify contents of "stable" lineage
 	assert.Len(t, stableLineage.YStreamChannels, 3)
@@ -510,76 +498,53 @@ func TestAssignChannelEntries(t *testing.T) {
 	assert.Equal(t, "rhacs-5.0", stableLineage.YStreamChannels[2].Name)
 	assert.Equal(t, stableChannelName, stableLineage.MainChannel.Name)
 
-	y40ChannelVersions := []string{
-		"4.0.0",
-		"4.0.1",
-	}
-	assertChannelContents(t, stableLineage.YStreamChannels[0], y40ChannelVersions...)
-
-	y41ChannelVersions := []string{
-		"4.0.0",
-		"4.0.1",
-		"4.1.0",
-	}
-	assertChannelContents(t, stableLineage.YStreamChannels[1], y41ChannelVersions...)
-
-	y5ChannelVersions := []string{
-		"4.0.0",
-		"4.0.1",
-		"4.1.0",
-		"5.0.0",
-		"5.0.1",
-	}
-	assertChannelContents(t, stableLineage.YStreamChannels[2], y5ChannelVersions...)
-
-	stableMainChannelVersions := y5ChannelVersions
-	assertChannelContents(t, stableLineage.MainChannel, stableMainChannelVersions...)
+	assertChannelContents(t, stableLineage.YStreamChannels[0], "4.0.0", "4.0.1")
+	assertChannelContents(t, stableLineage.YStreamChannels[1], "4.0.0", "4.0.1", "4.1.0")
+	assertChannelContents(t, stableLineage.YStreamChannels[2], "4.0.0", "4.0.1", "4.1.0", "5.0.0", "5.0.1")
+	assertChannelContents(t, stableLineage.MainChannel, "4.0.0", "4.0.1", "4.1.0", "5.0.0", "5.0.1")
 }
 
 func TestFlattenChannels(t *testing.T) {
-	latestLineage := newChannelLineage("latest", semver.MustParse("3.62.0"), semver.MustParse("4.0.0"))
+	latestLineage := newChannelLineage("latest", v(t, "3.62.0"), v(t, "4.0.0"))
 	latestLineage.YStreamChannels = []Channel{
 		{Name: "rhacs-3.62"},
 	}
 
-	stableLineage := newChannelLineage("stable", semver.MustParse("4.0.0"), semver.MustParse("9999.0.0"))
+	stableLineage := newChannelLineage("stable", v(t, "4.0.0"), v(t, "9999.0.0"))
 	stableLineage.YStreamChannels = []Channel{
-		{Name: "rhacs-4.0"},
-		{Name: "rhacs-4.1"},
+		channel(t, "4.0"),
+		channel(t, "4.1"),
 	}
 
 	lineages := []channelLineage{latestLineage, stableLineage}
 	channels := flattenChannels(lineages)
 
-	// Should have 5 channels total: rhacs-3.62, latest, rhacs-4.0, rhacs-4.1, stable
-	assert.Len(t, channels, 5)
-	names := []string{"rhacs-3.62", "latest", "rhacs-4.0", "rhacs-4.1", "stable"}
-	for i, ch := range channels {
-		assert.Equal(t, names[i], ch.Name)
-	}
+	expectedChannels := []string{"rhacs-3.62", "latest", "rhacs-4.0", "rhacs-4.1", "stable"}
+	assert.Len(t, channels, len(expectedChannels))
+	assert.Equal(t, expectedChannels, collectChannelNames(t, channels))
 }
 
 func TestClearReplacesForStartingEntries(t *testing.T) {
 	channels := []Channel{
 		{
 			Name:           "rhacs-3.62",
-			yStreamVersion: semver.MustParse("3.62.0"),
+			yStreamVersion: v(t, "3.62.0"),
 			Entries: []ChannelEntry{
-				{Name: "rhacs-operator.v3.62.0", Replaces: "rhacs-operator.v3.61.0", version: semver.MustParse("3.62.0")},
+				{Name: "rhacs-operator.v3.62.0", Replaces: "rhacs-operator.v3.61.0", version: v(t, "3.62.0")},
 			},
 		},
 		{
 			Name:           "rhacs-4.0",
-			yStreamVersion: semver.MustParse("4.0.0"),
+			yStreamVersion: v(t, "4.0.0"),
 			Entries: []ChannelEntry{
-				{Name: "rhacs-operator.v4.0.0", Replaces: "rhacs-operator.v3.62.1", version: semver.MustParse("4.0.0")},
-				{Name: "rhacs-operator.v4.0.1", Replaces: "rhacs-operator.v4.0.0", version: semver.MustParse("4.0.1")},
-				{Name: "rhacs-operator.v4.0.2", Replaces: "rhacs-operator.v4.0.1", version: semver.MustParse("4.0.2")},
+				{Name: "rhacs-operator.v4.0.0", Replaces: "rhacs-operator.v3.62.1", version: v(t, "4.0.0")},
+				{Name: "rhacs-operator.v4.0.1", Replaces: "rhacs-operator.v4.0.0", version: v(t, "4.0.1")},
+				{Name: "rhacs-operator.v4.0.2", Replaces: "rhacs-operator.v4.0.1", version: v(t, "4.0.2")},
 			},
 		},
 		{
 			Name:           "rhacs-4.1",
-			yStreamVersion: semver.MustParse("4.1.0"),
+			yStreamVersion: v(t, "4.1.0"),
 			Entries:        []ChannelEntry{},
 		},
 	}
@@ -597,59 +562,79 @@ func TestClearReplacesForStartingEntries(t *testing.T) {
 
 func TestChannelShouldHaveEntry(t *testing.T) {
 	tests := []struct {
-		name     string
-		channel  Channel
-		entry    ChannelEntry
-		expected bool
+		name           string
+		channelVersion string
+		entryVersion   string
+		expectedToHave bool
 	}{
 		{
-			name:     "Entry belongs to channel",
-			channel:  Channel{yStreamVersion: semver.MustParse("4.0.0")},
-			entry:    ChannelEntry{version: semver.MustParse("4.0.1")},
-			expected: true,
+			name:           "Entry belongs to channel",
+			channelVersion: "4.0.0",
+			entryVersion:   "4.0.1",
+			expectedToHave: true,
 		},
 		{
-			name:     "Entry is exact Y-stream version",
-			channel:  Channel{yStreamVersion: semver.MustParse("4.0.0")},
-			entry:    ChannelEntry{version: semver.MustParse("4.0.0")},
-			expected: true,
+			name:           "Entry is exact Y-stream version",
+			channelVersion: "4.0.0",
+			entryVersion:   "4.0.0",
+			expectedToHave: true,
 		},
 		{
-			name:     "Entry is from newer Y-stream",
-			channel:  Channel{yStreamVersion: semver.MustParse("4.0.0")},
-			entry:    ChannelEntry{version: semver.MustParse("4.1.0")},
-			expected: false,
+			name:           "Entry is from newer Y-stream",
+			channelVersion: "4.0.0",
+			entryVersion:   "4.1.0",
+			expectedToHave: false,
 		},
 		{
-			name:     "Entry is from older Major version",
-			channel:  Channel{yStreamVersion: semver.MustParse("5.0.0")},
-			entry:    ChannelEntry{version: semver.MustParse("4.0.0")},
-			expected: true,
+			name:           "Entry is from older Major version",
+			channelVersion: "5.0.0",
+			entryVersion:   "4.0.0",
+			expectedToHave: true,
 		},
 		{
-			name:     "Entry is from older Y-stream",
-			channel:  Channel{yStreamVersion: semver.MustParse("4.1.0")},
-			entry:    ChannelEntry{version: semver.MustParse("4.0.6")},
-			expected: true,
+			name:           "Entry is from older Y-stream",
+			channelVersion: "4.1.0",
+			entryVersion:   "4.0.6",
+			expectedToHave: true,
 		},
 		{
-			name:     "Entry minor equals channel minor",
-			channelVersion:  "4.1.0",
-			entryVersion:    "4.1.5",
+			name:           "Entry minor equals channel minor",
+			channelVersion: "4.1.0",
+			entryVersion:   "4.1.5",
 			expectedToHave: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			channel := Channel{yStreamVersion: semver.MustParse(tt.channelVersion)}
-			entry := ChannelEntry{version: semver.MustParse(tt.entryVersion)}
+			channel := channel(t, tt.channelVersion)
+			entry := ChannelEntry{version: v(t, tt.entryVersion)}
 
 			result := channelShouldHaveEntry(channel, entry)
 
 			assert.Equal(t, tt.expectedToHave, result)
 		})
 	}
+}
+
+// v is a shorthand for semver.MustParse
+func v(t *testing.T, version string) *semver.Version {
+	t.Helper()
+	return semver.MustParse(version)
+}
+
+func channel(t *testing.T, yStreamVersion string) Channel {
+	t.Helper()
+	return newChannel(v(t, yStreamVersion))
+}
+
+func collectChannelNames(t *testing.T, channels []Channel) []string {
+	t.Helper()
+	names := make([]string, len(channels))
+	for i, ch := range channels {
+		names[i] = ch.Name
+	}
+	return names
 }
 
 func assertChannelEntry(t *testing.T, entry ChannelEntry, name, replaces, skipRange string) {
