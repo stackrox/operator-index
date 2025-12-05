@@ -485,22 +485,26 @@ func TestAssignChannelEntries(t *testing.T) {
 
 	// Verify contents of "latest" lineage
 	assert.Len(t, latestLineage.YStreamChannels, 1)
-	assert.Equal(t, "rhacs-3.62", latestLineage.YStreamChannels[0].Name)
-	assert.Equal(t, latestChannelName, latestLineage.MainChannel.Name)
 
+	assert.Equal(t, "rhacs-3.62", latestLineage.YStreamChannels[0].Name)
 	assertChannelContents(t, latestLineage.YStreamChannels[0], "3.62.0", "3.62.1")
+
+	assert.Equal(t, latestChannelName, latestLineage.MainChannel.Name)
 	assertChannelContents(t, latestLineage.MainChannel, "3.62.0", "3.62.1")
 
 	// Verify contents of "stable" lineage
 	assert.Len(t, stableLineage.YStreamChannels, 3)
-	assert.Equal(t, "rhacs-4.0", stableLineage.YStreamChannels[0].Name)
-	assert.Equal(t, "rhacs-4.1", stableLineage.YStreamChannels[1].Name)
-	assert.Equal(t, "rhacs-5.0", stableLineage.YStreamChannels[2].Name)
-	assert.Equal(t, stableChannelName, stableLineage.MainChannel.Name)
 
+	assert.Equal(t, "rhacs-4.0", stableLineage.YStreamChannels[0].Name)
 	assertChannelContents(t, stableLineage.YStreamChannels[0], "4.0.0", "4.0.1")
+
+	assert.Equal(t, "rhacs-4.1", stableLineage.YStreamChannels[1].Name)
 	assertChannelContents(t, stableLineage.YStreamChannels[1], "4.0.0", "4.0.1", "4.1.0")
+
+	assert.Equal(t, "rhacs-5.0", stableLineage.YStreamChannels[2].Name)
 	assertChannelContents(t, stableLineage.YStreamChannels[2], "4.0.0", "4.0.1", "4.1.0", "5.0.0", "5.0.1")
+
+	assert.Equal(t, stableChannelName, stableLineage.MainChannel.Name)
 	assertChannelContents(t, stableLineage.MainChannel, "4.0.0", "4.0.1", "4.1.0", "5.0.0", "5.0.1")
 }
 
