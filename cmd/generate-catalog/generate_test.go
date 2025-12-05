@@ -413,11 +413,6 @@ func TestGenerateDeprecations(t *testing.T) {
 	assert.Equal(t, olmDeprecationsSchema, deprecations.Schema)
 	assert.Equal(t, rhacsOperator, deprecations.Package)
 
-	// Should deprecate:
-	// - `latest` channel
-	// - `rhacs-3.62` channel
-	// - `rhacs-operator.v3.62.0` bundle
-	// - `rhacs-operator.v3.62.1` bundle
 	assert.Len(t, deprecations.Entries, 4)
 	assertContainsDeprecationEntry(t, deprecations.Entries, olmChannelSchema, "latest", latestChannelDeprecationMessage)
 	assertContainsDeprecationEntry(t, deprecations.Entries, olmChannelSchema, "rhacs-3.62", channelDeprecationMessage)
@@ -639,16 +634,20 @@ func TestChannelShouldHaveEntry(t *testing.T) {
 		},
 		{
 			name:     "Entry minor equals channel minor",
-			channel:  Channel{yStreamVersion: semver.MustParse("4.1.0")},
-			entry:    ChannelEntry{version: semver.MustParse("4.1.5")},
-			expected: true,
+			channelVersion:  "4.1.0",
+			entryVersion:    "4.1.5",
+			expectedToHave: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := channelShouldHaveEntry(tt.channel, tt.entry)
-			assert.Equal(t, tt.expected, result)
+			channel := Channel{yStreamVersion: semver.MustParse(tt.channelVersion)}
+			entry := ChannelEntry{version: semver.MustParse(tt.entryVersion)}
+
+			result := channelShouldHaveEntry(channel, entry)
+
+			assert.Equal(t, tt.expectedToHave, result)
 		})
 	}
 }
