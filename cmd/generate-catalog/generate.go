@@ -237,7 +237,7 @@ func generateChannels(versions []*semver.Version) []Channel {
 	assignChannelEntries(lineages, entries)
 
 	channels := flattenChannels(lineages)
-	clearReplacesForStartingEntries(channels)
+	adjustStartingEntries(channels)
 	return channels
 }
 
@@ -332,8 +332,8 @@ func flattenChannels(lineages []channelLineage) []Channel {
 	return channels
 }
 
-// clearReplacesForStartingEntries clears the `replaces` field for the first entry in each channel according to OLM requirements.
-func clearReplacesForStartingEntries(channels []Channel) {
+// adjustStartingEntries clears the `replaces` field for the first entry in each channel according to OLM requirements.
+func adjustStartingEntries(channels []Channel) {
 	for i := range channels {
 		if len(channels[i].Entries) > 0 {
 			channels[i].Entries[0].clearReplaces()
