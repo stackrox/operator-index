@@ -1,0 +1,4 @@
+oldest_supported_version: 3.62.0
+images:
+  - image: "example.com/image:v3.62.0"
+    version: "not-a-valid-semantic-version"

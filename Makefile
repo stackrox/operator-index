@@ -6,6 +6,10 @@ MAKEFLAGS += "-j 2"
 
 OPM = .bin/opm-$(OPM_VERSION)
 
+GO := go
+
+GENERATE_SCRIPT_FOLDER = ./cmd/generate-catalog/
+
 .PHONY: valid-catalogs
 valid-catalogs: $(CATALOGS) $(OPM)
 	$(OPM) validate catalog-bundle-object
@@ -13,6 +17,7 @@ valid-catalogs: $(CATALOGS) $(OPM)
 
 .PHONY: clean
 clean:
+	rm -f catalog-template.yaml
 	rm -f $(CATALOGS)
 	rm -rf $$(dirname $(OPM))
 
@@ -23,6 +28,13 @@ catalog-bundle-object/rhacs-operator/catalog.json: catalog-template.yaml $(OPM)
 catalog-csv-metadata/rhacs-operator/catalog.json: catalog-template.yaml $(OPM)
 	mkdir -p "$$(dirname "$@")"
 	$(OPM) alpha render-template basic --migrate-level bundle-object-to-csv-metadata $< > $@
+
+# update template/catalog-template.yaml based on bundles.yaml file.
+catalog-template.yaml: bundles.yaml $(wildcard $(GENERATE_SCRIPT_FOLDER)/*.go)
+	@$(GO) run $(GENERATE_SCRIPT_FOLDER)
+
+go-test:
+	@$(GO) test -cover -v ./cmd/...
 
 $(OPM):
 	mkdir -p "$$(dirname $@)"
