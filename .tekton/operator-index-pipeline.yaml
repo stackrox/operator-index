@@ -76,28 +76,49 @@ spec:
       resolver: bundles
   - name: github-add-pr-comment
     params:
-    - name: REQUEST_URL
-      value: $(params.git-url)/pull/$(params.pr-number)/comments
-    - name: GITHUB_TOKEN_SECRET_NAME
+    - name: GITHUB_TOKEN_SECRET
       value: rhacs-github-bot-token
-    - name: GITHUB_TOKEN_SECRET_KEY
-      value: token
-    - name: MESSAGE
-      value: |
-        **Image Built Successfully**
-
-        Image URL: `$(tasks.build-image-index.results.IMAGE_URL)`
-    - name: COMMENT_TAG
-      value: konflux-image-url
-    taskRef:
+    - name: PR_NUMBER
+      value: $(params.pr-number)
+    - name: REPO_URL
+      value: $(params.git-url)
+    - name: IMAGE_URL
+      value: $(tasks.build-image-index.results.IMAGE_URL)
+    taskSpec:
       params:
-      - name: name
-        value: github-add-comment
-      - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-github-add-comment:0.1@sha256:579571f9f68b86d0585bbb065f04f2f99604741ce390c368d054e6dbb8c2f4e4
-      - name: kind
-        value: task
-      resolver: bundles
+      - name: GITHUB_TOKEN_SECRET
+      - name: PR_NUMBER
+      - name: REPO_URL
+      - name: IMAGE_URL
+      steps:
+      - name: post-comment
+        image: registry.access.redhat.com/ubi9/ubi:latest
+        env:
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: $(params.GITHUB_TOKEN_SECRET)
+              key: token
+        script: |
+          #!/bin/bash
+          set -e
+
+          # Install required tools
+          microdnf install -y jq
+
+          # Extract owner and repo from git URL
+          # Handle both https://github.com/owner/repo and https://github.com/owner/repo.git formats
+          REPO_PATH=$(echo "$(params.REPO_URL)" | sed -E 's#https?://github.com/##' | sed 's#\.git$##')
+
+          # Create the comment body (properly escaped for JSON)
+          COMMENT_BODY="**Image Built Successfully**\n\nImage URL: \`$(params.IMAGE_URL)\`"
+
+          # Post comment to GitHub
+          curl -X POST \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${REPO_PATH}/issues/$(params.PR_NUMBER)/comments" \
+            -d "$(jq -n --arg body "$COMMENT_BODY" '{body: $body}')"
     when:
     - input: $(params.pr-number)
       operator: notin
