@@ -74,6 +74,34 @@ spec:
       - name: kind
         value: task
       resolver: bundles
+  - name: github-add-pr-comment
+    params:
+    - name: REQUEST_URL
+      value: $(params.git-url)/pull/$(params.pr-number)/comments
+    - name: GITHUB_TOKEN_SECRET_NAME
+      value: rhacs-github-bot-token
+    - name: GITHUB_TOKEN_SECRET_KEY
+      value: token
+    - name: MESSAGE
+      value: |
+        **Image Built Successfully**
+
+        Image URL: `$(tasks.build-image-index.results.IMAGE_URL)`
+    - name: COMMENT_TAG
+      value: konflux-image-url
+    taskRef:
+      params:
+      - name: name
+        value: github-add-comment
+      - name: bundle
+        value: quay.io/konflux-ci/tekton-catalog/task-github-add-comment:0.1@sha256:579571f9f68b86d0585bbb065f04f2f99604741ce390c368d054e6dbb8c2f4e4
+      - name: kind
+        value: task
+      resolver: bundles
+    when:
+    - input: $(params.pr-number)
+      operator: notin
+      values: [""]
   params:
   - description: Source Repository URL
     name: git-url
@@ -81,6 +109,10 @@ spec:
   - default: ""
     description: Revision of the Source Repository
     name: revision
+    type: string
+  - default: ""
+    description: Pull Request Number (optional, for posting comments)
+    name: pr-number
     type: string
   - description: Output Image Tag. Will be qualified with output-image-repo.
     name: output-image-tag
