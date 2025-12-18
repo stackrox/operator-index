@@ -1,3 +1,4 @@
-# The RHTAP maintainers for ACS review all changes related to the Konflux (f.k.a. RHTAP) pipelines, such as new
-# pipelines, parameter changes or automated task updates as well as Dockerfile updates.
-/.tekton/               @stackrox/rhtap-maintainers
+# Konflux maintainers for ACS review all changes related to the Konflux pipelines, such as new pipelines, parameter
+# changes or automated task updates.
+/.tekton/               @stackrox/konflux-maintainers
+.github/renovate.json5  @stackrox/konflux-maintainers
