@@ -1,0 +1,400 @@
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-12-gl4tl
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
+    appstudio.openshift.io/component: operator-index-ocp-v4-12
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-12-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-12
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:a56a5274b936fdefb407be2603389eb8402cd52aef8e8481e677cfe7dd8a3196
+      name: operator-index-ocp-v4-12
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-12-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-12
+  snapshot: acs-operator-index-ocp-v4-12-20251218-prod-39a9e71
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-13-bc4fw
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-13
+    appstudio.openshift.io/component: operator-index-ocp-v4-13
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-13-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-13
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:eb6b737e546178103513e34e19dee82d339d4a43164086c0344737360638c4bf
+      name: operator-index-ocp-v4-13
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-13-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-13
+  snapshot: acs-operator-index-ocp-v4-13-20251218-prod-39a9e71
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-14-mtxzg
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-14
+    appstudio.openshift.io/component: operator-index-ocp-v4-14
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-14-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-14
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:7c27001b3d89ae9625c74c224055c11caa0293e3c8fe18b36cd48bbe913a5571
+      name: operator-index-ocp-v4-14
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-14-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-14
+  snapshot: acs-operator-index-ocp-v4-14-20251218-prod-39a9e71
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-15-28kvk
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-15
+    appstudio.openshift.io/component: operator-index-ocp-v4-15
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-15-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-15
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:e1d226549d7fa1f92de607f18c3b4f82ff276114075fd3562f679a52db87a4d2
+      name: operator-index-ocp-v4-15
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-15-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-15
+  snapshot: acs-operator-index-ocp-v4-15-20251218-prod-39a9e71
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-16-vqvf4
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-16
+    appstudio.openshift.io/component: operator-index-ocp-v4-16
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-16-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-16
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:4e7f2d24095bef243be7089e4f21680be44a6c676195e2f96947366c0224fdc0
+      name: operator-index-ocp-v4-16
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-16-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-16
+  snapshot: acs-operator-index-ocp-v4-16-20251218-prod-39a9e71
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-17-5d2mz
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+    appstudio.openshift.io/component: operator-index-ocp-v4-17
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-17-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-17
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:55564d52a268cd110fc91ded138d9b257498a8a7ff9990d964f22d44028bbf2a
+      name: operator-index-ocp-v4-17
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-17-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-17
+  snapshot: acs-operator-index-ocp-v4-17-20251218-prod-39a9e71
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-18-rpwxw
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-18
+    appstudio.openshift.io/component: operator-index-ocp-v4-18
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-18-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-18
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:bb2dcddf1756a234c3911db97bb1a1fd22df65443e143cb9553c6985e871caa9
+      name: operator-index-ocp-v4-18
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-18-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-18
+  snapshot: acs-operator-index-ocp-v4-18-20251218-prod-39a9e71
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-19-v4hjz
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-19
+    appstudio.openshift.io/component: operator-index-ocp-v4-19
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-19-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-19
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:73e227c64a0fe19115d9c210736a4660896a1a0c71b2c7b021eca61fea2903a1
+      name: operator-index-ocp-v4-19
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-19-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-19
+  snapshot: acs-operator-index-ocp-v4-19-20251218-prod-39a9e71
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-20-wl55q
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-20
+    appstudio.openshift.io/component: operator-index-ocp-v4-20
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-20-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-20
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:87e345a65b158f26604975d1240a132225e3d0ace43ff2b8af5e290533c12e3b
+      name: operator-index-ocp-v4-20
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-20-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-20
+  snapshot: acs-operator-index-ocp-v4-20-20251218-prod-39a9e71
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: tommartensen
+    pac.test.appstudio.openshift.io/sha-title: 'fix(gha): correct the job structure for the retester (#293)'
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-21-8wgw5
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-21
+    appstudio.openshift.io/component: operator-index-ocp-v4-21
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+  name: acs-operator-index-ocp-v4-21-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-21
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:1bcf4d80e91765fd3267f98630ec1c5402f0390afad3bff172d47706dfdd7b1a
+      name: operator-index-ocp-v4-21
+      source:
+        git:
+          revision: 39a9e7130a0fd6c816fcd8892ed64ea79d6b5ad0
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-21-20251218-prod-39a9e71
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-21
+  snapshot: acs-operator-index-ocp-v4-21-20251218-prod-39a9e71
