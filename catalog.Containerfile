@@ -1,5 +1,5 @@
 ARG base_image
-FROM ${base_image}
+FROM ${base_image}1
 
 ARG catalog_dir
 RUN echo "Checking required catalog_dir"; [[ "${catalog_dir}" != "" ]]
