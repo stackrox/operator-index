@@ -27,7 +27,8 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: base-image
-    value: registry.redhat.io/openshift4/ose-operator-registry-rhel9:v4.21
+    # value: registry.redhat.io/openshift4/ose-operator-registry-rhel9:v4.21
+    value: registry-proxy.engineering.redhat.com/rh-osbs/iib-pub:v4.22
   - name: output-image-tag
     value: ocp-v4-21-{{revision}}-fast
   - name: catalog-dir
