@@ -115,7 +115,7 @@ generate_release_resources() {
         snapshot="$(echo "$line" | cut -d "|" -f 1)"
         snapshot_copy_name="$(echo "${snapshot%-*}-${release_name_suffix}" | cut -c -63)" # Replace random suffix with release name and crop to 63 characters to avoid running over the Kubernetes limit.
         echo "---"
-        kubectl -n rh-acs-tenant get snapshot.appstudio.redhat.com "${snapshot}" -o yaml | \
+        kubectl ka -n rh-acs-tenant get snapshot.appstudio.redhat.com "${snapshot}" -o yaml | \
         "${YQ}" -P 'load("'"${whitelist_file}"'") as $whitelisted
          | del(.metadata.annotations |keys[]|select(. as $needle | $whitelisted.annotations | has($needle) | not))
          | del(.metadata.labels |keys[]|select(. as $needle | $whitelisted.labels | has($needle) | not))
