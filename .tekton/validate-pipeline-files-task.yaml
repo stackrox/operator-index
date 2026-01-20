@@ -47,3 +47,5 @@ spec:
           echo >&2 "  .tekton/operator-index-ocp-vX-Y-build.yaml"
           exit 1
       fi
+
+      echo "Pipeline file count validation passed: $pipelines_count files"
