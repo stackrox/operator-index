@@ -38,22 +38,16 @@ spec:
       echo "Validating pipeline files..."
 
       # Count files matching the naming pattern
-      named_files_count=10
-      # for f in .tekton/operator-index-ocp-*-*-build.yaml; do
-      #     if [[ -f "$f" ]]; then
-      #         ((named_files_count++))
-      #     fi
-      # done
+      named_files_count=$(find .tekton -maxdepth 1 -name 'operator-index-ocp-*-*-build.yaml' -type f | wc -l | tr -d ' ')
       echo "Found $named_files_count files matching pattern .tekton/operator-index-ocp-*-*-build.yaml"
-      ls -la 
 
       # Count files with operator-index-pipeline reference
-      pipelines_count=10
-      # for file in .tekton/*.yaml; do
-      #     if [[ -f "$file" ]] && yq eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
-      #         ((pipelines_count++))
-      #     fi
-      # done
+      pipelines_count=0
+      while IFS= read -r -d '' file; do
+          if yq eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
+              pipelines_count=$((pipelines_count + 1))
+          fi
+      done < <(find .tekton -maxdepth 1 -name '*.yaml' -type f -print0)
       echo "Found $pipelines_count files with .spec.pipelineRef.name == 'operator-index-pipeline'"
 
       if [[ "$named_files_count" -ne "$pipelines_count" ]]; then
