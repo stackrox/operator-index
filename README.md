@@ -65,7 +65,7 @@ See [konflux docs](https://github.com/konflux-ci/build-definitions/blob/c93ea73d
 ### Release process
 
 1. Make sure you [logged in](https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonfluxforRHACS-GettingocCLItoworkwithKonflux) to the Konflux cluster.
-2. Make sure you have installed [KubeArchive plugin](https://kubearchive.github.io/kubearchive/main/cli/installation.html). And configure it to the connected cluster by running `kubectl ka -n rh-acs-tenant get snapshots`.
+2. Make sure you have installed [KubeArchive plugin](https://kubearchive.github.io/kubearchive/main/cli/installation.html) and ensure it is configured correctly by running `kubectl ka -n rh-acs-tenant get snapshots`.
 3. Make sure you checked out the latest master branch: `git checkout master && git pull`
 4. Generate Release and Snapshot CRs by running `./scripts/generate-releases.sh <stage|prod>`. Use `stage` for test release and `prod` for production one.
 5. (Skip for `stage` release.) Create a PR which adds the file created by the script, get the PR reviewed and merged.
