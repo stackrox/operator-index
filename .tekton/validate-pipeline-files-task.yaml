@@ -34,7 +34,6 @@ spec:
     script: |
       #!/usr/bin/env bash
       set -euo pipefail
-      set -x
 
       echo "Validating pipeline files..."
 
@@ -47,6 +46,7 @@ spec:
       done
 
       echo "Compare..."
+      set -x
 
       if [[ "$named_files_count" -ne "$pipelines_count" ]]; then
           echo >&2 "ERROR: The number of .tekton/operator-index-ocp-*-build.yaml files ($named_files_count) does not match"
