@@ -14,8 +14,6 @@ spec:
   volumes:
   - name: workdir
     emptyDir: { }
-  - name: deps
-    emptyDir: { }
   stepTemplate:
     volumeMounts:
     - mountPath: /var/workdir
@@ -29,19 +27,15 @@ spec:
   - name: validate-pipeline-files
     image: quay.io/konflux-ci/release-service-utils:latest@sha256:2f9e6863e82bbc9ddce5a290f3fd0e87657c475e3de8a832b2ef7f8d0671e7d3
     workingDir: /var/workdir/source
-    securityContext:
-      runAsUser: 0
     script: |
       #!/usr/bin/env bash
       set -euo pipefail
 
       echo "Validating pipeline files..."
 
-      # Count files matching the naming pattern
       named_files_count=$(find .tekton -maxdepth 1 -name 'operator-index-ocp-*-*-build.yaml' -type f | wc -l | tr -d ' ')
       echo "Found $named_files_count files matching pattern .tekton/operator-index-ocp-*-*-build.yaml"
 
-      # Count files with operator-index-pipeline reference
       pipelines_count=0
       while IFS= read -r -d '' file; do
           if yq eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
@@ -59,4 +53,4 @@ spec:
           exit 1
       fi
 
-      echo "✓ Pipeline file count validation passed: $pipelines_count files"
+      echo "Pipeline file naming validation passed: $pipelines_count files"
