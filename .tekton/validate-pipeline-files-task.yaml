@@ -46,6 +46,8 @@ spec:
           fi
       done
 
+      echo "Compare..."
+
       if [[ "$named_files_count" -ne "$pipelines_count" ]]; then
           echo >&2 "ERROR: The number of .tekton/operator-index-ocp-*-build.yaml files ($named_files_count) does not match"
           echo >&2 "       the number of files with .spec.pipelineRef.name == 'operator-index-pipeline' ($pipelines_count)"
