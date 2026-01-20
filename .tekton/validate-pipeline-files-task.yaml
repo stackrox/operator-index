@@ -31,7 +31,7 @@ spec:
       #!/usr/bin/env bash
       set -euo pipefail
 
-      named_files_count=$(ls -1 .tekton/operator-index-ocp-*-build.yaml 2>/dev/null | wc -l)
+      named_files_count=$(ls -1 .tekton/operator-index-ocp-*-*-build.yaml 2>/dev/null | wc -l)
       pipelines_count=0
       for file in .tekton/*.yaml; do
           if [[ -f "$file" ]] && yq eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
@@ -44,6 +44,6 @@ spec:
           echo >&2 "       the number of files with .spec.pipelineRef.name == 'operator-index-pipeline' ($pipelines_count)"
           echo >&2 ""
           echo >&2 "All pipeline files referencing 'operator-index-pipeline' must follow the naming scheme:"
-          echo >&2 "  .tekton/operator-index-ocp-vX-YZ-build.yaml"
+          echo >&2 "  .tekton/operator-index-ocp-vX-Y-build.yaml"
           exit 1
       fi
