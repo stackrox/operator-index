@@ -25,7 +25,7 @@ spec:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
   - name: validate-pipeline-file-count
-    image: registry.redhat.io/ubi9/go-toolset@sha256:e8938564f866174a6d79e55dfe577c2ed184b1f53e91d782173fb69b07ce69ef
+    image: quay.io/konflux-ci/release-service-utils:latest@sha256:2f9e6863e82bbc9ddce5a290f3fd0e87657c475e3de8a832b2ef7f8d0671e7d3
     workingDir: /var/workdir/source
     script: |
       #!/usr/bin/env bash
