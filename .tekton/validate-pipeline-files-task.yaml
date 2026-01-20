@@ -1,0 +1,49 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: validate-pipeline-files
+  namespace: rh-acs-tenant
+spec:
+  description: Validates that the number of .tekton/operator-index-ocp-*-build.yaml files matches the number of operator-index pipelines. This enforces the naming scheme for pipeline files.
+  params:
+  - name: SOURCE_ARTIFACT
+    description: The Trusted Artifact URI pointing to the artifact with
+      the application source code. This should be the result of the git-clone task,
+      results from other tasks might fail as dirty.
+    type: string
+  volumes:
+  - name: workdir
+    emptyDir: { }
+  stepTemplate:
+    volumeMounts:
+    - mountPath: /var/workdir
+      name: workdir
+  steps:
+  - name: use-trusted-artifact
+    image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:9b180776a41d9a22a1c51539f1647c60defbbd55b44bbebdd4130e33512d8b0d
+    args:
+    - use
+    - $(params.SOURCE_ARTIFACT)=/var/workdir/source
+  - name: validate-pipeline-file-count
+    image: quay.io/rhacs-eng/konflux-tasks:latest@sha256:143219f9f70bf90ce80f7e0a2e21b88b8a71639a9e4cd5a5d32f70cb04e8a23d
+    workingDir: /var/workdir/source
+    script: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      named_files_count=$(ls -1 .tekton/operator-index-ocp-*-build.yaml 2>/dev/null | wc -l)
+      pipelines_count=0
+      for file in .tekton/*.yaml; do
+          if [[ -f "$file" ]] && yq eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
+              ((pipelines_count++))
+          fi
+      done
+
+      if [[ "$named_files_count" -ne "$pipelines_count" ]]; then
+          echo >&2 "ERROR: The number of .tekton/operator-index-ocp-*-build.yaml files ($named_files_count) does not match"
+          echo >&2 "       the number of files with .spec.pipelineRef.name == 'operator-index-pipeline' ($pipelines_count)"
+          echo >&2 ""
+          echo >&2 "All pipeline files referencing 'operator-index-pipeline' must follow the naming scheme:"
+          echo >&2 "  .tekton/operator-index-ocp-vX-YZ-build.yaml"
+          exit 1
+      fi
