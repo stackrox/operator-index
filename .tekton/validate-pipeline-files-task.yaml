@@ -37,19 +37,26 @@ spec:
 
       echo "Validating pipeline files..."
 
-      named_files_count=$(ls -1 .tekton/operator-index-ocp-*-*-build.yaml 2>/dev/null | wc -l)
+      # Count files matching the naming pattern
+      named_files_count=0
+      for f in .tekton/operator-index-ocp-*-*-build.yaml; do
+          if [[ -f "$f" ]]; then
+              ((named_files_count++))
+          fi
+      done
+      echo "Found $named_files_count files matching pattern .tekton/operator-index-ocp-*-*-build.yaml"
+
+      # Count files with operator-index-pipeline reference
       pipelines_count=0
       for file in .tekton/*.yaml; do
           if [[ -f "$file" ]] && yq eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
               ((pipelines_count++))
           fi
       done
-
-      echo "Compare..."
-      set -x
+      echo "Found $pipelines_count files with .spec.pipelineRef.name == 'operator-index-pipeline'"
 
       if [[ "$named_files_count" -ne "$pipelines_count" ]]; then
-          echo >&2 "ERROR: The number of .tekton/operator-index-ocp-*-build.yaml files ($named_files_count) does not match"
+          echo >&2 "ERROR: The number of .tekton/operator-index-ocp-*-*-build.yaml files ($named_files_count) does not match"
           echo >&2 "       the number of files with .spec.pipelineRef.name == 'operator-index-pipeline' ($pipelines_count)"
           echo >&2 ""
           echo >&2 "All pipeline files referencing 'operator-index-pipeline' must follow the naming scheme:"
@@ -57,4 +64,4 @@ spec:
           exit 1
       fi
 
-      echo "Pipeline file count validation passed: $pipelines_count files"
+      echo "✓ Pipeline file count validation passed: $pipelines_count files"
