@@ -24,7 +24,7 @@ spec:
     args:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
-  - name: validate-pipeline-file-count
+  - name: validate-pipeline-files
     image: quay.io/konflux-ci/release-service-utils:latest@sha256:2f9e6863e82bbc9ddce5a290f3fd0e87657c475e3de8a832b2ef7f8d0671e7d3
     workingDir: /var/workdir/source
     script: |
