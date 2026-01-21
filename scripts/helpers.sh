@@ -36,7 +36,7 @@ get_snapshots() {
     local -r commit="$1"
     local -r branch="$2"
 
-    kubectl ka -n rh-acs-tenant get snapshots -l pac.test.appstudio.openshift.io/sha="${commit}" -o json | jq '
+    kubectl ka get snapshots -n rh-acs-tenant -l pac.test.appstudio.openshift.io/sha="${commit}" -o json | jq '
         .items
         | map(select((.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="'"${branch}"'") or (.metadata.annotations["pac.test.appstudio.openshift.io/source-branch"]=="refs/heads/'${branch}'")))
         | map(select(.metadata.annotations["'"${ORIGINAL_SNAPSHOT_ANNOTATION_NAME}"'"] == null))
