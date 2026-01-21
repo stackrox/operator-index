@@ -117,7 +117,7 @@ generate_release_resources() {
         snapshot_yaml_list="$(kubectl ka get snapshot -n rh-acs-tenant "${snapshot}" -o yaml)"
         snapshot_count="$(echo "$snapshot_yaml_list" | "${YQ}" '.items | length')"
         if [[ "$snapshot_count" -eq 0 ]]; then
-            echo "ERROR: No snapshot found in kubearchive for ${snapshot}" >&2
+            echo "ERROR: No snapshot found in kubearchive for name: ${snapshot}" >&2
             return 1
         fi
         snapshot_yaml="$(echo "$snapshot_yaml_list" | "${YQ}" '.items[0]')"
