@@ -1,0 +1,430 @@
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-12-qnxs6
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
+    appstudio.openshift.io/component: operator-index-ocp-v4-12
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-12-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-12
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:dc08a3519a2c70085bb881f67041d592cf6c91484532f4979148ab408e38ec14
+      name: operator-index-ocp-v4-12
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-12-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-12
+  snapshot: acs-operator-index-ocp-v4-12-20260121-stage-f249375
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-13-s7srh
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-13
+    appstudio.openshift.io/component: operator-index-ocp-v4-13
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-13-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-13
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:ce728c932304662124014e7ba9daf85239f955f8f235e0412dbbe22f4e8aaa9c
+      name: operator-index-ocp-v4-13
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-13-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-13
+  snapshot: acs-operator-index-ocp-v4-13-20260121-stage-f249375
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-14-zfvxq
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-14
+    appstudio.openshift.io/component: operator-index-ocp-v4-14
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-14-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-14
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:b7719ee601a9933c03d815d1fea6ed1f3404a2a9ea0eadc224ed6cab560a76c9
+      name: operator-index-ocp-v4-14
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-14-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-14
+  snapshot: acs-operator-index-ocp-v4-14-20260121-stage-f249375
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-15-nn69c
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-15
+    appstudio.openshift.io/component: operator-index-ocp-v4-15
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-15-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-15
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:ed4324035ef269b10415eb2b7a842b11451258ac2607532f5db6e85f8170a940
+      name: operator-index-ocp-v4-15
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-15-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-15
+  snapshot: acs-operator-index-ocp-v4-15-20260121-stage-f249375
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-16-6jvkl
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-16
+    appstudio.openshift.io/component: operator-index-ocp-v4-16
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-16-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-16
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:d72d649fdf913857f500bea28b29332f4f21fd13b360b77815c4f81241915af4
+      name: operator-index-ocp-v4-16
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-16-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-16
+  snapshot: acs-operator-index-ocp-v4-16-20260121-stage-f249375
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-17-xs2pp
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+    appstudio.openshift.io/component: operator-index-ocp-v4-17
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-17-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-17
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:45cb07cd46887d9586254d5fd27d4a3eff99255e9db0406385b6c15fa0aecc02
+      name: operator-index-ocp-v4-17
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-17-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-17
+  snapshot: acs-operator-index-ocp-v4-17-20260121-stage-f249375
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-18-v25fj
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-18
+    appstudio.openshift.io/component: operator-index-ocp-v4-18
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-18-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-18
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:68a4711582cd4c610a4d1fdac0a6d0c62bf16542633cc9a31a36834420186c87
+      name: operator-index-ocp-v4-18
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-18-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-18
+  snapshot: acs-operator-index-ocp-v4-18-20260121-stage-f249375
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-19-vqd7g
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-19
+    appstudio.openshift.io/component: operator-index-ocp-v4-19
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-19-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-19
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:55aee4c0b0d23aaf326d87dbe23b056fb58ff9638d3ec272e2280657f2e07225
+      name: operator-index-ocp-v4-19
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-19-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-19
+  snapshot: acs-operator-index-ocp-v4-19-20260121-stage-f249375
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-20-f9sr2
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-20
+    appstudio.openshift.io/component: operator-index-ocp-v4-20
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-20-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-20
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:2a0dcc6c7af284c392c1c18c76eead0e65c1251c3fc96338405e47e98c69921c
+      name: operator-index-ocp-v4-20
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-20-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-20
+  snapshot: acs-operator-index-ocp-v4-20-20260121-stage-f249375
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: |-
+      chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to d37b352
+
+      Signed-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/f2493755caa9cb73a0531c536be6ae16ee8c2312
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-21-zxbsg
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-21
+    appstudio.openshift.io/component: operator-index-ocp-v4-21
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: f2493755caa9cb73a0531c536be6ae16ee8c2312
+  name: acs-operator-index-ocp-v4-21-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-21
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:7fa8b013e3c0802a8c9b1f126e3bfec280d69a544dd2b1d4dc87dfde80e52175
+      name: operator-index-ocp-v4-21
+      source:
+        git:
+          revision: f2493755caa9cb73a0531c536be6ae16ee8c2312
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-21-20260121-stage-f249375
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-stage-ocp-v4-21
+  snapshot: acs-operator-index-ocp-v4-21-20260121-stage-f249375

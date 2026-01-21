@@ -156,11 +156,6 @@ generate_release_resources() {
           snapshot: ${snapshot_copy_name}"
 
     done <<< "$snapshots_data" > "${out_file}"
-
-    if [[ "${environment}" == "prod" ]]; then
-        echo "Staging the file for commit..."
-        git add --verbose "${out_file}"
-    fi
 }
 
 usage "$@"
