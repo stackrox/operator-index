@@ -37,11 +37,11 @@ spec:
       echo "Found $named_files_count files matching pattern .tekton/operator-index-ocp-*-*-build.yaml"
 
       pipelines_count=0
-      while IFS= read -r -d '' file; do
+      for file in .tekton/*.yaml; do
           if yq eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
               pipelines_count=$((pipelines_count + 1))
           fi
-      done < <(find .tekton -maxdepth 1 -name '*.yaml' -type f -print0)
+      done
       echo "Found $pipelines_count files with .spec.pipelineRef.name == 'operator-index-pipeline'"
 
       if [[ "$named_files_count" -ne "$pipelines_count" ]]; then
