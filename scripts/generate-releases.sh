@@ -115,7 +115,7 @@ generate_release_resources() {
         snapshot="$(echo "$line" | cut -d "|" -f 1)"
         snapshot_copy_name="$(echo "${snapshot%-*}-${release_name_suffix}" | cut -c -63)" # Replace random suffix with release name and crop to 63 characters to avoid running over the Kubernetes limit.
         snapshot_yaml_list="$(kubectl ka get snapshot -n rh-acs-tenant "${snapshot}" -o yaml)"
-        snapshot_count="$(echo "$snapshot_yaml" | "${YQ}" '.items | length')"
+        snapshot_count="$(echo "$snapshot_yaml_list" | "${YQ}" '.items | length')"
         if [[ "$snapshot_count" -eq 0 ]]; then
             echo "ERROR: No snapshot found in kubearchive for ${snapshot}" >&2
             return 1
@@ -123,8 +123,8 @@ generate_release_resources() {
         snapshot_yaml="$(echo "$snapshot_yaml_list" | "${YQ}" '.items[0]')"
 
         echo "---"
-        echo "$snapshot_yaml"
-        echo "${YQ}" -P 'load("'"${whitelist_file}"'") as $whitelisted
+        echo "$snapshot_yaml" | \
+        "${YQ}" -P 'load("'"${whitelist_file}"'") as $whitelisted
          | del(.metadata.annotations |keys[]|select(. as $needle | $whitelisted.annotations | has($needle) | not))
          | del(.metadata.labels |keys[]|select(. as $needle | $whitelisted.labels | has($needle) | not))
          | {"apiVersion": .apiVersion,
