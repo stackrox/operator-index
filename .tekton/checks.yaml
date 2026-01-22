@@ -115,3 +115,10 @@ spec:
       retries: 3
       taskRef:
         name: check-generated-files-up-to-date
+
+    - name: validate-pipeline-files
+      params:
+      - name: SOURCE_ARTIFACT
+        value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
+      taskRef:
+        name: validate-pipeline-files

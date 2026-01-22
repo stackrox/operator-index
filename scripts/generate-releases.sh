@@ -78,7 +78,12 @@ validate_snapshots() {
 
     local pipelines_count
     local snapshots_count
-    pipelines_count="$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l)"
+    pipelines_count=0
+    for file in .tekton/*.yaml; do
+        if [[ -f "$file" ]] && "${YQ}" eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
+            ((pipelines_count++))
+        fi
+    done
     snapshots_count="$(echo "$snapshots_data" | sed '/^$/d' | wc -l)"
 
     echo -e "Found the following snapshots for \033[0;32m$commit\033[0m commit:" >&2

@@ -1,0 +1,56 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: validate-pipeline-files
+  namespace: rh-acs-tenant
+spec:
+  description: Validates that the number of .tekton/operator-index-ocp-*-build.yaml files matches the number of operator-index pipelines. This enforces the naming scheme for pipeline files.
+  params:
+  - name: SOURCE_ARTIFACT
+    description: The Trusted Artifact URI pointing to the artifact with
+      the application source code. This should be the result of the git-clone task,
+      results from other tasks might fail as dirty.
+    type: string
+  volumes:
+  - name: workdir
+    emptyDir: { }
+  stepTemplate:
+    volumeMounts:
+    - mountPath: /var/workdir
+      name: workdir
+  steps:
+  - name: use-trusted-artifact
+    image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:9b180776a41d9a22a1c51539f1647c60defbbd55b44bbebdd4130e33512d8b0d
+    args:
+    - use
+    - $(params.SOURCE_ARTIFACT)=/var/workdir/source
+  - name: validate-pipeline-files
+    image: quay.io/konflux-ci/release-service-utils:latest@sha256:2f9e6863e82bbc9ddce5a290f3fd0e87657c475e3de8a832b2ef7f8d0671e7d3
+    workingDir: /var/workdir/source
+    script: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      echo "Validating pipeline files..."
+
+      named_files_count=$(find .tekton -maxdepth 1 -name 'operator-index-ocp-*-*-build.yaml' -type f | wc -l | tr -d ' ')
+      echo "Found $named_files_count files matching pattern .tekton/operator-index-ocp-*-*-build.yaml"
+
+      pipelines_count=0
+      for file in .tekton/*.yaml; do
+          if yq eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
+              pipelines_count=$((pipelines_count + 1))
+          fi
+      done
+      echo "Found $pipelines_count files with .spec.pipelineRef.name == 'operator-index-pipeline'"
+
+      if [[ "$named_files_count" -ne "$pipelines_count" ]]; then
+          echo >&2 "ERROR: The number of .tekton/operator-index-ocp-*-*-build.yaml files ($named_files_count) does not match"
+          echo >&2 "       the number of files with .spec.pipelineRef.name == 'operator-index-pipeline' ($pipelines_count)"
+          echo >&2 ""
+          echo >&2 "All pipeline files referencing 'operator-index-pipeline' must follow the naming scheme:"
+          echo >&2 "  .tekton/operator-index-ocp-vX-Y-build.yaml"
+          exit 1
+      fi
+
+      echo "Pipeline file naming validation passed: $pipelines_count files"
