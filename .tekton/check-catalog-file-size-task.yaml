@@ -31,8 +31,8 @@ spec:
       #!/usr/bin/env bash
       set -euo pipefail
 
-      cat <<'EOF'
-      Checking Catalog file sizes...
+      echo "Checking Catalog file sizes...
+
       If this check fails, it means ACS likely contributes significant part to the size of the catalog image.
       If we let our part of catalog grow uncontrollably, it _may_ cause problems anywhere in the supply
       chain or on customers clusters. We don't know when it happens and how big the impact would be
@@ -46,11 +46,9 @@ spec:
       Right next after bumping the limit, you ought to pay the debt. Reach out to relevant ACS teams
       (e.g., the Install team) and reach out to the OLM team to find out whether this size of the catalog
       is safe or can cause issues and come up with a plan if the latter.
-      EOF
+      "
 
-      # Maximum allowed file size in megabytes for catalog-bundle-object/rhacs-operator/catalog.json
       max_old_format_size_mb="50"
-      # Maximum allowed file size in megabytes for catalog-csv-metadata/rhacs-operator/catalog.json
       max_new_format_size_mb="28"
 
       old_format_file="catalog-bundle-object/rhacs-operator/catalog.json"
@@ -61,12 +59,12 @@ spec:
       old_format_file_size_mb="$(stat -c %s "$old_format_file" | numfmt --to-unit=1M)"
       new_format_file_size_mb="$(stat -c %s "$new_format_file" | numfmt --to-unit=1M)"
 
-      if [[ $old_format_file_size_mb -gt $max_old_format_size_mb ]]; then
+      if [[ "$old_format_file_size_mb" -gt "$max_old_format_size_mb" ]]; then
         echo >&2 "ERROR: ${old_format_file} is bigger than ${old_format_file_size_mb}"
         exit 1
       fi
 
-      if [[ $new_format_file_size_mb -gt $max_new_format_size_mb ]]; then
+      if [[ "$new_format_file_size_mb" -gt "$max_new_format_size_mb" ]]; then
         echo >&2 "ERROR: ${new_format_file} is bigger than ${max_new_format_size_mb}"
         exit 1
       fi
