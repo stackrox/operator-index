@@ -162,7 +162,8 @@ spec:
 
             Right next after bumping the limit, you ought to pay the debt. Reach out to relevant ACS teams
             (e.g., the Install team) and reach out to the OLM team to find out whether this size of the catalog
-            is safe or can cause issues and come up with a plan if the latter."
+            is safe or can cause issues and come up with a plan if the latter.
+            "
 
             old_format_file="catalog-bundle-object/rhacs-operator/catalog.json"
             new_format_file="catalog-csv-metadata/rhacs-operator/catalog.json"
