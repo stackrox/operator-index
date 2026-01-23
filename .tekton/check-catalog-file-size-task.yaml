@@ -31,20 +31,22 @@ spec:
       #!/usr/bin/env bash
       set -euo pipefail
 
-      echo "Checking Catalog file sizes..."
-      echo "If this check fails, it means ACS likely contributes significant part to the size of the catalog image."
-      echo "If we let our part of catalog grow uncontrollably, it _may_ cause problems anywhere in the supply"
-      echo "chain or on customers clusters. We don't know when it happens and how big the impact would be"
-      echo "but we don't want to be the ones who find this all out. Hence we put this check in place."
-      echo ""
-      echo "When this check fails for you, you obviously want to proceed further with whatever important you"
-      echo "do. You may bump the limit just a bit to let your catalog update go through. It should be fine, we"
-      echo "started with somewhat conservative limits for you. Say, do +10MB or +10% limit increase."
-      echo "If your update is bigger than that, it's time to stop and reconsider whatever you are doing."
-      echo ""
-      echo "Right next after bumping the limit, you ought to pay the debt. Reach out to relevant ACS teams"
-      echo "(e.g., the Install team) and reach out to the OLM team to find out whether this size of the catalog"
-      echo "is safe or can cause issues and come up with a plan if the latter."
+      cat <<'EOF'
+      Checking Catalog file sizes...
+      If this check fails, it means ACS likely contributes significant part to the size of the catalog image.
+      If we let our part of catalog grow uncontrollably, it _may_ cause problems anywhere in the supply
+      chain or on customers clusters. We don't know when it happens and how big the impact would be
+      but we don't want to be the ones who find this all out. Hence we put this check in place.
+
+      When this check fails for you, you obviously want to proceed further with whatever important you
+      do. You may bump the limit just a bit to let your catalog update go through. It should be fine, we
+      started with somewhat conservative limits for you. Say, do +10MB or +10% limit increase.
+      If your update is bigger than that, it's time to stop and reconsider whatever you are doing.
+
+      Right next after bumping the limit, you ought to pay the debt. Reach out to relevant ACS teams
+      (e.g., the Install team) and reach out to the OLM team to find out whether this size of the catalog
+      is safe or can cause issues and come up with a plan if the latter.
+      EOF
 
       # Maximum allowed file size in megabytes for catalog-bundle-object/rhacs-operator/catalog.json
       max_old_format_size_mb="50"
@@ -63,7 +65,7 @@ spec:
         echo >&2 "ERROR: ${old_format_file} is bigger than ${old_format_file_size_mb}"
         exit 1
       fi
-      
+
       if [[ $new_format_file_size_mb -gt $max_new_format_size_mb ]]; then
         echo >&2 "ERROR: ${new_format_file} is bigger than ${max_new_format_size_mb}"
         exit 1
