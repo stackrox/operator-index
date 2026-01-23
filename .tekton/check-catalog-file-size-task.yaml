@@ -11,14 +11,6 @@ spec:
       the application source code. This should be the result of the git-clone task,
       results from other tasks might fail as dirty.
     type: string
-  - name: CATALOG_OLD_FORMAT_MAX_SIZE_MB
-    description: Maximum allowed file size in megabytes for catalog-bundle-object/rhacs-operator/catalog.json
-    type: string
-    default: "135"
-  - name: CATALOG_NEW_FORMAT_MAX_SIZE_MB
-    description: Maximum allowed file size in megabytes for catalog-csv-metadata/rhacs-operator/catalog.json
-    type: string
-    default: "28"
   volumes:
   - name: workdir
     emptyDir: { }
@@ -33,67 +25,48 @@ spec:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
   - name: check-catalog-file-size
-    image: registry.redhat.io/ubi9/go-toolset@sha256:e8938564f866174a6d79e55dfe577c2ed184b1f53e91d782173fb69b07ce69ef
+    image: registry.redhat.io/ubi9/ubi-minimal@sha256:7c5495d5fad59aaee12abc3cbbd2b283818ee1e814b00dbc7f25bf2d14fa4f0
     workingDir: /var/workdir/source
     script: |
       #!/usr/bin/env bash
       set -euo pipefail
 
-      echo "Checking Catalog file sizes...
+      echo "Checking Catalog file sizes..."
+      echo "If this check fails, it means ACS likely contributes significant part to the size of the catalog image."
+      echo "If we let our part of catalog grow uncontrollably, it _may_ cause problems anywhere in the supply"
+      echo "chain or on customers clusters. We don't know when it happens and how big the impact would be"
+      echo "but we don't want to be the ones who find this all out. Hence we put this check in place."
+      echo ""
+      echo "When this check fails for you, you obviously want to proceed further with whatever important you"
+      echo "do. You may bump the limit just a bit to let your catalog update go through. It should be fine, we"
+      echo "started with somewhat conservative limits for you. Say, do +10MB or +10% limit increase."
+      echo "If your update is bigger than that, it's time to stop and reconsider whatever you are doing."
+      echo ""
+      echo "Right next after bumping the limit, you ought to pay the debt. Reach out to relevant ACS teams"
+      echo "(e.g., the Install team) and reach out to the OLM team to find out whether this size of the catalog"
+      echo "is safe or can cause issues and come up with a plan if the latter."
 
-If this check fails, it means ACS likely contributes significant part to the size of the catalog image.
-If we let our part of catalog grow uncontrollably, it _may_ cause problems anywhere in the supply
-chain or on customers clusters. We don't know when it happens and how big the impact would be
-but we don't want to be the ones who find this all out. Hence we put this check in place.
-
-When this check fails for you, you obviously want to proceed further with whatever important you
-do. You may bump the limit just a bit to let your catalog update go through. It should be fine, we
-started with somewhat conservative limits for you. Say, do +10MB or +10% limit increase.
-If your update is bigger than that, it's time to stop and reconsider whatever you are doing.
-
-Right next after bumping the limit, you ought to pay the debt. Reach out to relevant ACS teams
-(e.g., the Install team) and reach out to the OLM team to find out whether this size of the catalog
-is safe or can cause issues and come up with a plan if the latter.
-"
-
-      max_old_format_size_mb=$(params.CATALOG_OLD_FORMAT_MAX_SIZE_MB)
-      max_new_format_size_mb=$(params.CATALOG_NEW_FORMAT_MAX_SIZE_MB)
+      # Maximum allowed file size in megabytes for catalog-bundle-object/rhacs-operator/catalog.json
+      max_old_format_size_mb="50"
+      # Maximum allowed file size in megabytes for catalog-csv-metadata/rhacs-operator/catalog.json
+      max_new_format_size_mb="28"
 
       old_format_file="catalog-bundle-object/rhacs-operator/catalog.json"
       new_format_file="catalog-csv-metadata/rhacs-operator/catalog.json"
-      for catalog_file in "$old_format_file" "$new_format_file"; do
-        if [[ ! -f "$catalog_file" ]]; then
-          echo >&2 "ERROR: File $catalog_file not found"
-          exit 1
-        fi
-      done
 
       du -h "$old_format_file" "$new_format_file"
 
-      old_format_file_size_mb=$(stat -c %s "$old_format_file" | numfmt --to-unit=1M --suffix=MB)
-      new_format_file_size_mb=$(stat -c %s "$new_format_file" | numfmt --to-unit=1M --suffix=MB)
+      old_format_file_size_mb="$(stat -c %s "$old_format_file" | numfmt --to-unit=1M)"
+      new_format_file_size_mb="$(stat -c %s "$new_format_file" | numfmt --to-unit=1M)"
 
       if [[ $old_format_file_size_mb -gt $max_old_format_size_mb ]]; then
         echo >&2 "ERROR: ${old_format_file} is bigger than ${old_format_file_size_mb}"
-        echo >&2 ""
-        echo >&2 "Check what is the biggest old format catalog by running:"
-        echo >&2 "       $ opm migrate registry.redhat.io/redhat/redhat-operator-index:v4.14 <tmp_dir>"
-        echo >&2 "       $ find <tmp_dir> -name "catalog.json" -type f -exec du -h {} \; | sort -h | tail -5"
-        echo >&2 "Adjust the CATALOG_OLD_FORMAT_MAX_SIZE_MB limit if ACS is not hte biggest one"
         exit 1
       fi
       
       if [[ $new_format_file_size_mb -gt $max_new_format_size_mb ]]; then
-        echo >&2 "ERROR: File $new_format_file exceeds maximum size limit"
-        echo >&2 "       File size: ${new_format_file_size_mb}MB, Maximum allowed: ${max_new_format_size_mb}MB"
-        echo >&2 ""
-        echo >&2 "Check what is the biggest new format catalog by running:"
-        echo >&2 "       $ opm migrate registry.redhat.io/redhat/redhat-operator-index:v4.20 <tmp_dir>"
-        echo >&2 "       $ find <tmp_dir> -name "catalog.json" -type f -exec du -h {} \; | sort -h | tail -5"
-        echo >&2 "Adjust the CATALOG_NEW_FORMAT_MAX_SIZE_MB limit if ACS catalog is not hte biggest one"
+        echo >&2 "ERROR: ${new_format_file} is bigger than ${max_new_format_size_mb}"
         exit 1
       fi
 
       echo "All catalog files are within their size limits"
-      echo "  old format catalog: size: ${old_format_file_size_mb}MB, max: ${max_old_format_size_mb}MB"
-      echo "  new format catalog (csv compact): size: ${new_format_file_size_mb}MB, max: ${max_new_format_size_mb}MB"
