@@ -39,7 +39,22 @@ spec:
       #!/usr/bin/env bash
       set -euo pipefail
 
-      echo "Checking File Based Catalog file sizes..."
+      echo "Checking Catalog file sizes...
+
+If this check fails, it means ACS likely contributes significant part to the size of the catalog image.
+If we let our part of catalog grow uncontrollably, it _may_ cause problems anywhere in the supply
+chain or on customers clusters. We don't know when it happens and how big the impact would be
+but we don't want to be the ones who find this all out. Hence we put this check in place.
+
+When this check fails for you, you obviously want to proceed further with whatever important you
+do. You may bump the limit just a bit to let your catalog update go through. It should be fine, we
+started with somewhat conservative limits for you. Say, do +10MB or +10% limit increase.
+If your update is bigger than that, it's time to stop and reconsider whatever you are doing.
+
+Right next after bumping the limit, you ought to pay the debt. Reach out to relevant ACS teams
+(e.g., the Install team) and reach out to the OLM team to find out whether this size of the catalog
+is safe or can cause issues and come up with a plan if the latter.
+"
 
       max_old_format_size_mb=$(params.CATALOG_OLD_FORMAT_MAX_SIZE_MB)
       max_new_format_size_mb=$(params.CATALOG_NEW_FORMAT_MAX_SIZE_MB)
@@ -53,12 +68,13 @@ spec:
         fi
       done
 
+      du -h "$old_format_file" "$new_format_file"
+
       old_format_file_size_mb=$(stat -c %s "$old_format_file" | numfmt --to-unit=1M --suffix=MB)
       new_format_file_size_mb=$(stat -c %s "$new_format_file" | numfmt --to-unit=1M --suffix=MB)
 
       if [[ $old_format_file_size_mb -gt $max_old_format_size_mb ]]; then
-        echo >&2 "ERROR: File $old_format_file exceeds maximum size limit"
-        echo >&2 "       File size: ${old_format_file_size_mb}MB, Maximum allowed: ${max_old_format_size_mb}MB"
+        echo >&2 "ERROR: ${old_format_file} is bigger than ${old_format_file_size_mb}"
         echo >&2 ""
         echo >&2 "Check what is the biggest old format catalog by running:"
         echo >&2 "       $ opm migrate registry.redhat.io/redhat/redhat-operator-index:v4.14 <tmp_dir>"
