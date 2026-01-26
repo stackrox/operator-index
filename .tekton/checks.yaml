@@ -122,3 +122,65 @@ spec:
         value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
       taskRef:
         name: validate-pipeline-files
+
+    - name: check-catalog-file-size
+      taskSpec:
+        volumes:
+        - name: workdir
+          emptyDir: { }
+        stepTemplate:
+          volumeMounts:
+          - mountPath: /var/workdir
+            name: workdir
+        steps:
+        - name: use-trusted-artifact
+          image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:9b180776a41d9a22a1c51539f1647c60defbbd55b44bbebdd4130e33512d8b0d
+          args:
+          - use
+          - $(tasks.clone-repository.results.SOURCE_ARTIFACT)=/var/workdir/source
+        - name: check-catalog-file-size
+          image: registry.redhat.io/ubi9/ubi-minimal@sha256:7c5495d5fad59aaee12abc3cbbd2b283818ee1e814b00dbc7f25bf2d14fa4f0c
+          workingDir: /var/workdir/source
+          script: |
+            #!/usr/bin/env bash
+            set -euo pipefail
+
+            echo "Checking Catalog file sizes...
+
+            If this check fails, it means ACS likely contributes significant part to the size of the catalog image.
+            If we let our part of catalog grow uncontrollably, it _may_ cause problems anywhere in the supply
+            chain or on customers clusters. We don't know when it happens and how big the impact would be
+            but we don't want to be the ones who find this all out. Hence we put this check in place.
+
+            When this check fails for you, you obviously want to proceed further with whatever important you
+            do. You may bump the limit just a bit to let your catalog update go through. It should be fine, we
+            started with somewhat conservative limits for you. Say, do +10MB or +10% limit increase.
+            If your update is bigger than that, it's time to stop and reconsider whatever you are doing.
+
+            Right next after bumping the limit, you ought to pay the debt. Reach out to relevant ACS teams
+            (e.g., the Install team) and reach out to the OLM team to find out whether this size of the catalog
+            is safe or can cause issues and come up with a plan if the latter.
+            "
+
+            max_old_format_size_mb="50"
+            max_new_format_size_mb="28"
+
+            old_format_file="catalog-bundle-object/rhacs-operator/catalog.json"
+            new_format_file="catalog-csv-metadata/rhacs-operator/catalog.json"
+
+            du -h "$old_format_file" "$new_format_file"
+
+            old_format_file_size_mb="$(stat -c %s "$old_format_file" | numfmt --to-unit=1M)"
+            new_format_file_size_mb="$(stat -c %s "$new_format_file" | numfmt --to-unit=1M)"
+
+            if [[ "$old_format_file_size_mb" -gt "$max_old_format_size_mb" ]]; then
+              echo >&2 "ERROR: ${old_format_file} is bigger than ${old_format_file_size_mb}"
+              exit 1
+            fi
+
+            if [[ "$new_format_file_size_mb" -gt "$max_new_format_size_mb" ]]; then
+              echo >&2 "ERROR: ${new_format_file} is bigger than ${max_new_format_size_mb}"
+              exit 1
+            fi
+
+            echo "All catalog files are within their size limits"
