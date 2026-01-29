@@ -2224,6 +2224,9 @@ entries:
   - name: rhacs-operator.v4.9.2
     replaces: rhacs-operator.v4.9.1
     skipRange: ">= 4.8.0 < 4.9.2"
+  - name: rhacs-operator.v4.9.3-rc.5
+    replaces: rhacs-operator.v4.9.2
+    skipRange: ">= 4.8.0 < 4.9.3-rc.5"
 - schema: olm.channel
   name: stable
   package: rhacs-operator
@@ -2467,6 +2470,9 @@ entries:
   - name: rhacs-operator.v4.9.2
     replaces: rhacs-operator.v4.9.1
     skipRange: ">= 4.8.0 < 4.9.2"
+  - name: rhacs-operator.v4.9.3-rc.5
+    replaces: rhacs-operator.v4.9.2
+    skipRange: ">= 4.8.0 < 4.9.3-rc.5"
 - schema: olm.deprecations
   package: rhacs-operator
   entries:
@@ -3266,3 +3272,5 @@ entries:
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:9312c096fef02f70b642551338fdf968ec6657ff0385f51c13767d8b29afc76d
 - schema: olm.bundle
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:b3fbc67b7b2333acf5b574dafc727b5953ff8360b2a9ead7505d3f223f29dbe6
+- schema: olm.bundle
+  image: quay.io/rhacs-eng/release-operator-bundle@sha256:b27fb35b99c536183186a76d18817bf744859e43b89bfaa5746e38b92a15266d
