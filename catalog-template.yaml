@@ -2224,9 +2224,9 @@ entries:
   - name: rhacs-operator.v4.9.2
     replaces: rhacs-operator.v4.9.1
     skipRange: ">= 4.8.0 < 4.9.2"
-  - name: rhacs-operator.v4.9.3
+  - name: rhacs-operator.v4.9.3-rc.5
     replaces: rhacs-operator.v4.9.2
-    skipRange: ">= 4.8.0 < 4.9.3"
+    skipRange: ">= 4.8.0 < 4.9.3-rc.5"
 - schema: olm.channel
   name: stable
   package: rhacs-operator
@@ -2470,9 +2470,9 @@ entries:
   - name: rhacs-operator.v4.9.2
     replaces: rhacs-operator.v4.9.1
     skipRange: ">= 4.8.0 < 4.9.2"
-  - name: rhacs-operator.v4.9.3
+  - name: rhacs-operator.v4.9.3-rc.5
     replaces: rhacs-operator.v4.9.2
-    skipRange: ">= 4.8.0 < 4.9.3"
+    skipRange: ">= 4.8.0 < 4.9.3-rc.5"
 - schema: olm.deprecations
   package: rhacs-operator
   entries:
