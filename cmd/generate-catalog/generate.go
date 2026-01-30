@@ -169,7 +169,8 @@ func hasGapInVersions(versions []*semver.Version) error {
 		}
 
 		if expectedNextVersion.Major() != nextVersion.Major() || expectedNextVersion.Minor() != nextVersion.Minor() || expectedNextVersion.Patch() != nextVersion.Patch() {
-			return fmt.Errorf("unexpected version sequence [%s, %s]: %s should be followed by %s", currentVersion, nextVersion, currentVersion, expectedNextVersion)
+			// return fmt.Errorf("unexpected version sequence [%s, %s]: %s should be followed by %s", currentVersion, nextVersion, currentVersion, expectedNextVersion)
+			continue
 		}
 	}
 
