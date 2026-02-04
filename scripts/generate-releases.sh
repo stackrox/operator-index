@@ -170,6 +170,8 @@ environment="$1"
 commit="${2:-$(git rev-parse HEAD)}"
 commit="$(expand_commit "$commit")"
 
+ensure_yq
+
 branch="${3:-$(git rev-parse --abbrev-ref HEAD)}"
 validate_branch "$branch" "$commit"
 
@@ -178,5 +180,4 @@ validate_environment "$environment" "$branch"
 snapshots_data=$(get_snapshots_data "$commit" "$branch")
 validate_snapshots "$commit" "$snapshots_data"
 
-ensure_yq
 generate_release_resources "$environment" "$commit" "$snapshots_data"
