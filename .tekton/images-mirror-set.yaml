@@ -16,10 +16,6 @@ spec:
   - source: registry.redhat.io/advanced-cluster-security/rhacs-collector-rhel8
     mirrors:
     - quay.io/rhacs-eng/release-collector
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-collector-slim-rhel8
-    mirrors:
-    - quay.io/rhacs-eng/release-collector
-    - quay.io/rhacs-eng/release-collector-slim
   - source: registry.redhat.io/advanced-cluster-security/rhacs-fact-rhel8
     mirrors:
     - quay.io/rhacs-eng/release-fact
