@@ -175,8 +175,8 @@ validate_branch "$branch" "$commit"
 
 validate_environment "$environment" "$branch"
 
+ensure_yq
 snapshots_data=$(get_snapshots_data "$commit" "$branch")
 validate_snapshots "$commit" "$snapshots_data"
 
-ensure_yq
 generate_release_resources "$environment" "$commit" "$snapshots_data"
