@@ -74,6 +74,55 @@ spec:
       - name: kind
         value: task
       resolver: bundles
+  - name: github-add-pr-comment
+    params:
+    - name: GITHUB_TOKEN_SECRET
+      value: rhacs-github-bot-token
+    - name: PR_NUMBER
+      value: $(params.pr-number)
+    - name: REPO_URL
+      value: $(params.git-url)
+    - name: IMAGE_URL
+      value: $(tasks.build-image-index.results.IMAGE_URL)
+    taskSpec:
+      params:
+      - name: GITHUB_TOKEN_SECRET
+      - name: PR_NUMBER
+      - name: REPO_URL
+      - name: IMAGE_URL
+      steps:
+      - name: post-comment
+        image: registry.access.redhat.com/ubi9/ubi:latest
+        env:
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: $(params.GITHUB_TOKEN_SECRET)
+              key: token
+        script: |
+          #!/bin/bash
+          set -e
+
+          # Install required tools
+          microdnf install -y jq
+
+          # Extract owner and repo from git URL
+          # Handle both https://github.com/owner/repo and https://github.com/owner/repo.git formats
+          REPO_PATH=$(echo "$(params.REPO_URL)" | sed -E 's#https?://github.com/##' | sed 's#\.git$##')
+
+          # Create the comment body (properly escaped for JSON)
+          COMMENT_BODY="**Image Built Successfully**\n\nImage URL: \`$(params.IMAGE_URL)\`"
+
+          # Post comment to GitHub
+          curl -X POST \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${REPO_PATH}/issues/$(params.PR_NUMBER)/comments" \
+            -d "$(jq -n --arg body "$COMMENT_BODY" '{body: $body}')"
+    when:
+    - input: $(params.pr-number)
+      operator: notin
+      values: [""]
   params:
   - description: Source Repository URL
     name: git-url
@@ -81,6 +130,10 @@ spec:
   - default: ""
     description: Revision of the Source Repository
     name: revision
+    type: string
+  - default: ""
+    description: Pull Request Number (optional, for posting comments)
+    name: pr-number
     type: string
   - description: Output Image Tag. Will be qualified with output-image-repo.
     name: output-image-tag
