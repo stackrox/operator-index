@@ -367,6 +367,7 @@ spec:
       operator: in
       values: ["false"]
 
+# TODO: Uncomment the check once https://issues.redhat.com/browse/KONFLUX-12211 is fixed
 #  - name: fbc-fips-check-oci-ta
 #    params:
 #    - name: image-digest
