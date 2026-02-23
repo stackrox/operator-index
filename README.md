@@ -65,18 +65,19 @@ See [konflux docs](https://github.com/konflux-ci/build-definitions/blob/c93ea73d
 ### Release process
 
 1. Make sure you [logged in](https://spaces.redhat.com/pages/viewpage.action?pageId=407312060#HowtoeverythingKonfluxforRHACS-GettingocCLItoworkwithKonflux) to the Konflux cluster.
-2. Make sure you checked out the latest master branch: `git checkout master && git pull`
-3. Generate Release and Snapshot CRs by running `./scripts/generate-releases.sh <stage|prod>`. Use `stage` for test release and `prod` for production one.
-4. (Skip for `stage` release.) Create a PR which adds the file created by the script, get the PR reviewed and merged.
-5. (Skip for `stage` release.) Go to the [#acs-operator-index-release](https://redhat.enterprise.slack.com/archives/C096WU0GZUG) channel, and:
+2. Make sure you have installed [KubeArchive plugin](https://kubearchive.github.io/kubearchive/main/cli/installation.html) and ensure it is configured correctly by running `kubectl ka -n rh-acs-tenant get snapshots`.
+3. Make sure you checked out the latest master branch: `git checkout master && git pull`
+4. Generate Release and Snapshot CRs by running `./scripts/generate-releases.sh <stage|prod>`. Use `stage` for test release and `prod` for production one.
+5. (Skip for `stage` release.) Create a PR which adds the file created by the script, get the PR reviewed and merged.
+6. (Skip for `stage` release.) Go to the [#acs-operator-index-release](https://redhat.enterprise.slack.com/archives/C096WU0GZUG) channel, and:
    1. make sure the previous operator index release is complete (has a green check mark emoticon)
    2. if not, coordinate with the person conducting that release
    3. once that release is complete, start a new thread for your release
-6. Apply generated CRs to the cluster: `oc create -f release-history/<YYYYMMDD>-<stage|prod>-<SHA>.yaml`
-7. Monitor release [using monitor release script](#monitoring-release). Each supported OCP version has its own `Release`. Successfully finished `Release` has `Succeeded` status.
-8. Follow [the restarting release step below](#restarting-konflux-release) if any of the `Release`s fails for any OCP version.
-9. (Skip for `stage` release.) Once done, go back to the Slack thread you started earlier, add a message that your release is done and add a green check mark emoticon on the initial message of the thread.
-10. Once releases for all OCP versions successfully finish, then the operator catalog release is done. If you perform it as part of a bigger release procedure, you should go back to that procedure and continue with further steps.
+7. Apply generated CRs to the cluster: `oc create -f release-history/<YYYYMMDD>-<stage|prod>-<SHA>.yaml`
+8. Monitor release [using monitor release script](#monitoring-release). Each supported OCP version has its own `Release`. Successfully finished `Release` has `Succeeded` status.
+9. Follow [the restarting release step below](#restarting-konflux-release) if any of the `Release`s fails for any OCP version.
+10. (Skip for `stage` release.) Once done, go back to the Slack thread you started earlier, add a message that your release is done and add a green check mark emoticon on the initial message of the thread.
+11. Once releases for all OCP versions successfully finish, then the operator catalog release is done. If you perform it as part of a bigger release procedure, you should go back to that procedure and continue with further steps.
 
 
 ### Monitoring Release
