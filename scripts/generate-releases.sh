@@ -78,7 +78,12 @@ validate_snapshots() {
 
     local pipelines_count
     local snapshots_count
-    pipelines_count="$(find ".tekton" -maxdepth 1 -type f -name "operator-index-ocp-*-build.yaml" | wc -l)"
+    pipelines_count=0
+    for file in .tekton/*.yaml; do
+        if [[ -f "$file" ]] && "${YQ}" eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
+            ((pipelines_count++))
+        fi
+    done
     snapshots_count="$(echo "$snapshots_data" | sed '/^$/d' | wc -l)"
 
     echo -e "Found the following snapshots for \033[0;32m$commit\033[0m commit:" >&2
@@ -114,8 +119,16 @@ generate_release_resources() {
     do
         snapshot="$(echo "$line" | cut -d "|" -f 1)"
         snapshot_copy_name="$(echo "${snapshot%-*}-${release_name_suffix}" | cut -c -63)" # Replace random suffix with release name and crop to 63 characters to avoid running over the Kubernetes limit.
+        snapshot_yaml_list="$(kubectl ka get snapshot -n rh-acs-tenant "${snapshot}" -o yaml)"
+        snapshot_count="$(echo "$snapshot_yaml_list" | "${YQ}" '.items | length')"
+        if [[ "$snapshot_count" -eq 0 ]]; then
+            echo "ERROR: No snapshot found in kubearchive for name: ${snapshot}" >&2
+            return 1
+        fi
+        snapshot_yaml="$(echo "$snapshot_yaml_list" | "${YQ}" '.items[0]')"
+
         echo "---"
-        kubectl -n rh-acs-tenant get snapshot.appstudio.redhat.com "${snapshot}" -o yaml | \
+        echo "$snapshot_yaml" | \
         "${YQ}" -P 'load("'"${whitelist_file}"'") as $whitelisted
          | del(.metadata.annotations |keys[]|select(. as $needle | $whitelisted.annotations | has($needle) | not))
          | del(.metadata.labels |keys[]|select(. as $needle | $whitelisted.labels | has($needle) | not))
@@ -148,9 +161,6 @@ generate_release_resources() {
           snapshot: ${snapshot_copy_name}"
 
     done <<< "$snapshots_data" > "${out_file}"
-
-    echo "Staging the file for commit..."
-    git add --verbose "${out_file}"
 }
 
 usage "$@"
@@ -165,8 +175,8 @@ validate_branch "$branch" "$commit"
 
 validate_environment "$environment" "$branch"
 
+ensure_yq
 snapshots_data=$(get_snapshots_data "$commit" "$branch")
 validate_snapshots "$commit" "$snapshots_data"
 
-ensure_yq
 generate_release_resources "$environment" "$commit" "$snapshots_data"
