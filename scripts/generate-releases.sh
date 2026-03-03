@@ -81,7 +81,7 @@ validate_snapshots() {
     pipelines_count=0
     for file in .tekton/*.yaml; do
         if [[ -f "$file" ]] && "${YQ}" eval '.spec.pipelineRef.name == "operator-index-pipeline"' "$file" 2>/dev/null | grep -q "true"; then
-            ((pipelines_count++))
+            ((pipelines_count++)) || true
         fi
     done
     snapshots_count="$(echo "$snapshots_data" | sed '/^$/d' | wc -l)"
