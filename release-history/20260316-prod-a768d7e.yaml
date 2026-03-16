@@ -1,0 +1,320 @@
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "358"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: "chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to ec63440 (#358)\n\nThis PR contains the following updates:\n\n| Package | Type | Update | Change |\n|---|---|---|---|\n| quay.io/rhacs-eng/konflux-tasks | tekton-bundle | digest | `7d31e99`\n-> `ec63440` |\n\n---\n\n### Configuration\n\n\U0001F4C5 **Schedule**: Branch creation - \"after 3am and before 7am\" in timezone\nEtc/UTC, Automerge - At any time (no schedule defined).\n\n\U0001F6A6 **Automerge**: Enabled.\n\n♻ **Rebasing**: Whenever PR is behind base branch, or you tick the\nrebase/retry checkbox.\n\n\U0001F515 **Ignore**: Close this PR and you won't be reminded about this update\nagain.\n\n---\n\n- [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check\nthis box\n\n---\n\nTo execute skipped test pipelines write comment `/ok-to-test`.\n\n---\n### Documentation\n\nFind out how to configure dependency updates in [MintMaker\ndocumentation](https://konflux-ci.dev/docs/mintmaker/user/) or see all\navailable configuration options in [Renovate\ndocumentation](https://docs.renovatebot.com/configuration-options/).\n\n<!--renovate-debug:eyJjcmVhdGVkSW5WZXIiOiI0Mi4yNi41LXJwbSIsInVwZGF0ZWRJblZlciI6IjQyLjI2LjUtcnBtIiwidGFyZ2V0QnJhbmNoIjoibWFzdGVyIiwibGFiZWxzIjpbXX0=-->\n\nSigned-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>\nCo-authored-by: red-hat-konflux[bot] <126015336+red-hat-konflux[bot]@users.noreply.github.com>"
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/a768d7e7cab1f20ea738cc38242e30876b2f6933
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-12-20260315-140027-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
+    appstudio.openshift.io/component: operator-index-ocp-v4-12
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: a768d7e7cab1f20ea738cc38242e30876b2f6933
+  name: acs-operator-index-ocp-v4-12-20260315-140027-20260316-prod-a768
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-12
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:747ffa1bbf8b2238124e82dce529ca22646316d561550b0902cf743f0f473875
+      name: operator-index-ocp-v4-12
+      source:
+        git:
+          revision: a768d7e7cab1f20ea738cc38242e30876b2f6933
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-12-20260316-prod-a768d7e
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-12
+  snapshot: acs-operator-index-ocp-v4-12-20260315-140027-20260316-prod-a768
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "358"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: "chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to ec63440 (#358)\n\nThis PR contains the following updates:\n\n| Package | Type | Update | Change |\n|---|---|---|---|\n| quay.io/rhacs-eng/konflux-tasks | tekton-bundle | digest | `7d31e99`\n-> `ec63440` |\n\n---\n\n### Configuration\n\n\U0001F4C5 **Schedule**: Branch creation - \"after 3am and before 7am\" in timezone\nEtc/UTC, Automerge - At any time (no schedule defined).\n\n\U0001F6A6 **Automerge**: Enabled.\n\n♻ **Rebasing**: Whenever PR is behind base branch, or you tick the\nrebase/retry checkbox.\n\n\U0001F515 **Ignore**: Close this PR and you won't be reminded about this update\nagain.\n\n---\n\n- [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check\nthis box\n\n---\n\nTo execute skipped test pipelines write comment `/ok-to-test`.\n\n---\n### Documentation\n\nFind out how to configure dependency updates in [MintMaker\ndocumentation](https://konflux-ci.dev/docs/mintmaker/user/) or see all\navailable configuration options in [Renovate\ndocumentation](https://docs.renovatebot.com/configuration-options/).\n\n<!--renovate-debug:eyJjcmVhdGVkSW5WZXIiOiI0Mi4yNi41LXJwbSIsInVwZGF0ZWRJblZlciI6IjQyLjI2LjUtcnBtIiwidGFyZ2V0QnJhbmNoIjoibWFzdGVyIiwibGFiZWxzIjpbXX0=-->\n\nSigned-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>\nCo-authored-by: red-hat-konflux[bot] <126015336+red-hat-konflux[bot]@users.noreply.github.com>"
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/a768d7e7cab1f20ea738cc38242e30876b2f6933
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-14-20260315-140027-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-14
+    appstudio.openshift.io/component: operator-index-ocp-v4-14
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: a768d7e7cab1f20ea738cc38242e30876b2f6933
+  name: acs-operator-index-ocp-v4-14-20260315-140027-20260316-prod-a768
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-14
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:e3eb6857d3d9034231b59d8ac1fd7112562506785fe4c140c42bc7dbb5b203c6
+      name: operator-index-ocp-v4-14
+      source:
+        git:
+          revision: a768d7e7cab1f20ea738cc38242e30876b2f6933
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-14-20260316-prod-a768d7e
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-14
+  snapshot: acs-operator-index-ocp-v4-14-20260315-140027-20260316-prod-a768
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "358"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: "chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to ec63440 (#358)\n\nThis PR contains the following updates:\n\n| Package | Type | Update | Change |\n|---|---|---|---|\n| quay.io/rhacs-eng/konflux-tasks | tekton-bundle | digest | `7d31e99`\n-> `ec63440` |\n\n---\n\n### Configuration\n\n\U0001F4C5 **Schedule**: Branch creation - \"after 3am and before 7am\" in timezone\nEtc/UTC, Automerge - At any time (no schedule defined).\n\n\U0001F6A6 **Automerge**: Enabled.\n\n♻ **Rebasing**: Whenever PR is behind base branch, or you tick the\nrebase/retry checkbox.\n\n\U0001F515 **Ignore**: Close this PR and you won't be reminded about this update\nagain.\n\n---\n\n- [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check\nthis box\n\n---\n\nTo execute skipped test pipelines write comment `/ok-to-test`.\n\n---\n### Documentation\n\nFind out how to configure dependency updates in [MintMaker\ndocumentation](https://konflux-ci.dev/docs/mintmaker/user/) or see all\navailable configuration options in [Renovate\ndocumentation](https://docs.renovatebot.com/configuration-options/).\n\n<!--renovate-debug:eyJjcmVhdGVkSW5WZXIiOiI0Mi4yNi41LXJwbSIsInVwZGF0ZWRJblZlciI6IjQyLjI2LjUtcnBtIiwidGFyZ2V0QnJhbmNoIjoibWFzdGVyIiwibGFiZWxzIjpbXX0=-->\n\nSigned-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>\nCo-authored-by: red-hat-konflux[bot] <126015336+red-hat-konflux[bot]@users.noreply.github.com>"
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/a768d7e7cab1f20ea738cc38242e30876b2f6933
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-16-20260315-140027-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-16
+    appstudio.openshift.io/component: operator-index-ocp-v4-16
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: a768d7e7cab1f20ea738cc38242e30876b2f6933
+  name: acs-operator-index-ocp-v4-16-20260315-140027-20260316-prod-a768
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-16
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:dad5ea46d185824304356738452fa021a2cb014cee32499d6edee19cb49381df
+      name: operator-index-ocp-v4-16
+      source:
+        git:
+          revision: a768d7e7cab1f20ea738cc38242e30876b2f6933
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-16-20260316-prod-a768d7e
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-16
+  snapshot: acs-operator-index-ocp-v4-16-20260315-140027-20260316-prod-a768
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "358"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: "chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to ec63440 (#358)\n\nThis PR contains the following updates:\n\n| Package | Type | Update | Change |\n|---|---|---|---|\n| quay.io/rhacs-eng/konflux-tasks | tekton-bundle | digest | `7d31e99`\n-> `ec63440` |\n\n---\n\n### Configuration\n\n\U0001F4C5 **Schedule**: Branch creation - \"after 3am and before 7am\" in timezone\nEtc/UTC, Automerge - At any time (no schedule defined).\n\n\U0001F6A6 **Automerge**: Enabled.\n\n♻ **Rebasing**: Whenever PR is behind base branch, or you tick the\nrebase/retry checkbox.\n\n\U0001F515 **Ignore**: Close this PR and you won't be reminded about this update\nagain.\n\n---\n\n- [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check\nthis box\n\n---\n\nTo execute skipped test pipelines write comment `/ok-to-test`.\n\n---\n### Documentation\n\nFind out how to configure dependency updates in [MintMaker\ndocumentation](https://konflux-ci.dev/docs/mintmaker/user/) or see all\navailable configuration options in [Renovate\ndocumentation](https://docs.renovatebot.com/configuration-options/).\n\n<!--renovate-debug:eyJjcmVhdGVkSW5WZXIiOiI0Mi4yNi41LXJwbSIsInVwZGF0ZWRJblZlciI6IjQyLjI2LjUtcnBtIiwidGFyZ2V0QnJhbmNoIjoibWFzdGVyIiwibGFiZWxzIjpbXX0=-->\n\nSigned-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>\nCo-authored-by: red-hat-konflux[bot] <126015336+red-hat-konflux[bot]@users.noreply.github.com>"
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/a768d7e7cab1f20ea738cc38242e30876b2f6933
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-17-20260315-140027-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+    appstudio.openshift.io/component: operator-index-ocp-v4-17
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: a768d7e7cab1f20ea738cc38242e30876b2f6933
+  name: acs-operator-index-ocp-v4-17-20260315-140027-20260316-prod-a768
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-17
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:05f619913ca16fd755b2f4c5b9b5b79fe491f605006f4306da6cc88598a433e3
+      name: operator-index-ocp-v4-17
+      source:
+        git:
+          revision: a768d7e7cab1f20ea738cc38242e30876b2f6933
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-17-20260316-prod-a768d7e
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-17
+  snapshot: acs-operator-index-ocp-v4-17-20260315-140027-20260316-prod-a768
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "358"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: "chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to ec63440 (#358)\n\nThis PR contains the following updates:\n\n| Package | Type | Update | Change |\n|---|---|---|---|\n| quay.io/rhacs-eng/konflux-tasks | tekton-bundle | digest | `7d31e99`\n-> `ec63440` |\n\n---\n\n### Configuration\n\n\U0001F4C5 **Schedule**: Branch creation - \"after 3am and before 7am\" in timezone\nEtc/UTC, Automerge - At any time (no schedule defined).\n\n\U0001F6A6 **Automerge**: Enabled.\n\n♻ **Rebasing**: Whenever PR is behind base branch, or you tick the\nrebase/retry checkbox.\n\n\U0001F515 **Ignore**: Close this PR and you won't be reminded about this update\nagain.\n\n---\n\n- [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check\nthis box\n\n---\n\nTo execute skipped test pipelines write comment `/ok-to-test`.\n\n---\n### Documentation\n\nFind out how to configure dependency updates in [MintMaker\ndocumentation](https://konflux-ci.dev/docs/mintmaker/user/) or see all\navailable configuration options in [Renovate\ndocumentation](https://docs.renovatebot.com/configuration-options/).\n\n<!--renovate-debug:eyJjcmVhdGVkSW5WZXIiOiI0Mi4yNi41LXJwbSIsInVwZGF0ZWRJblZlciI6IjQyLjI2LjUtcnBtIiwidGFyZ2V0QnJhbmNoIjoibWFzdGVyIiwibGFiZWxzIjpbXX0=-->\n\nSigned-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>\nCo-authored-by: red-hat-konflux[bot] <126015336+red-hat-konflux[bot]@users.noreply.github.com>"
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/a768d7e7cab1f20ea738cc38242e30876b2f6933
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-18-20260315-140027-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-18
+    appstudio.openshift.io/component: operator-index-ocp-v4-18
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: a768d7e7cab1f20ea738cc38242e30876b2f6933
+  name: acs-operator-index-ocp-v4-18-20260315-140027-20260316-prod-a768
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-18
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:c2b42d35aedc2c6b48c53de86a1d87ab662b1d03c10190eb5ffaa433e91f5a76
+      name: operator-index-ocp-v4-18
+      source:
+        git:
+          revision: a768d7e7cab1f20ea738cc38242e30876b2f6933
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-18-20260316-prod-a768d7e
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-18
+  snapshot: acs-operator-index-ocp-v4-18-20260315-140027-20260316-prod-a768
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "358"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: "chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to ec63440 (#358)\n\nThis PR contains the following updates:\n\n| Package | Type | Update | Change |\n|---|---|---|---|\n| quay.io/rhacs-eng/konflux-tasks | tekton-bundle | digest | `7d31e99`\n-> `ec63440` |\n\n---\n\n### Configuration\n\n\U0001F4C5 **Schedule**: Branch creation - \"after 3am and before 7am\" in timezone\nEtc/UTC, Automerge - At any time (no schedule defined).\n\n\U0001F6A6 **Automerge**: Enabled.\n\n♻ **Rebasing**: Whenever PR is behind base branch, or you tick the\nrebase/retry checkbox.\n\n\U0001F515 **Ignore**: Close this PR and you won't be reminded about this update\nagain.\n\n---\n\n- [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check\nthis box\n\n---\n\nTo execute skipped test pipelines write comment `/ok-to-test`.\n\n---\n### Documentation\n\nFind out how to configure dependency updates in [MintMaker\ndocumentation](https://konflux-ci.dev/docs/mintmaker/user/) or see all\navailable configuration options in [Renovate\ndocumentation](https://docs.renovatebot.com/configuration-options/).\n\n<!--renovate-debug:eyJjcmVhdGVkSW5WZXIiOiI0Mi4yNi41LXJwbSIsInVwZGF0ZWRJblZlciI6IjQyLjI2LjUtcnBtIiwidGFyZ2V0QnJhbmNoIjoibWFzdGVyIiwibGFiZWxzIjpbXX0=-->\n\nSigned-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>\nCo-authored-by: red-hat-konflux[bot] <126015336+red-hat-konflux[bot]@users.noreply.github.com>"
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/a768d7e7cab1f20ea738cc38242e30876b2f6933
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-19-20260315-140027-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-19
+    appstudio.openshift.io/component: operator-index-ocp-v4-19
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: a768d7e7cab1f20ea738cc38242e30876b2f6933
+  name: acs-operator-index-ocp-v4-19-20260315-140027-20260316-prod-a768
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-19
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:5f452c54de9a1ba1c83987714fd608daf80fe5573ff742420b6a673bbc38db64
+      name: operator-index-ocp-v4-19
+      source:
+        git:
+          revision: a768d7e7cab1f20ea738cc38242e30876b2f6933
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-19-20260316-prod-a768d7e
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-19
+  snapshot: acs-operator-index-ocp-v4-19-20260315-140027-20260316-prod-a768
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "358"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: "chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to ec63440 (#358)\n\nThis PR contains the following updates:\n\n| Package | Type | Update | Change |\n|---|---|---|---|\n| quay.io/rhacs-eng/konflux-tasks | tekton-bundle | digest | `7d31e99`\n-> `ec63440` |\n\n---\n\n### Configuration\n\n\U0001F4C5 **Schedule**: Branch creation - \"after 3am and before 7am\" in timezone\nEtc/UTC, Automerge - At any time (no schedule defined).\n\n\U0001F6A6 **Automerge**: Enabled.\n\n♻ **Rebasing**: Whenever PR is behind base branch, or you tick the\nrebase/retry checkbox.\n\n\U0001F515 **Ignore**: Close this PR and you won't be reminded about this update\nagain.\n\n---\n\n- [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check\nthis box\n\n---\n\nTo execute skipped test pipelines write comment `/ok-to-test`.\n\n---\n### Documentation\n\nFind out how to configure dependency updates in [MintMaker\ndocumentation](https://konflux-ci.dev/docs/mintmaker/user/) or see all\navailable configuration options in [Renovate\ndocumentation](https://docs.renovatebot.com/configuration-options/).\n\n<!--renovate-debug:eyJjcmVhdGVkSW5WZXIiOiI0Mi4yNi41LXJwbSIsInVwZGF0ZWRJblZlciI6IjQyLjI2LjUtcnBtIiwidGFyZ2V0QnJhbmNoIjoibWFzdGVyIiwibGFiZWxzIjpbXX0=-->\n\nSigned-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>\nCo-authored-by: red-hat-konflux[bot] <126015336+red-hat-konflux[bot]@users.noreply.github.com>"
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/a768d7e7cab1f20ea738cc38242e30876b2f6933
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-20-20260315-140027-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-20
+    appstudio.openshift.io/component: operator-index-ocp-v4-20
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: a768d7e7cab1f20ea738cc38242e30876b2f6933
+  name: acs-operator-index-ocp-v4-20-20260315-140027-20260316-prod-a768
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-20
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:47b7dfc9e287db8b572eb09a631d9f2b564e2dba68db0710cef80930e31f3431
+      name: operator-index-ocp-v4-20
+      source:
+        git:
+          revision: a768d7e7cab1f20ea738cc38242e30876b2f6933
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-20-20260316-prod-a768d7e
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-20
+  snapshot: acs-operator-index-ocp-v4-20-20260315-140027-20260316-prod-a768
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "358"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: red-hat-konflux[bot]
+    pac.test.appstudio.openshift.io/sha-title: "chore(deps): update quay.io/rhacs-eng/konflux-tasks:latest docker digest to ec63440 (#358)\n\nThis PR contains the following updates:\n\n| Package | Type | Update | Change |\n|---|---|---|---|\n| quay.io/rhacs-eng/konflux-tasks | tekton-bundle | digest | `7d31e99`\n-> `ec63440` |\n\n---\n\n### Configuration\n\n\U0001F4C5 **Schedule**: Branch creation - \"after 3am and before 7am\" in timezone\nEtc/UTC, Automerge - At any time (no schedule defined).\n\n\U0001F6A6 **Automerge**: Enabled.\n\n♻ **Rebasing**: Whenever PR is behind base branch, or you tick the\nrebase/retry checkbox.\n\n\U0001F515 **Ignore**: Close this PR and you won't be reminded about this update\nagain.\n\n---\n\n- [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check\nthis box\n\n---\n\nTo execute skipped test pipelines write comment `/ok-to-test`.\n\n---\n### Documentation\n\nFind out how to configure dependency updates in [MintMaker\ndocumentation](https://konflux-ci.dev/docs/mintmaker/user/) or see all\navailable configuration options in [Renovate\ndocumentation](https://docs.renovatebot.com/configuration-options/).\n\n<!--renovate-debug:eyJjcmVhdGVkSW5WZXIiOiI0Mi4yNi41LXJwbSIsInVwZGF0ZWRJblZlciI6IjQyLjI2LjUtcnBtIiwidGFyZ2V0QnJhbmNoIjoibWFzdGVyIiwibGFiZWxzIjpbXX0=-->\n\nSigned-off-by: red-hat-konflux <126015336+red-hat-konflux[bot]@users.noreply.github.com>\nCo-authored-by: red-hat-konflux[bot] <126015336+red-hat-konflux[bot]@users.noreply.github.com>"
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/a768d7e7cab1f20ea738cc38242e30876b2f6933
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-21-20260315-140027-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-21
+    appstudio.openshift.io/component: operator-index-ocp-v4-21
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: a768d7e7cab1f20ea738cc38242e30876b2f6933
+  name: acs-operator-index-ocp-v4-21-20260315-140027-20260316-prod-a768
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-21
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:f7791fa73926735718244b70ebc1c85a5610e7c6a880d90e2dc2d70c8d14e990
+      name: operator-index-ocp-v4-21
+      source:
+        git:
+          revision: a768d7e7cab1f20ea738cc38242e30876b2f6933
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-21-20260316-prod-a768d7e
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-21
+  snapshot: acs-operator-index-ocp-v4-21-20260315-140027-20260316-prod-a768
