@@ -103,7 +103,7 @@ spec:
           - use
           - $(tasks.clone-repository.results.SOURCE_ARTIFACT)=/var/workdir/source
         - name: run-go-tests
-          image: registry.redhat.io/ubi9/go-toolset@sha256:0f4f6f7868962aa75dddfe4230b664bdf77071e92c43c70c824c58450e37693f
+          image: registry.redhat.io/ubi9/go-toolset@sha256:4b7a967ce9c283ecfb1e7a186f7b97d3f35a479bcc38d3c03a0707f3c36e974d
           workingDir: /var/workdir/source
           script: time make go-test
 
