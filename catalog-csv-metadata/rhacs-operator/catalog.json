@@ -2038,13 +2038,13 @@
             "skipRange": ">= 4.8.0 < 4.9.5"
         },
         {
-            "name": "rhacs-operator.v4.9.6-rc.2",
+            "name": "rhacs-operator.v4.9.6",
             "replaces": "rhacs-operator.v4.9.5",
-            "skipRange": ">= 4.8.0 < 4.9.6-rc.2"
+            "skipRange": ">= 4.8.0 < 4.9.6"
         },
         {
             "name": "rhacs-operator.v4.10.0",
-            "replaces": "rhacs-operator.v4.9.6-rc.2",
+            "replaces": "rhacs-operator.v4.9.6",
             "skipRange": ">= 4.9.0 < 4.10.0"
         },
         {
@@ -4216,9 +4216,9 @@
             "skipRange": ">= 4.8.0 < 4.9.5"
         },
         {
-            "name": "rhacs-operator.v4.9.6-rc.2",
+            "name": "rhacs-operator.v4.9.6",
             "replaces": "rhacs-operator.v4.9.5",
-            "skipRange": ">= 4.8.0 < 4.9.6-rc.2"
+            "skipRange": ">= 4.8.0 < 4.9.6"
         }
     ]
 }
@@ -4657,13 +4657,13 @@
             "skipRange": ">= 4.8.0 < 4.9.5"
         },
         {
-            "name": "rhacs-operator.v4.9.6-rc.2",
+            "name": "rhacs-operator.v4.9.6",
             "replaces": "rhacs-operator.v4.9.5",
-            "skipRange": ">= 4.8.0 < 4.9.6-rc.2"
+            "skipRange": ">= 4.8.0 < 4.9.6"
         },
         {
             "name": "rhacs-operator.v4.10.0",
-            "replaces": "rhacs-operator.v4.9.6-rc.2",
+            "replaces": "rhacs-operator.v4.9.6",
             "skipRange": ">= 4.9.0 < 4.10.0"
         },
         {
@@ -184752,9 +184752,9 @@
 }
 {
     "schema": "olm.bundle",
-    "name": "rhacs-operator.v4.9.6-rc.2",
+    "name": "rhacs-operator.v4.9.6",
     "package": "rhacs-operator",
-    "image": "quay.io/rhacs-eng/release-operator-bundle@sha256:a1b09a8c8a2022e3c85cafcefe0533978627727bfa5e94de5f509c4755d7e697",
+    "image": "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:8f2b6efc9e8be5db2e175daef5d0f95ab2bd585dc20df56d844366946dd60057",
     "properties": [
         {
             "type": "olm.gvk",
@@ -184784,7 +184784,7 @@
             "type": "olm.package",
             "value": {
                 "packageName": "rhacs-operator",
-                "version": "4.9.6-rc.2"
+                "version": "4.9.6"
             }
         },
         {
@@ -184794,8 +184794,8 @@
                     "alm-examples": "[\n  {\n    \"apiVersion\": \"platform.stackrox.io/v1alpha1\",\n    \"kind\": \"Central\",\n    \"metadata\": {\n      \"name\": \"stackrox-central-services\",\n      \"namespace\": \"stackrox\"\n    },\n    \"spec\": {\n      \"central\": {\n        \"exposure\": {\n          \"route\": {\n            \"enabled\": true\n          }\n        }\n      }\n    }\n  },\n  {\n    \"apiVersion\": \"platform.stackrox.io/v1alpha1\",\n    \"kind\": \"SecuredCluster\",\n    \"metadata\": {\n      \"name\": \"stackrox-secured-cluster-services\",\n      \"namespace\": \"stackrox\"\n    },\n    \"spec\": {\n      \"clusterName\": \"my-cluster\"\n    }\n  }\n]",
                     "capabilities": "Seamless Upgrades",
                     "categories": "Security",
-                    "containerImage": "registry.redhat.io/advanced-cluster-security/rhacs-rhel8-operator@sha256:5548feefcb222027ddaec4fe157e78cc54782f6df68dcaffac85c9702a051e1b",
-                    "createdAt": "2026-04-28T16:33:52.483984+00:00",
+                    "containerImage": "registry.redhat.io/advanced-cluster-security/rhacs-rhel8-operator@sha256:66b33e1d1f07c0ce895228e519bea7032daa1263e55276674d48637f251d8cd8",
+                    "createdAt": "2026-05-05T14:17:19.561270+00:00",
                     "description": "Red Hat Advanced Cluster Security (RHACS) operator provisions the services necessary to secure each of your OpenShift and Kubernetes clusters.",
                     "features.operators.openshift.io/cnf": "false",
                     "features.operators.openshift.io/cni": "false",
@@ -184807,7 +184807,7 @@
                     "features.operators.openshift.io/token-auth-aws": "false",
                     "features.operators.openshift.io/token-auth-azure": "false",
                     "features.operators.openshift.io/token-auth-gcp": "false",
-                    "olm.skipRange": ">= 4.8.0 < 4.9.6-rc.2",
+                    "olm.skipRange": ">= 4.8.0 < 4.9.6",
                     "operatorframework.io/suggested-namespace": "rhacs-operator",
                     "operators.openshift.io/infrastructure-features": "[\"disconnected\", \"proxy-aware\"]",
                     "operators.openshift.io/valid-subscription": "[\"OpenShift Platform Plus\", \"Red Hat Advanced Cluster Security\"]",
@@ -186598,12 +186598,8 @@
     ],
     "relatedImages": [
         {
-            "name": "",
-            "image": "quay.io/rhacs-eng/release-operator-bundle@sha256:a1b09a8c8a2022e3c85cafcefe0533978627727bfa5e94de5f509c4755d7e697"
-        },
-        {
             "name": "central_db",
-            "image": "registry.redhat.io/advanced-cluster-security/rhacs-central-db-rhel8@sha256:cc653dd64905f5b79c5bf69ef3e2db2a34989cdd75c54a75929848b3d64a82b5"
+            "image": "registry.redhat.io/advanced-cluster-security/rhacs-central-db-rhel8@sha256:90737bfb8acf7d08f602f50c9da914ef160b8cf1f044e8b29da0cc90bca77787"
         },
         {
             "name": "collector",
@@ -186611,15 +186607,19 @@
         },
         {
             "name": "main",
-            "image": "registry.redhat.io/advanced-cluster-security/rhacs-main-rhel8@sha256:9aceb6b78a37a05edd4cdf116619c89ed0c11c9ee607d6f52dc476b569f89d3a"
+            "image": "registry.redhat.io/advanced-cluster-security/rhacs-main-rhel8@sha256:962a4d77de84b36a2847ed34e629a1bbd5dfdb318b8eab8255f6ade8bafc99a1"
+        },
+        {
+            "name": "",
+            "image": "registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:8f2b6efc9e8be5db2e175daef5d0f95ab2bd585dc20df56d844366946dd60057"
         },
         {
             "name": "manager",
-            "image": "registry.redhat.io/advanced-cluster-security/rhacs-rhel8-operator@sha256:5548feefcb222027ddaec4fe157e78cc54782f6df68dcaffac85c9702a051e1b"
+            "image": "registry.redhat.io/advanced-cluster-security/rhacs-rhel8-operator@sha256:66b33e1d1f07c0ce895228e519bea7032daa1263e55276674d48637f251d8cd8"
         },
         {
             "name": "roxctl",
-            "image": "registry.redhat.io/advanced-cluster-security/rhacs-roxctl-rhel8@sha256:20cc1b0d417d2ffdee5bec1ca01251f33ae6d06e35f1f87e64c087d7d2e02ae3"
+            "image": "registry.redhat.io/advanced-cluster-security/rhacs-roxctl-rhel8@sha256:e547a4963ff3a408873dc6c2346c367bce6c4ef9af1092f96511cb30b9290e47"
         },
         {
             "name": "scanner_db",
@@ -186639,11 +186639,11 @@
         },
         {
             "name": "scanner_v4_db",
-            "image": "registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-db-rhel8@sha256:dae0f8aecdabc8f894347f56d1c0701c91387bde38ace0fc8e020fe50194cf45"
+            "image": "registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-db-rhel8@sha256:6a5d8d746bee6207dbd5db47979de475a99c1efbd57252f464b0d71241eef87b"
         },
         {
             "name": "scanner_v4",
-            "image": "registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-rhel8@sha256:91b772ae5abb16ac51cd8eec480ef9c7cd61495a8fab81df132b5dba9c0e9b27"
+            "image": "registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-rhel8@sha256:8fe7cef00701d1ef8488e69386e72672a8a3423ff3c5dc2d459ac9fb4e04d00a"
         }
     ]
 }
