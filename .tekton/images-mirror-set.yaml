@@ -10,6 +10,8 @@ spec:
   - source: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle
     mirrors:
     - quay.io/rhacs-eng/release-operator-bundle
+  # RHEL 8 based images
+  # TODO: Remove after 4.10 goes out of support
   - source: registry.redhat.io/advanced-cluster-security/rhacs-central-db-rhel8
     mirrors:
     - quay.io/rhacs-eng/release-central-db
@@ -44,5 +46,42 @@ spec:
     mirrors:
     - quay.io/rhacs-eng/release-scanner-v4-db
   - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-rhel8
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-v4
+  # RHEL 9 based images (ACS 4.11 and following releases)
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-central-db-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-central-db
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-collector-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-collector
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-fact-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-fact
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-main-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-main
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-rhel9-operator
+    mirrors:
+    - quay.io/rhacs-eng/release-operator
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-roxctl-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-roxctl
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-db-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-db
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-db-slim-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-db-slim
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-slim-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-slim
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-db-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-v4-db
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-rhel9
     mirrors:
     - quay.io/rhacs-eng/release-scanner-v4
