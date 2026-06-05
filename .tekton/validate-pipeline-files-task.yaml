@@ -21,11 +21,13 @@ spec:
   steps:
   - name: use-trusted-artifact
     image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:9b180776a41d9a22a1c51539f1647c60defbbd55b44bbebdd4130e33512d8b0d
+    imagePullPolicy: IfNotPresent
     args:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
   - name: validate-pipeline-files
     image: quay.io/konflux-ci/release-service-utils:latest@sha256:d216555c53ee97d06bfae53c4fa0524cfbd1fa5f8f065d7f490822d4c5bff4c2
+    imagePullPolicy: IfNotPresent
     workingDir: /var/workdir/source
     script: |
       #!/usr/bin/env bash
