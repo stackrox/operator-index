@@ -28,7 +28,7 @@ spec:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
   - name: check-generated-files-up-to-date
-    image: registry.redhat.io/ubi9/go-toolset:latest@sha256:ebcc3560ec892af7c081bcfbef9959fe54c4b1603dc1f6c6e1494992f6c71f89
+    image: registry.redhat.io/ubi9/go-toolset:latest@sha256:b2c0898987b688a95f4d2f38abdfd929f45903948831783153019ab749495c72
     imagePullPolicy: IfNotPresent
     workingDir: /var/workdir/source
     securityContext:
