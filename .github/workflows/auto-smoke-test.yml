@@ -41,6 +41,9 @@ jobs:
         env:
           ACS_VERSION_OVERRIDE: ${{ inputs.acs-version-override }}
           OPERATOR_INDEX_IMAGE_OVERRIDE: ${{ inputs.operator-index-image-override }}
+          BASE_REF: ${{ github.base_ref }}
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
         run: |
           # Image override without version override is ambiguous — fail fast.
           if [ -n "$OPERATOR_INDEX_IMAGE_OVERRIDE" ] && [ -z "$ACS_VERSION_OVERRIDE" ]; then
@@ -54,11 +57,11 @@ jobs:
             exit 0
           fi
 
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            DIFF_BASE="origin/${{ github.base_ref }}"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            DIFF_BASE="origin/$BASE_REF"
           else
             # Use event.before to capture all commits in the push, not just the tip commit.
-            DIFF_BASE="${{ github.event.before }}"
+            DIFF_BASE="$BEFORE_SHA"
             # event.before is all-zeros on first push to a branch; fall back to parent.
             if [[ "$DIFF_BASE" =~ ^0+$ ]]; then
               DIFF_BASE="HEAD~1"
