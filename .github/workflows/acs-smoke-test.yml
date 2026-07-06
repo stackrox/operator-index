@@ -79,8 +79,8 @@ jobs:
       - name: Download cluster kubeconfig
         run: |
           infractl artifacts \
-            --cluster-name=${{ needs.create-cluster.outputs.cluster-name }} \
-            --download-dir=./artifacts
+            --download-dir=./artifacts \
+            ${{ needs.create-cluster.outputs.cluster-name }}
 
       - name: Set KUBECONFIG
         run: echo "KUBECONFIG=${{ github.workspace }}/artifacts/kubeconfig" >> "$GITHUB_ENV"
@@ -125,7 +125,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_RELEASE_AUTOMATION_SA }}
 
       - name: Delete cluster
-        run: infractl delete --cluster-name=${{ needs.create-cluster.outputs.cluster-name }}
+        run: infractl delete ${{ needs.create-cluster.outputs.cluster-name }}
 
   report-status:
     name: Report test status
