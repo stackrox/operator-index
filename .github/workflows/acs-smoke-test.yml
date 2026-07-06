@@ -58,7 +58,7 @@ jobs:
         uses: stackrox/actions/infra/create-cluster@v1
         with:
           token: ${{ secrets.INFRA_TOKEN }}
-          flavor: openshift-4-demo
+          flavor: openshift-4
           name: ${{ env.CLUSTER_NAME }}
           lifespan: ${{ inputs.cluster-lifespan || '2h' }}
           wait: true
