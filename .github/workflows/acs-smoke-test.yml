@@ -1,6 +1,9 @@
 name: "ACS Smoke Test"
 
 on:
+  # TODO: remove pull_request trigger before merging
+  pull_request:
+    branches: [master]
   workflow_dispatch:
     inputs:
       operator-index-image:
@@ -57,7 +60,7 @@ jobs:
           token: ${{ secrets.INFRA_TOKEN }}
           flavor: ocp-default
           name: ${{ env.CLUSTER_NAME }}
-          lifespan: ${{ inputs.cluster-lifespan }}
+          lifespan: ${{ inputs.cluster-lifespan || '2h' }}
           args: nodes=3,machine-type=e2-standard-8
           wait: true
 
@@ -94,8 +97,10 @@ jobs:
       - name: "Test 1: upgrade oldest-supported → provided"
         working-directory: ./smoke-test
         env:
-          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image }}
-          ACS_VERSION: ${{ inputs.acs-version }}
+          # Add a || operator-index image and version for testing in the PR.
+          # TODO: remove before merging!
+          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image || 'quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-7a9fcba929e5858cca91a84c3e5da8c829a3c990-fast' }}
+          ACS_VERSION: ${{ inputs.acs-version || '4.11' }}
         run: bash upgrade-oldest-test.sh
 
       - name: Reset operator state between tests
@@ -108,8 +113,10 @@ jobs:
       - name: "Test 2: install provided → optionally upgrade to latest GA"
         working-directory: ./smoke-test
         env:
-          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image }}
-          ACS_VERSION: ${{ inputs.acs-version }}
+          # Add a || operator-index image and version for testing in the PR.
+          # TODO: remove before merging!
+          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image || 'quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-7a9fcba929e5858cca91a84c3e5da8c829a3c990-fast' }}
+          ACS_VERSION: ${{ inputs.acs-version || '4.11' }}
         run: bash upgrade-latest-test.sh
 
   cleanup-cluster:
