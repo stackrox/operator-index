@@ -38,9 +38,18 @@ jobs:
 
       - name: Determine ACS version
         id: version
+        env:
+          ACS_VERSION_OVERRIDE: ${{ inputs.acs-version-override }}
+          OPERATOR_INDEX_IMAGE_OVERRIDE: ${{ inputs.operator-index-image-override }}
         run: |
-          if [ -n "${{ inputs.acs-version-override }}" ]; then
-            echo "acs-version=${{ inputs.acs-version-override }}" >> "$GITHUB_OUTPUT"
+          # Image override without version override is ambiguous — fail fast.
+          if [ -n "$OPERATOR_INDEX_IMAGE_OVERRIDE" ] && [ -z "$ACS_VERSION_OVERRIDE" ]; then
+            echo "::error::operator-index-image-override requires acs-version-override to also be set"
+            exit 1
+          fi
+
+          if [ -n "$ACS_VERSION_OVERRIDE" ]; then
+            echo "acs-version=$ACS_VERSION_OVERRIDE" >> "$GITHUB_OUTPUT"
             echo "should-run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -48,14 +57,21 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             DIFF_BASE="origin/${{ github.base_ref }}"
           else
-            DIFF_BASE="HEAD~1"
+            # Use event.before to capture all commits in the push, not just the tip commit.
+            DIFF_BASE="${{ github.event.before }}"
+            # event.before is all-zeros on first push to a branch; fall back to parent.
+            if [[ "$DIFF_BASE" =~ ^0+$ ]]; then
+              DIFF_BASE="HEAD~1"
+            fi
           fi
 
+          # Exclude diff headers first, then match only the `version:` key (not
+          # `oldest_supported_version:` or other keys that contain "version").
           NEW_VERSIONS=$(git diff "$DIFF_BASE" -- bundles.yaml \
-            | grep '^+.*version:' \
             | grep -v '^+++' \
-            | sed 's/.*version: *//' \
-            | sort -V)
+            | grep '^+[[:space:]]*version:' \
+            | sed 's/.*version:[[:space:]]*//' \
+            | sort -V || true)
 
           if [ -z "$NEW_VERSIONS" ]; then
             echo "No new versions found in bundles.yaml diff, skipping smoke test"
@@ -72,9 +88,11 @@ jobs:
       - name: Determine operator-index image
         id: image
         if: steps.version.outputs.should-run == 'true'
+        env:
+          OPERATOR_INDEX_IMAGE_OVERRIDE: ${{ inputs.operator-index-image-override }}
         run: |
-          if [ -n "${{ inputs.operator-index-image-override }}" ]; then
-            echo "operator-index-image=${{ inputs.operator-index-image-override }}" >> "$GITHUB_OUTPUT"
+          if [ -n "$OPERATOR_INDEX_IMAGE_OVERRIDE" ]; then
+            echo "operator-index-image=$OPERATOR_INDEX_IMAGE_OVERRIDE" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -89,15 +107,21 @@ jobs:
           echo "Waiting for Konflux to build: $IMAGE"
 
           for i in $(seq 1 40); do
-            RESPONSE=$(curl -sf "https://quay.io/api/v1/repository/rhacs-eng/stackrox-operator-index/tag/?specificTag=${TAG}" || echo '{}')
-            FOUND=$(echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print('true' if d.get('tags') else 'false')" 2>/dev/null || echo 'false')
-            if [ "$FOUND" = "true" ]; then
-              echo "Image available after attempt $i: $IMAGE"
-              echo "operator-index-image=$IMAGE" >> "$GITHUB_OUTPUT"
-              exit 0
+            if RESPONSE=$(curl -sf --max-time 30 --connect-timeout 10 \
+              "https://quay.io/api/v1/repository/rhacs-eng/stackrox-operator-index/tag/?specificTag=${TAG}"); then
+              FOUND=$(echo "$RESPONSE" | python3 -c \
+                "import json,sys; d=json.load(sys.stdin); print('true' if d.get('tags') else 'false')" \
+                2>/dev/null || echo 'false')
+              if [ "$FOUND" = "true" ]; then
+                echo "Image available after attempt $i: $IMAGE"
+                echo "operator-index-image=$IMAGE" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              echo "Attempt $i/40: image not yet in Quay, retrying in 3 minutes..."
+            else
+              echo "Attempt $i/40: Quay API request failed (network or HTTP error), retrying in 3 minutes..."
             fi
-            echo "Attempt $i/40: image not yet available, retrying in 3 minutes..."
-            sleep 180
+            [ "$i" -lt 40 ] && sleep 180
           done
 
           echo "Timed out after 2 hours waiting for: $IMAGE"
@@ -111,4 +135,5 @@ jobs:
     with:
       operator-index-image: ${{ needs.derive-inputs.outputs.operator-index-image }}
       acs-version: ${{ needs.derive-inputs.outputs.acs-version }}
+      cluster-lifespan: 3h
     secrets: inherit
