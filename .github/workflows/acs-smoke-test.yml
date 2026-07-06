@@ -16,6 +16,21 @@ on:
         required: false
         default: '2h'
         type: string
+  workflow_call:
+    inputs:
+      operator-index-image:
+        description: 'ACS Operator index image'
+        required: true
+        type: string
+      acs-version:
+        description: 'ACS minor version under test (e.g. 4.10). Determines channel and Y-2 oldest.'
+        required: true
+        type: string
+      cluster-lifespan:
+        description: 'Cluster lifespan (e.g., 2h, 4h, 8h)'
+        required: false
+        default: '2h'
+        type: string
 
 env:
   CLUSTER_NAME: smoke-${{ github.run_number }}

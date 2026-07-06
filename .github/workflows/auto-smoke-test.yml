@@ -1,0 +1,114 @@
+name: "Auto Smoke Test"
+
+on:
+  workflow_dispatch:
+    inputs:
+      acs-version-override:
+        description: 'Override ACS version, skips bundles.yaml diff (e.g. "4.10")'
+        required: false
+        type: string
+      operator-index-image-override:
+        description: 'Override operator-index image, skips Quay polling (e.g. quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-...)'
+        required: false
+        type: string
+  push:
+    branches: [master]
+    paths: ['bundles.yaml']
+  pull_request:
+    paths: ['bundles.yaml']
+
+env:
+  # OCP version used to construct the Konflux-built operator-index image tag.
+  # Update when infra cluster uses a newer OCP version.
+  OCP_VERSION: v4-22
+
+jobs:
+  derive-inputs:
+    name: Derive smoke test inputs
+    runs-on: ubuntu-latest
+    outputs:
+      acs-version: ${{ steps.version.outputs.acs-version }}
+      operator-index-image: ${{ steps.image.outputs.operator-index-image }}
+      should-run: ${{ steps.version.outputs.should-run }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Determine ACS version
+        id: version
+        run: |
+          if [ -n "${{ inputs.acs-version-override }}" ]; then
+            echo "acs-version=${{ inputs.acs-version-override }}" >> "$GITHUB_OUTPUT"
+            echo "should-run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            DIFF_BASE="origin/${{ github.base_ref }}"
+          else
+            DIFF_BASE="HEAD~1"
+          fi
+
+          NEW_VERSIONS=$(git diff "$DIFF_BASE" -- bundles.yaml \
+            | grep '^+.*version:' \
+            | grep -v '^+++' \
+            | sed 's/.*version: *//' \
+            | sort -V)
+
+          if [ -z "$NEW_VERSIONS" ]; then
+            echo "No new versions found in bundles.yaml diff, skipping smoke test"
+            echo "should-run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          LATEST=$(echo "$NEW_VERSIONS" | tail -1)
+          MINOR=$(echo "$LATEST" | cut -d. -f1-2)
+          echo "New versions added: $(echo "$NEW_VERSIONS" | tr '\n' ' '), testing minor: $MINOR"
+          echo "acs-version=$MINOR" >> "$GITHUB_OUTPUT"
+          echo "should-run=true" >> "$GITHUB_OUTPUT"
+
+      - name: Determine operator-index image
+        id: image
+        if: steps.version.outputs.should-run == 'true'
+        run: |
+          if [ -n "${{ inputs.operator-index-image-override }}" ]; then
+            echo "operator-index-image=${{ inputs.operator-index-image-override }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            SHA="${{ github.sha }}"
+          fi
+
+          TAG="ocp-${OCP_VERSION}-${SHA}-fast"
+          IMAGE="quay.io/rhacs-eng/stackrox-operator-index:${TAG}"
+          echo "Waiting for Konflux to build: $IMAGE"
+
+          for i in $(seq 1 40); do
+            RESPONSE=$(curl -sf "https://quay.io/api/v1/repository/rhacs-eng/stackrox-operator-index/tag/?specificTag=${TAG}" || echo '{}')
+            FOUND=$(echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print('true' if d.get('tags') else 'false')" 2>/dev/null || echo 'false')
+            if [ "$FOUND" = "true" ]; then
+              echo "Image available after attempt $i: $IMAGE"
+              echo "operator-index-image=$IMAGE" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Attempt $i/40: image not yet available, retrying in 3 minutes..."
+            sleep 180
+          done
+
+          echo "Timed out after 2 hours waiting for: $IMAGE"
+          exit 1
+
+  smoke-test:
+    name: Run smoke test
+    needs: derive-inputs
+    if: needs.derive-inputs.outputs.should-run == 'true'
+    uses: ./.github/workflows/acs-smoke-test.yml
+    with:
+      operator-index-image: ${{ needs.derive-inputs.outputs.operator-index-image }}
+      acs-version: ${{ needs.derive-inputs.outputs.acs-version }}
+    secrets: inherit
