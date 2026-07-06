@@ -31,9 +31,10 @@ echo "======================================================================"
 
 # Query latest GA minor NOW while redhat-operators is still enabled.
 # install_from_custom() disables default sources, making this unavailable later.
+# Use || true so a catalog timeout degrades gracefully to skipping the upgrade check.
 LATEST_MINOR=""
-wait_for_catalog "redhat-operators" "openshift-marketplace" 180
-if latest=$(get_latest_official_minor "$ACS_MAJOR") && [[ -n "$latest" ]]; then
+if wait_for_catalog "redhat-operators" "openshift-marketplace" 180 &&
+   latest=$(get_latest_official_minor "$ACS_MAJOR") && [[ -n "$latest" ]]; then
   LATEST_MINOR="$latest"
   info "Latest GA in redhat-operators: ${ACS_MAJOR}.${LATEST_MINOR}"
 else

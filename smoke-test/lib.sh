@@ -8,7 +8,7 @@ step() { echo; echo "═══════════════════�
 info() { echo "  $*"; }
 ok()   { echo "  ✅ $*"; }
 warn() { echo "  ⚠️  $*"; }
-fail() { echo "  ❌ $*" >&2; return 1; }
+fail() { echo "  ❌ $*" >&2; exit 1; }
 
 # Splits "4.10" → ACS_MAJOR=4, ACS_MINOR=10
 parse_acs_version() {
@@ -105,11 +105,11 @@ EOF
 }
 
 # Sets TARGET_CSV to the currentCSV for a given channel from the specified catalog label.
-# Retries for up to 60s because packagemanifests can lag behind catalog READY state.
+# Retries for up to timeout (default 60s) because packagemanifests can lag behind catalog READY state.
 _resolve_target_csv() {
-  local catalog_label="$1" channel="$2"
+  local catalog_label="$1" channel="$2" timeout="${3:-60}"
   local deadline
-  deadline=$(( $(date +%s) + 60 ))
+  deadline=$(( $(date +%s) + timeout ))
   info "Resolving currentCSV for channel ${channel} from ${catalog_label}..."
   while (( $(date +%s) < deadline )); do
     TARGET_CSV=$(oc get packagemanifest -n openshift-marketplace \
@@ -123,7 +123,7 @@ _resolve_target_csv() {
     info "  packagemanifest not ready yet, retrying in 10s..."
     sleep 10
   done
-  fail "Could not resolve currentCSV for channel ${channel} from ${catalog_label} after 60s"
+  fail "Could not resolve currentCSV for channel ${channel} from ${catalog_label} after ${timeout}s"
 }
 
 # Install from official redhat-operators at channel rhacs-MAJOR.MINOR.
@@ -133,7 +133,7 @@ install_from_official() {
   local channel="rhacs-${major}.${minor}"
   info "Installing ACS Operator from redhat-operators, channel ${channel}..."
   wait_for_catalog "redhat-operators" "openshift-marketplace" 120
-  _resolve_target_csv "redhat-operators" "$channel"
+  _resolve_target_csv "redhat-operators" "$channel" 120
   apply_subscription "$channel" "redhat-operators"
 }
 
@@ -154,8 +154,8 @@ install_from_custom() {
 upgrade_via_custom() {
   local index_image="$1" channel="$2"
   info "Upgrading via custom catalog (channel: ${channel})..."
-  apply_custom_catalog "$index_image"
   disable_default_sources
+  apply_custom_catalog "$index_image"
   wait_for_catalog "my-operator-catalog"
   _resolve_target_csv "my-operator-catalog" "$channel"
   apply_subscription "$channel" "my-operator-catalog"
@@ -173,7 +173,7 @@ upgrade_to_latest_official() {
   [[ -n "$latest_minor" ]] || fail "Could not determine latest GA minor from redhat-operators"
   local channel="rhacs-${major}.${latest_minor}"
   info "Upgrading to latest GA channel: ${channel}..."
-  _resolve_target_csv "redhat-operators" "$channel"
+  _resolve_target_csv "redhat-operators" "$channel" 180
   apply_subscription "$channel" "redhat-operators"
   ok "Subscription updated to ${channel}, target: ${TARGET_CSV}"
 }
