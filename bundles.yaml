@@ -284,3 +284,5 @@ images:
     version: 4.10.4
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:09da338721670816180c98f7c24f2fae79971487b82bcfeca750d49b369ca0a6
     version: 4.11.0
+  - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76
+    version: 4.11.1
