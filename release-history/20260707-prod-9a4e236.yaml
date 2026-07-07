@@ -1,0 +1,423 @@
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "427"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: kovayur
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Add 4.11.1 version (#427)
+
+      Adds operator-bundle image for 4.11.1 to the catalog.
+      - Bundle image:
+      `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76`
+      - Errata: https://access.redhat.com/errata/RHSA-2026:36207
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/9a4e236fe78bba61748dcef9ab224211bd06f403
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-12-20260707-123912-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
+    appstudio.openshift.io/component: operator-index-ocp-v4-12
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 9a4e236fe78bba61748dcef9ab224211bd06f403
+  name: acs-operator-index-ocp-v4-12-20260707-123912-20260707-prod-9a4e
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-12
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:b014b68ce418b6a9d3ae2e00b3f13d1d07cb2b1f79311dd8ebe248a12985f8e3
+      name: operator-index-ocp-v4-12
+      source:
+        git:
+          context: ./
+          revision: 9a4e236fe78bba61748dcef9ab224211bd06f403
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-12-20260707-prod-9a4e236
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-12
+  snapshot: acs-operator-index-ocp-v4-12-20260707-123912-20260707-prod-9a4e
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "427"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: kovayur
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Add 4.11.1 version (#427)
+
+      Adds operator-bundle image for 4.11.1 to the catalog.
+      - Bundle image:
+      `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76`
+      - Errata: https://access.redhat.com/errata/RHSA-2026:36207
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/9a4e236fe78bba61748dcef9ab224211bd06f403
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-14-20260707-123839-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-14
+    appstudio.openshift.io/component: operator-index-ocp-v4-14
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 9a4e236fe78bba61748dcef9ab224211bd06f403
+  name: acs-operator-index-ocp-v4-14-20260707-123839-20260707-prod-9a4e
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-14
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:5948044f60cc6cb39a69ae66f0484fd26178f018f95de007e7bfdfe051dd7adf
+      name: operator-index-ocp-v4-14
+      source:
+        git:
+          context: ./
+          revision: 9a4e236fe78bba61748dcef9ab224211bd06f403
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-14-20260707-prod-9a4e236
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-14
+  snapshot: acs-operator-index-ocp-v4-14-20260707-123839-20260707-prod-9a4e
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "427"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: kovayur
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Add 4.11.1 version (#427)
+
+      Adds operator-bundle image for 4.11.1 to the catalog.
+      - Bundle image:
+      `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76`
+      - Errata: https://access.redhat.com/errata/RHSA-2026:36207
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/9a4e236fe78bba61748dcef9ab224211bd06f403
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-16-20260707-123846-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-16
+    appstudio.openshift.io/component: operator-index-ocp-v4-16
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 9a4e236fe78bba61748dcef9ab224211bd06f403
+  name: acs-operator-index-ocp-v4-16-20260707-123846-20260707-prod-9a4e
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-16
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:1102043c21c05fa0d73b783b6d064536e7331ff090bfae1458d39b291e083361
+      name: operator-index-ocp-v4-16
+      source:
+        git:
+          context: ./
+          revision: 9a4e236fe78bba61748dcef9ab224211bd06f403
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-16-20260707-prod-9a4e236
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-16
+  snapshot: acs-operator-index-ocp-v4-16-20260707-123846-20260707-prod-9a4e
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "427"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: kovayur
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Add 4.11.1 version (#427)
+
+      Adds operator-bundle image for 4.11.1 to the catalog.
+      - Bundle image:
+      `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76`
+      - Errata: https://access.redhat.com/errata/RHSA-2026:36207
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/9a4e236fe78bba61748dcef9ab224211bd06f403
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-17-20260707-123852-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+    appstudio.openshift.io/component: operator-index-ocp-v4-17
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 9a4e236fe78bba61748dcef9ab224211bd06f403
+  name: acs-operator-index-ocp-v4-17-20260707-123852-20260707-prod-9a4e
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-17
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:30038814c179476c4d643aeed05019ef60e4f129f89755a509b59ab24f284785
+      name: operator-index-ocp-v4-17
+      source:
+        git:
+          context: ./
+          revision: 9a4e236fe78bba61748dcef9ab224211bd06f403
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-17-20260707-prod-9a4e236
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-17
+  snapshot: acs-operator-index-ocp-v4-17-20260707-123852-20260707-prod-9a4e
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "427"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: kovayur
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Add 4.11.1 version (#427)
+
+      Adds operator-bundle image for 4.11.1 to the catalog.
+      - Bundle image:
+      `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76`
+      - Errata: https://access.redhat.com/errata/RHSA-2026:36207
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/9a4e236fe78bba61748dcef9ab224211bd06f403
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-18-20260707-123923-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-18
+    appstudio.openshift.io/component: operator-index-ocp-v4-18
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 9a4e236fe78bba61748dcef9ab224211bd06f403
+  name: acs-operator-index-ocp-v4-18-20260707-123923-20260707-prod-9a4e
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-18
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:2a95d8ddc6a6e768ce2c06a2a4441fc267c79e97f0b4953d6902aff61720592a
+      name: operator-index-ocp-v4-18
+      source:
+        git:
+          context: ./
+          revision: 9a4e236fe78bba61748dcef9ab224211bd06f403
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-18-20260707-prod-9a4e236
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-18
+  snapshot: acs-operator-index-ocp-v4-18-20260707-123923-20260707-prod-9a4e
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "427"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: kovayur
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Add 4.11.1 version (#427)
+
+      Adds operator-bundle image for 4.11.1 to the catalog.
+      - Bundle image:
+      `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76`
+      - Errata: https://access.redhat.com/errata/RHSA-2026:36207
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/9a4e236fe78bba61748dcef9ab224211bd06f403
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-19-20260707-123853-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-19
+    appstudio.openshift.io/component: operator-index-ocp-v4-19
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 9a4e236fe78bba61748dcef9ab224211bd06f403
+  name: acs-operator-index-ocp-v4-19-20260707-123853-20260707-prod-9a4e
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-19
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:0b649824b479909e604b0a3025b8eac75290b7d74737a0bdc905c1541753139e
+      name: operator-index-ocp-v4-19
+      source:
+        git:
+          context: ./
+          revision: 9a4e236fe78bba61748dcef9ab224211bd06f403
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-19-20260707-prod-9a4e236
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-19
+  snapshot: acs-operator-index-ocp-v4-19-20260707-123853-20260707-prod-9a4e
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "427"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: kovayur
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Add 4.11.1 version (#427)
+
+      Adds operator-bundle image for 4.11.1 to the catalog.
+      - Bundle image:
+      `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76`
+      - Errata: https://access.redhat.com/errata/RHSA-2026:36207
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/9a4e236fe78bba61748dcef9ab224211bd06f403
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-20-20260707-123925-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-20
+    appstudio.openshift.io/component: operator-index-ocp-v4-20
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 9a4e236fe78bba61748dcef9ab224211bd06f403
+  name: acs-operator-index-ocp-v4-20-20260707-123925-20260707-prod-9a4e
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-20
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:4067f56f61ece67b1b7e2564446a19dbd1c75d47628439428ea6162b3a81d484
+      name: operator-index-ocp-v4-20
+      source:
+        git:
+          context: ./
+          revision: 9a4e236fe78bba61748dcef9ab224211bd06f403
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-20-20260707-prod-9a4e236
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-20
+  snapshot: acs-operator-index-ocp-v4-20-20260707-123925-20260707-prod-9a4e
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "427"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: kovayur
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Add 4.11.1 version (#427)
+
+      Adds operator-bundle image for 4.11.1 to the catalog.
+      - Bundle image:
+      `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76`
+      - Errata: https://access.redhat.com/errata/RHSA-2026:36207
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/9a4e236fe78bba61748dcef9ab224211bd06f403
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-21-20260707-123902-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-21
+    appstudio.openshift.io/component: operator-index-ocp-v4-21
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 9a4e236fe78bba61748dcef9ab224211bd06f403
+  name: acs-operator-index-ocp-v4-21-20260707-123902-20260707-prod-9a4e
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-21
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:3b9117f8e65e0254b140b3634a11dfc801aa5c1519ca392b8e1f4b5742d32eb2
+      name: operator-index-ocp-v4-21
+      source:
+        git:
+          context: ./
+          revision: 9a4e236fe78bba61748dcef9ab224211bd06f403
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-21-20260707-prod-9a4e236
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-21
+  snapshot: acs-operator-index-ocp-v4-21-20260707-123902-20260707-prod-9a4e
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "427"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: kovayur
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Add 4.11.1 version (#427)
+
+      Adds operator-bundle image for 4.11.1 to the catalog.
+      - Bundle image:
+      `registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76`
+      - Errata: https://access.redhat.com/errata/RHSA-2026:36207
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/9a4e236fe78bba61748dcef9ab224211bd06f403
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-22-20260707-123856-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-22
+    appstudio.openshift.io/component: operator-index-ocp-v4-22
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 9a4e236fe78bba61748dcef9ab224211bd06f403
+  name: acs-operator-index-ocp-v4-22-20260707-123856-20260707-prod-9a4e
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-22
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:62a8fa04999020137ac3a9714c0410a177b2d6a6058093ad16c8d29ee96b8f6e
+      name: operator-index-ocp-v4-22
+      source:
+        git:
+          context: ./
+          revision: 9a4e236fe78bba61748dcef9ab224211bd06f403
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-22-20260707-prod-9a4e236
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-22
+  snapshot: acs-operator-index-ocp-v4-22-20260707-123856-20260707-prod-9a4e
