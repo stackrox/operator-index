@@ -27,7 +27,7 @@ jobs:
     name: Derive smoke test inputs
     runs-on: ubuntu-latest
     outputs:
-      acs-version: ${{ steps.version.outputs.acs-version }}
+      acs-versions: ${{ steps.version.outputs.acs-versions }}
       operator-index-image: ${{ steps.image.outputs.operator-index-image }}
       should-run: ${{ steps.version.outputs.should-run }}
     steps:
@@ -43,16 +43,16 @@ jobs:
           OPERATOR_INDEX_IMAGE_OVERRIDE: ${{ inputs.operator-index-image-override }}
           BASE_REF: ${{ github.base_ref }}
           EVENT_NAME: ${{ github.event_name }}
-          BEFORE_SHA: ${{ github.event.before }}
         run: |
-          # Image override without version override is ambiguous — fail fast.
+          # Image override without version override is ambiguous then fail fast.
           if [ -n "$OPERATOR_INDEX_IMAGE_OVERRIDE" ] && [ -z "$ACS_VERSION_OVERRIDE" ]; then
             echo "::error::operator-index-image-override requires acs-version-override to also be set"
             exit 1
           fi
 
           if [ -n "$ACS_VERSION_OVERRIDE" ]; then
-            echo "acs-version=$ACS_VERSION_OVERRIDE" >> "$GITHUB_OUTPUT"
+            echo "Version override provided, skipping bundles.yaml diff: $ACS_VERSION_OVERRIDE"
+            echo "acs-versions=[\"$ACS_VERSION_OVERRIDE\"]" >> "$GITHUB_OUTPUT"
             echo "should-run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -60,21 +60,15 @@ jobs:
           if [ "$EVENT_NAME" = "pull_request" ]; then
             DIFF_BASE="origin/$BASE_REF"
           else
-            # Use event.before to capture all commits in the push, not just the tip commit.
-            DIFF_BASE="$BEFORE_SHA"
-            # event.before is all-zeros on first push to a branch; fall back to parent.
-            if [[ "$DIFF_BASE" =~ ^0+$ ]]; then
-              DIFF_BASE="HEAD~1"
-            fi
+            # Merge to master then diff the previous commit.
+            DIFF_BASE="HEAD~1"
           fi
 
-          # Exclude diff headers first, then match only the `version:` key (not
-          # `oldest_supported_version:` or other keys that contain "version").
+          # Match only the `version:` key, ignore `oldest_supported_version:` and others.
           NEW_VERSIONS=$(git diff "$DIFF_BASE" -- bundles.yaml \
-            | grep -v '^+++' \
             | grep '^+[[:space:]]*version:' \
             | sed 's/.*version:[[:space:]]*//' \
-            | sort -V || true)
+            || true)
 
           if [ -z "$NEW_VERSIONS" ]; then
             echo "No new versions found in bundles.yaml diff, skipping smoke test"
@@ -82,10 +76,13 @@ jobs:
             exit 0
           fi
 
-          LATEST=$(echo "$NEW_VERSIONS" | tail -1)
-          MINOR=$(echo "$LATEST" | cut -d. -f1-2)
-          echo "New versions added: $(echo "$NEW_VERSIONS" | tr '\n' ' '), testing minor: $MINOR"
-          echo "acs-version=$MINOR" >> "$GITHUB_OUTPUT"
+          # Build version JSON array for the matrix.
+          MINORS_JSON=$(echo "$NEW_VERSIONS" \
+            | sed 's/^\([0-9]*\.[0-9]*\).*/\1/' \
+            | sort -uV \
+            | jq -Rc '[.,inputs]')
+          echo "New versions added: $(echo "$NEW_VERSIONS" | tr '\n' ' '), testing minors: $MINORS_JSON"
+          echo "acs-versions=$MINORS_JSON" >> "$GITHUB_OUTPUT"
           echo "should-run=true" >> "$GITHUB_OUTPUT"
 
       - name: Determine operator-index image
@@ -93,50 +90,58 @@ jobs:
         if: steps.version.outputs.should-run == 'true'
         env:
           OPERATOR_INDEX_IMAGE_OVERRIDE: ${{ inputs.operator-index-image-override }}
+          SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
         run: |
           if [ -n "$OPERATOR_INDEX_IMAGE_OVERRIDE" ]; then
             echo "operator-index-image=$OPERATOR_INDEX_IMAGE_OVERRIDE" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            SHA="${{ github.event.pull_request.head.sha }}"
-          else
-            SHA="${{ github.sha }}"
-          fi
-
           TAG="ocp-${OCP_VERSION}-${SHA}-fast"
           IMAGE="quay.io/rhacs-eng/stackrox-operator-index:${TAG}"
-          echo "Waiting for Konflux to build: $IMAGE"
+
+          CHECK_NAME="Red Hat Konflux / operator-index-ocp-${OCP_VERSION}-on-push"
+          echo "Waiting for Konflux check '$CHECK_NAME' on $SHA..."
 
           for i in $(seq 1 40); do
-            if RESPONSE=$(curl -sf --max-time 30 --connect-timeout 10 \
-              "https://quay.io/api/v1/repository/rhacs-eng/stackrox-operator-index/tag/?specificTag=${TAG}"); then
-              FOUND=$(echo "$RESPONSE" | python3 -c \
-                "import json,sys; d=json.load(sys.stdin); print('true' if d.get('tags') else 'false')" \
-                2>/dev/null || echo 'false')
-              if [ "$FOUND" = "true" ]; then
-                echo "Image available after attempt $i: $IMAGE"
-                echo "operator-index-image=$IMAGE" >> "$GITHUB_OUTPUT"
-                exit 0
-              fi
-              echo "Attempt $i/40: image not yet in Quay, retrying in 3 minutes..."
-            else
-              echo "Attempt $i/40: Quay API request failed (network or HTTP error), retrying in 3 minutes..."
-            fi
+            RESULT=$(gh api /repos/stackrox/operator-index/commits/"$SHA"/check-runs \
+              | jq -r --arg name "$CHECK_NAME" \
+                '.check_runs[] | select(.name == $name) | "\(.status) \(.conclusion)"')
+            case "$RESULT" in
+              "completed success")
+                echo "Konflux build succeeded, verifying image in Quay..."
+                if curl -sf --max-time 30 --connect-timeout 10 \
+                  "https://quay.io/api/v1/repository/rhacs-eng/stackrox-operator-index/tag/?specificTag=${TAG}" \
+                  | jq -e '.tags | length > 0' > /dev/null; then
+                  echo "Image confirmed in Quay: $IMAGE"
+                  echo "operator-index-image=$IMAGE" >> "$GITHUB_OUTPUT"
+                  exit 0
+                fi
+                echo "Konflux check passed but image not found in Quay: $IMAGE"
+                exit 1 ;;
+              "completed "*)
+                echo "Konflux build failed: $RESULT"
+                exit 1 ;;
+            esac
+            echo "Attempt $i/40: ${RESULT:-check not yet started}, retrying in 3 minutes..."
             [ "$i" -lt 40 ] && sleep 180
           done
 
-          echo "Timed out after 2 hours waiting for: $IMAGE"
+          echo "Timed out after 2 hours waiting for Konflux build: $CHECK_NAME"
           exit 1
 
   smoke-test:
     name: Run smoke test
     needs: derive-inputs
     if: needs.derive-inputs.outputs.should-run == 'true'
+    strategy:
+      matrix:
+        acs-version: ${{ fromJson(needs.derive-inputs.outputs.acs-versions) }}
+      # if any matrix job fails, continue to run the rest of the jobs
+      fail-fast: false
     uses: ./.github/workflows/acs-smoke-test.yml
     with:
       operator-index-image: ${{ needs.derive-inputs.outputs.operator-index-image }}
-      acs-version: ${{ needs.derive-inputs.outputs.acs-version }}
+      acs-version: ${{ matrix.acs-version }}
       cluster-lifespan: 3h
     secrets: inherit
