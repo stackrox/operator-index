@@ -2551,9 +2551,9 @@ entries:
   - name: rhacs-operator.v4.10.4
     replaces: rhacs-operator.v4.10.3
     skipRange: ">= 4.9.0 < 4.10.4"
-  - name: rhacs-operator.v4.10.5-rc.2
+  - name: rhacs-operator.v4.10.5
     replaces: rhacs-operator.v4.10.4
-    skipRange: ">= 4.9.0 < 4.10.5-rc.2"
+    skipRange: ">= 4.9.0 < 4.10.5"
 - schema: olm.channel
   name: rhacs-4.11
   package: rhacs-operator
@@ -2842,11 +2842,11 @@ entries:
   - name: rhacs-operator.v4.10.4
     replaces: rhacs-operator.v4.10.3
     skipRange: ">= 4.9.0 < 4.10.4"
-  - name: rhacs-operator.v4.10.5-rc.2
+  - name: rhacs-operator.v4.10.5
     replaces: rhacs-operator.v4.10.4
-    skipRange: ">= 4.9.0 < 4.10.5-rc.2"
+    skipRange: ">= 4.9.0 < 4.10.5"
   - name: rhacs-operator.v4.11.0
-    replaces: rhacs-operator.v4.10.5-rc.2
+    replaces: rhacs-operator.v4.10.5
     skipRange: ">= 4.10.0 < 4.11.0"
   - name: rhacs-operator.v4.11.1
     replaces: rhacs-operator.v4.11.0
@@ -3139,11 +3139,11 @@ entries:
   - name: rhacs-operator.v4.10.4
     replaces: rhacs-operator.v4.10.3
     skipRange: ">= 4.9.0 < 4.10.4"
-  - name: rhacs-operator.v4.10.5-rc.2
+  - name: rhacs-operator.v4.10.5
     replaces: rhacs-operator.v4.10.4
-    skipRange: ">= 4.9.0 < 4.10.5-rc.2"
+    skipRange: ">= 4.9.0 < 4.10.5"
   - name: rhacs-operator.v4.11.0
-    replaces: rhacs-operator.v4.10.5-rc.2
+    replaces: rhacs-operator.v4.10.5
     skipRange: ">= 4.10.0 < 4.11.0"
   - name: rhacs-operator.v4.11.1
     replaces: rhacs-operator.v4.11.0
@@ -4030,7 +4030,7 @@ entries:
 - schema: olm.bundle
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:d96aad39e2545948e5aee4c81335acf99a2390502d2f1a9d363445536d46563b
 - schema: olm.bundle
-  image: quay.io/rhacs-eng/release-operator-bundle@sha256:db5987c0a5192920c29b9cc350ae071754f5355533eb74766caffb376ba0555f
+  image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:c77fd69d41cb6f1f2abd0099cb41758eadf4e96d7b1a979473232bd80788b1e4
 - schema: olm.bundle
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:09da338721670816180c98f7c24f2fae79971487b82bcfeca750d49b369ca0a6
 - schema: olm.bundle
