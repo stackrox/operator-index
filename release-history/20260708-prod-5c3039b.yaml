@@ -1,0 +1,369 @@
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: ovalenti
+    pac.test.appstudio.openshift.io/sha-title: Add 4.10.5 version (#428)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/5c3039b7aacd3847e3190302d7ffa4b413948ffa
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-12-20260708-104817-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
+    appstudio.openshift.io/component: operator-index-ocp-v4-12
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+  name: acs-operator-index-ocp-v4-12-20260708-104817-20260708-prod-5c30
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-12
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:e477f6c5b630fd26fdf7ef9e5939e62bf7d2eb3ec75b5d7ad5144af999ef47b5
+      name: operator-index-ocp-v4-12
+      source:
+        git:
+          context: ./
+          revision: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-12-20260708-prod-5c3039b
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-12
+  snapshot: acs-operator-index-ocp-v4-12-20260708-104817-20260708-prod-5c30
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: ovalenti
+    pac.test.appstudio.openshift.io/sha-title: Add 4.10.5 version (#428)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/5c3039b7aacd3847e3190302d7ffa4b413948ffa
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-14-20260708-104818-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-14
+    appstudio.openshift.io/component: operator-index-ocp-v4-14
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+  name: acs-operator-index-ocp-v4-14-20260708-104818-20260708-prod-5c30
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-14
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:bf84e9da86ffd50e115e76689c4064c3a9c1f1d0c9a6f7e3539040cd27a98417
+      name: operator-index-ocp-v4-14
+      source:
+        git:
+          context: ./
+          revision: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-14-20260708-prod-5c3039b
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-14
+  snapshot: acs-operator-index-ocp-v4-14-20260708-104818-20260708-prod-5c30
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: ovalenti
+    pac.test.appstudio.openshift.io/sha-title: Add 4.10.5 version (#428)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/5c3039b7aacd3847e3190302d7ffa4b413948ffa
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-16-20260708-104817-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-16
+    appstudio.openshift.io/component: operator-index-ocp-v4-16
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+  name: acs-operator-index-ocp-v4-16-20260708-104817-20260708-prod-5c30
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-16
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:8f0d720b4e355c02e0e2ac89ebe17e444d12818e34a657fe5f3c946d0d65f01b
+      name: operator-index-ocp-v4-16
+      source:
+        git:
+          context: ./
+          revision: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-16-20260708-prod-5c3039b
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-16
+  snapshot: acs-operator-index-ocp-v4-16-20260708-104817-20260708-prod-5c30
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: ovalenti
+    pac.test.appstudio.openshift.io/sha-title: Add 4.10.5 version (#428)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/5c3039b7aacd3847e3190302d7ffa4b413948ffa
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-17-20260708-104817-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+    appstudio.openshift.io/component: operator-index-ocp-v4-17
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+  name: acs-operator-index-ocp-v4-17-20260708-104817-20260708-prod-5c30
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-17
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:85988aaa95c1f33cb8f7439c30a30b315b5249aa8b2a2582627a09cbf3773885
+      name: operator-index-ocp-v4-17
+      source:
+        git:
+          context: ./
+          revision: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-17-20260708-prod-5c3039b
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-17
+  snapshot: acs-operator-index-ocp-v4-17-20260708-104817-20260708-prod-5c30
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: ovalenti
+    pac.test.appstudio.openshift.io/sha-title: Add 4.10.5 version (#428)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/5c3039b7aacd3847e3190302d7ffa4b413948ffa
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-18-20260708-104817-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-18
+    appstudio.openshift.io/component: operator-index-ocp-v4-18
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+  name: acs-operator-index-ocp-v4-18-20260708-104817-20260708-prod-5c30
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-18
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:31d174dafa435bc0157a753543ac4452df591eeb349d55474cc91eaa435769a2
+      name: operator-index-ocp-v4-18
+      source:
+        git:
+          context: ./
+          revision: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-18-20260708-prod-5c3039b
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-18
+  snapshot: acs-operator-index-ocp-v4-18-20260708-104817-20260708-prod-5c30
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: ovalenti
+    pac.test.appstudio.openshift.io/sha-title: Add 4.10.5 version (#428)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/5c3039b7aacd3847e3190302d7ffa4b413948ffa
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-19-20260708-104817-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-19
+    appstudio.openshift.io/component: operator-index-ocp-v4-19
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+  name: acs-operator-index-ocp-v4-19-20260708-104817-20260708-prod-5c30
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-19
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:22c5c30070e6d32eac9c50c3450186ac2961642f33f2e87e66ed4530dd35cd2a
+      name: operator-index-ocp-v4-19
+      source:
+        git:
+          context: ./
+          revision: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-19-20260708-prod-5c3039b
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-19
+  snapshot: acs-operator-index-ocp-v4-19-20260708-104817-20260708-prod-5c30
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: ovalenti
+    pac.test.appstudio.openshift.io/sha-title: Add 4.10.5 version (#428)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/5c3039b7aacd3847e3190302d7ffa4b413948ffa
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-20-20260708-104817-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-20
+    appstudio.openshift.io/component: operator-index-ocp-v4-20
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+  name: acs-operator-index-ocp-v4-20-20260708-104817-20260708-prod-5c30
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-20
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:7000432bc4a195449a9c0bc05336e311831e59b593630452b140f41853fd2767
+      name: operator-index-ocp-v4-20
+      source:
+        git:
+          context: ./
+          revision: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-20-20260708-prod-5c3039b
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-20
+  snapshot: acs-operator-index-ocp-v4-20-20260708-104817-20260708-prod-5c30
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: ovalenti
+    pac.test.appstudio.openshift.io/sha-title: Add 4.10.5 version (#428)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/5c3039b7aacd3847e3190302d7ffa4b413948ffa
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-21-20260708-104818-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-21
+    appstudio.openshift.io/component: operator-index-ocp-v4-21
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+  name: acs-operator-index-ocp-v4-21-20260708-104818-20260708-prod-5c30
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-21
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:0b67d316751928b5c7e4720f587473364644037235d4d36584b062305949ae57
+      name: operator-index-ocp-v4-21
+      source:
+        git:
+          context: ./
+          revision: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-21-20260708-prod-5c3039b
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-21
+  snapshot: acs-operator-index-ocp-v4-21-20260708-104818-20260708-prod-5c30
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: ovalenti
+    pac.test.appstudio.openshift.io/sha-title: Add 4.10.5 version (#428)
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/5c3039b7aacd3847e3190302d7ffa4b413948ffa
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-22-20260708-104816-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-22
+    appstudio.openshift.io/component: operator-index-ocp-v4-22
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+  name: acs-operator-index-ocp-v4-22-20260708-104816-20260708-prod-5c30
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-22
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:cdf61a69168ae0b5fc182d21bce719ea31f1c4b1223970cc7ff1b50e645297e0
+      name: operator-index-ocp-v4-22
+      source:
+        git:
+          context: ./
+          revision: 5c3039b7aacd3847e3190302d7ffa4b413948ffa
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-22-20260708-prod-5c3039b
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-22
+  snapshot: acs-operator-index-ocp-v4-22-20260708-104816-20260708-prod-5c30
