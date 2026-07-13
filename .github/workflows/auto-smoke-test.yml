@@ -44,7 +44,7 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
           EVENT_NAME: ${{ github.event_name }}
         run: |
-          # Image override without version override is ambiguous then fail fast.
+          # Image override without version override is ambiguous, thus fail fast.
           if [ -n "$OPERATOR_INDEX_IMAGE_OVERRIDE" ] && [ -z "$ACS_VERSION_OVERRIDE" ]; then
             echo "::error::operator-index-image-override requires acs-version-override to also be set"
             exit 1
@@ -60,7 +60,7 @@ jobs:
           if [ "$EVENT_NAME" = "pull_request" ]; then
             DIFF_BASE="origin/$BASE_REF"
           else
-            # Merge to master then diff the previous commit.
+            # For runs on master branch, diff the previous commit.
             DIFF_BASE="HEAD~1"
           fi
 

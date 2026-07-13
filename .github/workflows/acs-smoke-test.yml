@@ -47,12 +47,6 @@ jobs:
   create-cluster:
     name: Create OpenShift cluster
     runs-on: ubuntu-latest
-    outputs:
-      cluster-name: ${{ steps.info.outputs.name }}
-    steps:
-      - name: Set cluster name
-        id: info
-        run: echo "name=${{ env.CLUSTER_NAME }}" >> "$GITHUB_OUTPUT"
 
       - name: Create OpenShift cluster
         uses: stackrox/actions/infra/create-cluster@v1
@@ -82,7 +76,7 @@ jobs:
         run: |
           infractl artifacts \
             --download-dir=./artifacts \
-            ${{ needs.create-cluster.outputs.cluster-name }}
+            ${{ env.CLUSTER_NAME }}
 
       - name: Set KUBECONFIG
         run: echo "KUBECONFIG=${{ github.workspace }}/artifacts/kubeconfig" >> "$GITHUB_ENV"
@@ -94,11 +88,14 @@ jobs:
           # TODO: remove before merging!
           OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image || 'quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-7a9fcba929e5858cca91a84c3e5da8c829a3c990-fast' }}
           ACS_VERSION: ${{ inputs.acs-version || '4.11' }}
-        run: bash upgrade-oldest-test.sh
+        run: |
+          set -uo pipefail
+          bash upgrade-oldest-test.sh
 
       - name: Reset operator state between tests
         working-directory: ./smoke-test
         run: |
+          set -uo pipefail
           source lib.sh
           reset_operator
         shell: bash
@@ -112,8 +109,8 @@ jobs:
           ACS_VERSION: ${{ inputs.acs-version || '4.11' }}
         run: bash upgrade-latest-test.sh
 
-  cleanup-cluster:
-    name: Cleanup cluster
+  delete-test-cluster:
+    name: Delete infra test cluster
     needs: [create-cluster, run-smoke-tests]
     runs-on: ubuntu-latest
     if: always() && needs.create-cluster.result != 'cancelled'
@@ -147,5 +144,5 @@ jobs:
 
           ## Tests run:
           1. **Test 1** — install oldest supported ACS version, upgrade to the provided operator-index image
-          2. **Test 2** — install provided operator-index image, upgrade to latest GA if minor is behind
+          2. **Test 2** — install provided operator-index image, upgrade to latest GA if provided ACS version is behind
           EOF
