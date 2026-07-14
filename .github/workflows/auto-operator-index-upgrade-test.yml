@@ -1,4 +1,4 @@
-name: "Auto Smoke Test"
+name: "Auto Operator Index Upgrade Test"
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
         required: false
         type: string
       operator-index-image-override:
-        description: 'Override operator-index image, skips Quay polling (e.g. quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-...)'
+        description: 'Override operator-index image, skips Konflux polling (e.g. quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-...)'
         required: false
         type: string
   push:
@@ -17,24 +17,24 @@ on:
   pull_request:
     paths: ['bundles.yaml']
 
-env:
-  # OCP version used to construct the Konflux-built operator-index image tag.
-  # Update when infra cluster uses a newer OCP version.
-  OCP_VERSION: v4-22
+permissions:
+  contents: read
 
 jobs:
   derive-inputs:
-    name: Derive smoke test inputs
+    name: Derive operator-index-upgrade test inputs
     runs-on: ubuntu-latest
     outputs:
       acs-versions: ${{ steps.version.outputs.acs-versions }}
       operator-index-image: ${{ steps.image.outputs.operator-index-image }}
+      ocp-version: ${{ steps.image.outputs.ocp-version }}
       should-run: ${{ steps.version.outputs.should-run }}
     steps:
       - name: Check out code
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Determine ACS version
         id: version
@@ -64,14 +64,14 @@ jobs:
             DIFF_BASE="HEAD~1"
           fi
 
-          # Match only the `version:` key, ignore `oldest_supported_version:` and others.
+          # Lines starting with '+' are additions in the diff; anchor to 'version:' to skip 'oldest_supported_version:' etc.
           NEW_VERSIONS=$(git diff "$DIFF_BASE" -- bundles.yaml \
             | grep '^+[[:space:]]*version:' \
             | sed 's/.*version:[[:space:]]*//' \
             || true)
 
           if [ -z "$NEW_VERSIONS" ]; then
-            echo "No new versions found in bundles.yaml diff, skipping smoke test"
+            echo "No new versions found in bundles.yaml diff, skipping operator-index-upgrade test"
             echo "should-run=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -79,7 +79,6 @@ jobs:
           # Build version JSON array for the matrix.
           MINORS_JSON=$(echo "$NEW_VERSIONS" \
             | sed 's/^\([0-9]*\.[0-9]*\).*/\1/' \
-            | sort -uV \
             | jq -Rc '[.,inputs]')
           echo "New versions added: $(echo "$NEW_VERSIONS" | tr '\n' ' '), testing minors: $MINORS_JSON"
           echo "acs-versions=$MINORS_JSON" >> "$GITHUB_OUTPUT"
@@ -94,44 +93,35 @@ jobs:
         run: |
           if [ -n "$OPERATOR_INDEX_IMAGE_OVERRIDE" ]; then
             echo "operator-index-image=$OPERATOR_INDEX_IMAGE_OVERRIDE" >> "$GITHUB_OUTPUT"
+            echo "ocp-version=" >> "$GITHUB_OUTPUT"
+            echo "needs-wait=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
+          # Use the highest OCP version from .tekton/ pipelines to build the image tag.
+          OCP_VERSION=$(ls .tekton/operator-index-ocp-v*-build.yaml \
+            | sed 's/.*operator-index-ocp-\(v[0-9]*-[0-9]*\)-build\.yaml/\1/' \
+            | sort -V | tail -1)
+          echo "Derived OCP_VERSION: $OCP_VERSION"
+
           TAG="ocp-${OCP_VERSION}-${SHA}-fast"
           IMAGE="quay.io/rhacs-eng/stackrox-operator-index:${TAG}"
+          echo "Image: $IMAGE"
+          echo "operator-index-image=$IMAGE" >> "$GITHUB_OUTPUT"
+          # Convert v4-22 → 4.22 for the infra create-cluster args.
+          echo "ocp-version=$(echo "$OCP_VERSION" | sed 's/^v//' | tr '-' '.')" >> "$GITHUB_OUTPUT"
+          echo "needs-wait=true" >> "$GITHUB_OUTPUT"
 
-          CHECK_NAME="Red Hat Konflux / operator-index-ocp-${OCP_VERSION}-on-push"
-          echo "Waiting for Konflux check '$CHECK_NAME' on $SHA..."
+      - name: Wait for operator-index image
+        if: steps.version.outputs.should-run == 'true' && steps.image.outputs.needs-wait == 'true'
+        uses: stackrox/actions/release/wait-for-image@v1
+        with:
+          image: ${{ steps.image.outputs.operator-index-image }}
+          interval: "60"
+          limit: "7200"
 
-          for i in $(seq 1 40); do
-            RESULT=$(gh api /repos/stackrox/operator-index/commits/"$SHA"/check-runs \
-              | jq -r --arg name "$CHECK_NAME" \
-                '.check_runs[] | select(.name == $name) | "\(.status) \(.conclusion)"')
-            case "$RESULT" in
-              "completed success")
-                echo "Konflux build succeeded, verifying image in Quay..."
-                if curl -sf --max-time 30 --connect-timeout 10 \
-                  "https://quay.io/api/v1/repository/rhacs-eng/stackrox-operator-index/tag/?specificTag=${TAG}" \
-                  | jq -e '.tags | length > 0' > /dev/null; then
-                  echo "Image confirmed in Quay: $IMAGE"
-                  echo "operator-index-image=$IMAGE" >> "$GITHUB_OUTPUT"
-                  exit 0
-                fi
-                echo "Konflux check passed but image not found in Quay: $IMAGE"
-                exit 1 ;;
-              "completed "*)
-                echo "Konflux build failed: $RESULT"
-                exit 1 ;;
-            esac
-            echo "Attempt $i/40: ${RESULT:-check not yet started}, retrying in 3 minutes..."
-            [ "$i" -lt 40 ] && sleep 180
-          done
-
-          echo "Timed out after 2 hours waiting for Konflux build: $CHECK_NAME"
-          exit 1
-
-  smoke-test:
-    name: Run smoke test
+  run-upgrade-tests:
+    name: Run operator-index upgrade tests
     needs: derive-inputs
     if: needs.derive-inputs.outputs.should-run == 'true'
     strategy:
@@ -139,9 +129,11 @@ jobs:
         acs-version: ${{ fromJson(needs.derive-inputs.outputs.acs-versions) }}
       # if any matrix job fails, continue to run the rest of the jobs
       fail-fast: false
-    uses: ./.github/workflows/acs-smoke-test.yml
+    uses: ./.github/workflows/operator-index-upgrade-test.yml
     with:
       operator-index-image: ${{ needs.derive-inputs.outputs.operator-index-image }}
       acs-version: ${{ matrix.acs-version }}
+      ocp-version: ${{ needs.derive-inputs.outputs.ocp-version }}
       cluster-lifespan: 3h
-    secrets: inherit
+    secrets:
+      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
