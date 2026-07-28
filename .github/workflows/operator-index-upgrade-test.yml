@@ -115,14 +115,14 @@ jobs:
         env:
           # TODO: remove fallback values before merging
           OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image || 'quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-80b73dc51ca36405af84bf6714257e741420c275-fast' }}
-          ACS_VERSION: ${{ inputs.acs-version || '4.11' }}
+          ACS_VERSION: ${{ inputs.acs-version || '4.10' }}
         run: make upgrade-test-oldest
 
       - name: "Test 2: install provided → optionally upgrade to latest GA"
         env:
           # TODO: remove fallback values before merging
           OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image || 'quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-80b73dc51ca36405af84bf6714257e741420c275-fast' }}
-          ACS_VERSION: ${{ inputs.acs-version || '4.11' }}
+          ACS_VERSION: ${{ inputs.acs-version || '4.10' }}
         run: make upgrade-test-latest
 
   delete-test-cluster:
