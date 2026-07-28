@@ -123,7 +123,7 @@ jobs:
   run-upgrade-tests:
     name: Run operator-index upgrade tests
     needs: derive-inputs
-    if: needs.derive-inputs.outputs.should-run == 'true'
+    if: needs.derive-inputs.outputs.should-run == true
     strategy:
       matrix:
         acs-version: ${{ fromJson(needs.derive-inputs.outputs.acs-versions) }}

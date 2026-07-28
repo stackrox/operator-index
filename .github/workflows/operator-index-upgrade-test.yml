@@ -132,7 +132,7 @@ jobs:
         uses: stackrox/actions/infra/install-infractl@v1
 
       - name: Delete cluster
-        run: infractl delete "$CLUSTER_NAME"
+        run: infractl delete "${CLUSTER_NAME}"
 
   report-status:
     name: Report test status
