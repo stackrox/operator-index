@@ -52,18 +52,13 @@ func ReadOldestSupportedVersion() (major, minor int, err error) {
 	if err := yaml.Unmarshal(data, &b); err != nil {
 		return 0, 0, fmt.Errorf("parsing bundles.yaml: %w", err)
 	}
-	// Strip optional patch component ("4.9.0" → "4.9") before delegating to ParseACSVersion.
-	parts := strings.SplitN(b.OldestSupportedVersion, ".", 3)
-	if len(parts) < 2 {
-		return 0, 0, fmt.Errorf("invalid oldest_supported_version: %s", b.OldestSupportedVersion)
-	}
-	return ParseACSVersion(parts[0] + "." + parts[1])
+	return ParseACSVersion(b.OldestSupportedVersion)
 }
 
-// ParseACSVersion parses "4.10" into (major=4, minor=10).
+// ParseACSVersion parses "4.10" or "4.10.3" or "4.10.0-rc.1" into (major=4, minor=10).
 func ParseACSVersion(ver string) (major, minor int, err error) {
-	parts := strings.SplitN(ver, ".", 2)
-	if len(parts) != 2 {
+	parts := strings.SplitN(ver, ".", 3)
+	if len(parts) < 2 {
 		return 0, 0, fmt.Errorf("ACS_VERSION must be MAJOR.MINOR (e.g. 4.10), got: %q", ver)
 	}
 	maj, err := strconv.Atoi(parts[0])
