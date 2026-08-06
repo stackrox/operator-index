@@ -217,6 +217,34 @@ spec:
     - name: basic-auth
       workspace: git-auth
 
+  - name: fbc-inject-lifecycle
+    taskRef:
+      resolver: bundles
+      params:
+      - name: kind
+        value: task
+      - name: name
+        value: fbc-inject-lifecycle-oci-ta
+      - name: bundle
+        value: quay.io/konflux-ci/tekton-catalog/task-fbc-inject-lifecycle-oci-ta:0.1@sha256:da1217be1dcec3d5b5140ea351466607005481397b31f2b81108c4fd3012fbde
+    params:
+    - name: DOCKERFILE
+      value: $(params.dockerfile)
+    - name: CONTEXT
+      value: $(params.path-context)
+    - name: SOURCE_ARTIFACT
+      value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
+    - name: ociStorage
+      value: $(params.output-image-repo):konflux-$(params.revision).lifecycle
+    - name: ociArtifactExpiresAfter
+      value: $(params.image-expires-after)
+    - name: BUILD_ARGS
+      value:
+      - base_image=$(params.base-image)
+      - catalog_dir=$(params.catalog-dir)
+    runAfter:
+    - clone-repository
+
   - name: build-images
     matrix:
       params:
@@ -241,7 +269,7 @@ spec:
       - base_image=$(params.base-image)
       - catalog_dir=$(params.catalog-dir)
     - name: SOURCE_ARTIFACT
-      value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
+      value: $(tasks.fbc-inject-lifecycle.results.SOURCE_ARTIFACT)
     - name: IMAGE_APPEND_PLATFORM
       value: "true"
     - name: BUILDAH_FORMAT
@@ -370,7 +398,7 @@ spec:
     - name: image-url
       value: $(tasks.build-image-index.results.IMAGE_URL)
     - name: SOURCE_ARTIFACT
-      value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
+      value: $(tasks.fbc-inject-lifecycle.results.SOURCE_ARTIFACT)
     taskRef:
       params:
       - name: name
