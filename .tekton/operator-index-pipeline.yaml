@@ -237,7 +237,7 @@ spec:
     - name: ociStorage
       value: $(params.output-image-repo):konflux-$(params.revision).lifecycle
     - name: ociArtifactExpiresAfter
-      value: $(params.image-expires-after)
+      value: $(params.oci-artifact-expires-after)
     - name: BUILD_ARGS
       value:
       - base_image=$(params.base-image)
