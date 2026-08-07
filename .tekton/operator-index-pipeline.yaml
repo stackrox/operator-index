@@ -239,7 +239,9 @@ spec:
     - name: ociArtifactExpiresAfter
       value: $(params.oci-artifact-expires-after)
     - name: BUILD_ARGS
-      value:
+      # fbc-inject-lifecycle needs the same BUILD_ARGS as buildah in order to resolve ARGs in the Dockerfile.
+      # Therefore, the same ones are reused between the two tasks.
+      value: &build_args
       - base_image=$(params.base-image)
       - catalog_dir=$(params.catalog-dir)
 
@@ -263,9 +265,7 @@ spec:
     - name: COMMIT_SHA
       value: $(tasks.clone-repository.results.commit)
     - name: BUILD_ARGS
-      value:
-      - base_image=$(params.base-image)
-      - catalog_dir=$(params.catalog-dir)
+      value: *build_args
     - name: SOURCE_ARTIFACT
       value: $(tasks.fbc-inject-lifecycle.results.SOURCE_ARTIFACT)
     - name: IMAGE_APPEND_PLATFORM
