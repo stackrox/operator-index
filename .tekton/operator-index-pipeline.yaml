@@ -242,8 +242,6 @@ spec:
       value:
       - base_image=$(params.base-image)
       - catalog_dir=$(params.catalog-dir)
-    runAfter:
-    - clone-repository
 
   - name: build-images
     matrix:
