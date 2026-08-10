@@ -23,7 +23,8 @@
     // Allowed syntax: https://docs.renovatebot.com/configuration-options/#schedule
     // The time was selected (with the help of https://time.fyi/timezones) so that Renovate isn't active during business
     // hours from Germany to US West Coast. This way, we limit the number of changes Renovate can merge to one per day.
-    "after 3am and before 7am",
+    // Between 0a.m. and 7:59a.m. every day.
+    "* 0-7 * * *",
   ],
   // Tell Renovate that it can rebase and update its branches (and/or its PRs) at times outside the `schedule`.
   "updateNotScheduled": true,
@@ -34,7 +35,8 @@
     "schedule": [
       // For some reason, Konflux config defines custom schedule on each type of dependency manager and that takes
       // precedence over the global/default schedule. We want our own schedule and hence need to make this override.
-      "after 3am and before 7am",
+      // Between 0a.m. and 7:59a.m. every day.
+      "* 0-7 * * *",
     ],
     "packageRules": [
       // Note: the packageRules from the Konflux config (find URL in comments above) get merged with these.
