@@ -276,8 +276,8 @@ images:
     version: 4.9.9
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:50473a07f0ee77e9ec073acb3f51ede534abeaf038f11c118223b81cc275c1f5
     version: 4.9.10
-  - image: quay.io/rhacs-eng/release-operator-bundle@sha256:1e36dbfea53bfc94a1e100a7ceee25536f087e29e57a1c9b07aeaab91f49a8c2
-    version: 4.9.11-rc.3
+  - image: quay.io/rhacs-eng/release-operator-bundle@sha256:5afe3b973e0be981bbba37179d5eef9ed01f3e0011d398346252cb353446c91c
+    version: 4.9.11-rc.4
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:1b1480e72310d6ec17c4dd4368214cd940a4da230b13304f4621c5ae560f9e9e
     version: 4.10.0
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:aa1984fa95a56acef9828b273563c3a552b192a5eb97f79daacd036d734a4d36
@@ -292,13 +292,13 @@ images:
     version: 4.10.5
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:96c59bb24164e747ad5e83d9f118b2da8c485f6a3dd4f7533a45aea91e9fb163
     version: 4.10.6
-  - image: quay.io/rhacs-eng/release-operator-bundle@sha256:2d8128ed98a5ba359145f7d7c3b573682908ce853825d65a80428b72bd4eb069
-    version: 4.10.7-rc.3
+  - image: quay.io/rhacs-eng/release-operator-bundle@sha256:885bddbf01a65017fef5b8fdef1e0988c0d07b1504801df8662241d479ee9861
+    version: 4.10.7-rc.4
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:09da338721670816180c98f7c24f2fae79971487b82bcfeca750d49b369ca0a6
     version: 4.11.0
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76
     version: 4.11.1
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:a54d7087a3af9b61a1cbddda89b5d4b952e4d5e7341ab9c61495ef9c33305636
     version: 4.11.2
-  - image: quay.io/rhacs-eng/release-operator-bundle@sha256:dca549e0f0b1b2e5c6c00926436d25487ebb3373dc1e9fc5fa97684ecce40558
-    version: 4.11.3-rc.3
+  - image: quay.io/rhacs-eng/release-operator-bundle@sha256:838996aee9155b779da20fe233a487cd0af0bf19d97c01a6cc30db4ef249334e
+    version: 4.11.3-rc.4
