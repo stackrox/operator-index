@@ -2,6 +2,7 @@ package upgradetest
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,6 +12,20 @@ import (
 
 	yaml "github.com/goccy/go-yaml"
 )
+
+type packageManifestList struct {
+	Items []struct {
+		Metadata struct {
+			Name string `json:"name"`
+		} `json:"metadata"`
+		Status struct {
+			Channels []struct {
+				Name       string `json:"name"`
+				CurrentCSV string `json:"currentCSV"`
+			} `json:"channels"`
+		} `json:"status"`
+	} `json:"items"`
+}
 
 func ocRun(args ...string) error {
 	cmd := exec.Command("oc", args...)
@@ -83,24 +98,35 @@ func GetLatestOfficialMinor(major int, timeout time.Duration) (int, error) {
 		out, err := exec.Command("oc", "get", "packagemanifest",
 			"-n", "openshift-marketplace",
 			"-l", "catalog=redhat-operators",
-			"-o", `jsonpath={range .items[?(@.metadata.name=="rhacs-operator")].status.channels[*]}{.name}{"\n"}{end}`,
+			"-o", "json",
 		).Output()
 		if err != nil {
 			fmt.Printf("  packagemanifest query failed: %v, retrying in 10s...\n", err)
 			time.Sleep(10 * time.Second)
 			continue
 		}
+		var list packageManifestList
+		if err := json.Unmarshal(out, &list); err != nil {
+			fmt.Printf("  failed to parse packagemanifest JSON: %v, retrying in 10s...\n", err)
+			time.Sleep(10 * time.Second)
+			continue
+		}
 		maxMinor := -1
-		for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
-			if !strings.HasPrefix(line, prefix) {
+		for _, item := range list.Items {
+			if item.Metadata.Name != "rhacs-operator" {
 				continue
 			}
-			n, err := strconv.Atoi(strings.TrimPrefix(line, prefix))
-			if err != nil {
-				continue
-			}
-			if n > maxMinor {
-				maxMinor = n
+			for _, ch := range item.Status.Channels {
+				if !strings.HasPrefix(ch.Name, prefix) {
+					continue
+				}
+				n, err := strconv.Atoi(strings.TrimPrefix(ch.Name, prefix))
+				if err != nil {
+					continue
+				}
+				if n > maxMinor {
+					maxMinor = n
+				}
 			}
 		}
 		if maxMinor >= 0 {
@@ -181,17 +207,27 @@ spec:
 func ResolveTargetCSV(catalogLabel, channel string, timeout time.Duration) (string, error) {
 	deadline := time.Now().Add(timeout)
 	fmt.Printf("  Resolving currentCSV for channel %s from %s...\n", channel, catalogLabel)
-	jsonpath := fmt.Sprintf(
-		`{range .items[?(@.metadata.name=="rhacs-operator")].status.channels[?(@.name=="%s")]}{.currentCSV}{end}`,
-		channel)
 	for time.Now().Before(deadline) {
-		csv, _ := ocOutput("get", "packagemanifest",
+		out, err := exec.Command("oc", "get", "packagemanifest",
 			"-n", "openshift-marketplace",
 			"-l", "catalog="+catalogLabel,
-			"-o", "jsonpath="+jsonpath)
-		if csv != "" {
-			fmt.Printf("  Target CSV: %s\n", csv)
-			return csv, nil
+			"-o", "json",
+		).Output()
+		if err == nil {
+			var list packageManifestList
+			if err := json.Unmarshal(out, &list); err == nil {
+				for _, item := range list.Items {
+					if item.Metadata.Name != "rhacs-operator" {
+						continue
+					}
+					for _, ch := range item.Status.Channels {
+						if ch.Name == channel && ch.CurrentCSV != "" {
+							fmt.Printf("  Target CSV: %s\n", ch.CurrentCSV)
+							return ch.CurrentCSV, nil
+						}
+					}
+				}
+			}
 		}
 		fmt.Println("  packagemanifest not ready yet, retrying in 10s...")
 		time.Sleep(10 * time.Second)
