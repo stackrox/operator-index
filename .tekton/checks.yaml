@@ -104,7 +104,7 @@ spec:
           - use
           - $(tasks.clone-repository.results.SOURCE_ARTIFACT)=/var/workdir/source
         - name: run-go-tests
-          image: registry.redhat.io/ubi9/go-toolset:latest@sha256:1a755651ffe1a438f137418d183f18ebad527ec929206c17804f93490a97869e
+          image: registry.redhat.io/ubi9/go-toolset:latest@sha256:8cf89835994846ca0dffb9078e3a5638c57ec6175750f0af02fbe9c9942696d3
           imagePullPolicy: IfNotPresent
           workingDir: /var/workdir/source
           script: time make go-test
@@ -142,7 +142,7 @@ spec:
           - use
           - $(tasks.clone-repository.results.SOURCE_ARTIFACT)=/var/workdir/source
         - name: check-catalog-file-size
-          image: registry.redhat.io/ubi9/ubi-minimal:latest@sha256:580752f96d36c4132bffd30f9c34865bf4bd87f6aa161c969d117f21732e50f7
+          image: registry.redhat.io/ubi9/ubi-minimal:latest@sha256:7fbeae18dc9476399f565e68255f602a3374ea8614ba3d14843565131a13ff93
           imagePullPolicy: IfNotPresent
           workingDir: /var/workdir/source
           script: |
