@@ -1,0 +1,139 @@
+name: "Auto Operator Index Upgrade Test"
+
+on:
+  workflow_dispatch:
+    inputs:
+      acs-version-override:
+        description: 'Override ACS version, skips bundles.yaml diff (e.g. "4.10")'
+        required: false
+        type: string
+      operator-index-image-override:
+        description: 'Override operator-index image, skips Konflux polling (e.g. quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-...)'
+        required: false
+        type: string
+  push:
+    branches: [master]
+    paths: ['bundles.yaml']
+  pull_request:
+    paths: ['bundles.yaml']
+
+permissions:
+  contents: read
+
+jobs:
+  derive-inputs:
+    name: Derive operator-index-upgrade test inputs
+    runs-on: ubuntu-latest
+    outputs:
+      acs-versions: ${{ steps.version.outputs.acs-versions }}
+      operator-index-image: ${{ steps.image.outputs.operator-index-image }}
+      ocp-version: ${{ steps.image.outputs.ocp-version }}
+      should-run: ${{ steps.version.outputs.should-run }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Determine ACS version
+        id: version
+        env:
+          ACS_VERSION_OVERRIDE: ${{ inputs.acs-version-override }}
+          OPERATOR_INDEX_IMAGE_OVERRIDE: ${{ inputs.operator-index-image-override }}
+          BASE_REF: ${{ github.base_ref }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          # Image override without version override is ambiguous, thus fail fast.
+          if [ -n "$OPERATOR_INDEX_IMAGE_OVERRIDE" ] && [ -z "$ACS_VERSION_OVERRIDE" ]; then
+            echo "::error::operator-index-image-override requires acs-version-override to also be set"
+            exit 1
+          fi
+
+          if [ -n "$ACS_VERSION_OVERRIDE" ]; then
+            echo "Version override provided, skipping bundles.yaml diff: $ACS_VERSION_OVERRIDE"
+            echo "acs-versions=[\"$ACS_VERSION_OVERRIDE\"]" >> "$GITHUB_OUTPUT"
+            echo "should-run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            DIFF_BASE="origin/$BASE_REF"
+          else
+            # For runs on master branch, diff the previous commit.
+            DIFF_BASE="HEAD~1"
+          fi
+
+          # Lines starting with '+' are additions in the diff; anchor to 'version:' to skip 'oldest_supported_version:' etc.
+          NEW_VERSIONS=$(git diff "$DIFF_BASE" -- bundles.yaml \
+            | grep '^+[[:space:]]*version:' \
+            | sed 's/.*version:[[:space:]]*//' \
+            || true)
+
+          if [ -z "$NEW_VERSIONS" ]; then
+            echo "No new versions found in bundles.yaml diff, skipping operator-index-upgrade test"
+            echo "should-run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Build version JSON array for the matrix.
+          MINORS_JSON=$(echo "$NEW_VERSIONS" \
+            | sed 's/^\([0-9]*\.[0-9]*\).*/\1/' \
+            | jq -Rc '[.,inputs]')
+          echo "New versions added: $(echo "$NEW_VERSIONS" | tr '\n' ' '), testing minors: $MINORS_JSON"
+          echo "acs-versions=$MINORS_JSON" >> "$GITHUB_OUTPUT"
+          echo "should-run=true" >> "$GITHUB_OUTPUT"
+
+      - name: Determine operator-index image
+        id: image
+        if: steps.version.outputs.should-run == 'true'
+        env:
+          OPERATOR_INDEX_IMAGE_OVERRIDE: ${{ inputs.operator-index-image-override }}
+          SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ -n "$OPERATOR_INDEX_IMAGE_OVERRIDE" ]; then
+            echo "operator-index-image=$OPERATOR_INDEX_IMAGE_OVERRIDE" >> "$GITHUB_OUTPUT"
+            echo "ocp-version=" >> "$GITHUB_OUTPUT"
+            echo "needs-wait=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Use the highest OCP version from .tekton/ pipelines to build the image tag.
+          OCP_VERSION=$(ls .tekton/operator-index-ocp-v*-build.yaml \
+            | sed 's/.*operator-index-ocp-\(v[0-9]*-[0-9]*\)-build\.yaml/\1/' \
+            | sort -V | tail -1)
+          echo "Derived OCP_VERSION: $OCP_VERSION"
+
+          TAG="ocp-${OCP_VERSION}-${SHA}-fast"
+          IMAGE="quay.io/rhacs-eng/stackrox-operator-index:${TAG}"
+          echo "Image: $IMAGE"
+          echo "operator-index-image=$IMAGE" >> "$GITHUB_OUTPUT"
+          # Convert v4-22 → 4.22 for the infra create-cluster args.
+          echo "ocp-version=$(echo "$OCP_VERSION" | sed 's/^v//' | tr '-' '.')" >> "$GITHUB_OUTPUT"
+          echo "needs-wait=true" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for operator-index image
+        if: steps.version.outputs.should-run == 'true' && steps.image.outputs.needs-wait == 'true'
+        uses: stackrox/actions/release/wait-for-image@v1
+        with:
+          image: ${{ steps.image.outputs.operator-index-image }}
+          interval: "60"
+          limit: "7200"
+
+  run-upgrade-tests:
+    name: Run operator-index upgrade tests
+    needs: derive-inputs
+    if: needs.derive-inputs.outputs.should-run == true
+    strategy:
+      matrix:
+        acs-version: ${{ fromJson(needs.derive-inputs.outputs.acs-versions) }}
+      # if any matrix job fails, continue to run the rest of the jobs
+      fail-fast: false
+    uses: ./.github/workflows/operator-index-upgrade-test.yml
+    with:
+      operator-index-image: ${{ needs.derive-inputs.outputs.operator-index-image }}
+      acs-version: ${{ matrix.acs-version }}
+      ocp-version: ${{ needs.derive-inputs.outputs.ocp-version }}
+      cluster-lifespan: 3h
+    secrets:
+      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
