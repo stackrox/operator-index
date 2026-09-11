@@ -36,6 +36,18 @@ catalog-template.yaml: bundles.yaml $(wildcard $(GENERATE_SCRIPT_FOLDER)/*.go)
 go-test:
 	@$(GO) test -cover -v ./cmd/...
 
+# Operator index upgrade tests — require OPERATOR_INDEX_IMAGE and ACS_VERSION env vars.
+# Example: make upgrade-test-oldest OPERATOR_INDEX_IMAGE=quay.io/rhacs-eng/stackrox-operator-index:... ACS_VERSION=4.11
+.PHONY: upgrade-test-oldest upgrade-test-latest upgrade-test
+
+upgrade-test-oldest:
+	$(GO) test -v -count=1 -run TestUpgradeOldest -timeout 45m ./operator-index-upgrade-test/
+
+upgrade-test-latest:
+	$(GO) test -v -count=1 -run TestUpgradeLatest -timeout 30m ./operator-index-upgrade-test/
+
+upgrade-test: upgrade-test-oldest upgrade-test-latest
+
 $(OPM):
 	mkdir -p "$$(dirname $@)"
 	os_name="$$(uname | tr '[:upper:]' '[:lower:]')"; \

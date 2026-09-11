@@ -1,0 +1,165 @@
+name: "Operator Index Upgrade Test"
+
+on:
+  # TODO: remove pull_request trigger before merging
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      operator-index-image:
+        description: 'ACS Operator index image (e.g., quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-...)'
+        required: true
+        type: string
+      acs-version:
+        description: 'ACS minor version under test (e.g. 4.10). Determines channel and Y-2 oldest.'
+        required: true
+        type: string
+      ocp-version:
+        description: 'OCP version for the infra cluster (e.g. 4.22). Derived from operator-index-image tag if not set.'
+        required: false
+        default: ''
+        type: string
+      cluster-lifespan:
+        description: 'Cluster lifespan (e.g., 2h, 4h, 8h)'
+        required: false
+        default: '2h'
+        type: string
+  workflow_call:
+    inputs:
+      operator-index-image:
+        description: 'ACS Operator index image'
+        required: true
+        type: string
+      acs-version:
+        description: 'ACS minor version under test (e.g. 4.10). Determines channel and Y-2 oldest.'
+        required: true
+        type: string
+      ocp-version:
+        description: 'OCP version for the infra cluster (e.g. 4.22). Derived from operator-index-image tag if not set.'
+        required: false
+        default: ''
+        type: string
+      cluster-lifespan:
+        description: 'Cluster lifespan (e.g., 2h, 4h, 8h)'
+        required: false
+        default: '2h'
+        type: string
+    secrets:
+      INFRA_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CLUSTER_NAME: upgrade-test-${{ github.run_id }}-${{ github.run_attempt }}
+  GH_TOKEN: ${{ github.token }}
+  GH_NO_UPDATE_NOTIFIER: 1
+
+run-name: >-
+  ${{ format('Operator Index Upgrade Test v{0}', inputs.acs-version) }}
+
+jobs:
+  create-cluster:
+    name: Create OpenShift cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set cluster args
+        id: ocp
+        env:
+          OCP_VERSION: ${{ inputs.ocp-version }}
+        run: |
+          if [ -n "$OCP_VERSION" ]; then
+            echo "infra-args=openshift-version=ocp/stable-${OCP_VERSION}" >> "$GITHUB_OUTPUT"
+          else
+            echo "infra-args=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create OpenShift cluster
+        uses: stackrox/actions/infra/create-cluster@v1
+        with:
+          token: ${{ secrets.INFRA_TOKEN }}
+          flavor: openshift-4
+          name: ${{ env.CLUSTER_NAME }}
+          lifespan: ${{ inputs.cluster-lifespan || '2h' }}
+          wait: true
+          args: ${{ steps.ocp.outputs.infra-args }}
+
+  run-upgrade-tests:
+    name: Run operator-index upgrade tests
+    needs: create-cluster
+    runs-on: ubuntu-latest
+    env:
+      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
+    container:
+      image: quay.io/stackrox-io/apollo-ci:stackrox-test-stable
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install infractl
+        uses: stackrox/actions/infra/install-infractl@v1
+
+      - name: Download cluster kubeconfig
+        run: |
+          infractl artifacts --download-dir=./artifacts "$CLUSTER_NAME"
+          echo "KUBECONFIG=${{ github.workspace }}/artifacts/kubeconfig" >> "$GITHUB_ENV"
+
+      - name: "Test 1: upgrade oldest-supported → provided"
+        env:
+          # TODO: remove fallback values before merging
+          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image || 'quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-80b73dc51ca36405af84bf6714257e741420c275-fast' }}
+          ACS_VERSION: ${{ inputs.acs-version || '4.10' }}
+        run: make upgrade-test-oldest
+
+      - name: "Test 2: install provided → optionally upgrade to latest GA"
+        env:
+          # TODO: remove fallback values before merging
+          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image || 'quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-80b73dc51ca36405af84bf6714257e741420c275-fast' }}
+          ACS_VERSION: ${{ inputs.acs-version || '4.10' }}
+        run: make upgrade-test-latest
+
+  delete-test-cluster:
+    name: Delete infra test cluster
+    needs: [create-cluster, run-upgrade-tests]
+    runs-on: ubuntu-latest
+    if: always() && needs.create-cluster.result != 'cancelled'
+    env:
+      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
+    steps:
+      - name: Install infractl
+        uses: stackrox/actions/infra/install-infractl@v1
+
+      - name: Delete cluster
+        run: infractl delete "${CLUSTER_NAME}"
+
+  report-status:
+    name: Report test status
+    needs: [create-cluster, run-upgrade-tests, delete-test-cluster]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Write summary
+        run: |
+          cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          # Operator Index Upgrade Test Results
+
+          | Field | Value |
+          |-------|-------|
+          | **Operator image** | `${{ inputs.operator-index-image }}` |
+          | **ACS version** | `${{ inputs.acs-version }}` |
+          | **Cluster** | `${{ env.CLUSTER_NAME }}` |
+          | **Create cluster** | ${{ needs.create-cluster.result }} |
+          | **Upgrade tests** | ${{ needs.run-upgrade-tests.result }} |
+          | **Delete cluster** | ${{ needs.delete-test-cluster.result }} |
+
+          ## Tests run:
+          1. **Test 1** — install oldest supported ACS version, upgrade to the provided operator-index image
+          2. **Test 2** — install provided operator-index image, upgrade to latest GA if provided ACS version is behind
+          EOF
