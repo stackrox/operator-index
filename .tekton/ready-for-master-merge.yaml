@@ -104,7 +104,7 @@ spec:
           - use
           - $(tasks.clone-repository.results.SOURCE_ARTIFACT)=/var/workdir/source
         - name: check-bundle-images-in-catalog-template
-          image: quay.io/konflux-ci/release-service-utils:latest@sha256:7463f3c1deba0fb6a3bf69a29f8d1d2778fd943e3badab1da459e6fee6eaa84a
+          image: quay.io/konflux-ci/release-service-utils:latest@sha256:f61b44e4d3f4923ca5d264896dcd20a85aacf56272c92678f37cecd847c822ae
           imagePullPolicy: IfNotPresent
           workingDir: /var/workdir/source
           script: |
