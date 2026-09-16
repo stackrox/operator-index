@@ -56,15 +56,21 @@ func run() error {
 		return inputs.write()
 	}
 
-	inputs, err := inputsFromGit(versionStreamOverride, eventName, baseRef, sha)
+	streams, err := deriveVersionStreams(versionStreamOverride, eventName, baseRef)
 	if err != nil {
 		return err
 	}
-	if inputs == nil {
+	if len(streams) == 0 {
 		logf("No new bundle versions in diff, skipping upgrade test")
 		return nil
 	}
-	return inputs.write()
+
+	targets, err := deriveOCPVersionRange(sha)
+	if err != nil {
+		return err
+	}
+
+	return newWorkflowInputs(streams, targets).write()
 }
 
 // inputsFromOverrides builds workflowInputs directly from the provided overrides,
@@ -75,59 +81,11 @@ func inputsFromOverrides(versionStreamOverride, imageOverride string) (*workflow
 	if err != nil {
 		return nil, fmt.Errorf("invalid VERSION_STREAM_OVERRIDE %q: %w", versionStreamOverride, err)
 	}
-	return &workflowInputs{
-		versionStreams:     []*semver.Version{v},
-		operatorIndexImage: imageOverride,
-		ocpVersion:         "",
-	}, nil
-}
-
-// inputsFromGit derives workflowInputs from the git diff and .tekton/ pipeline files.
-// Returns nil, nil when the diff contains no new bundle versions (test should not run).
-func inputsFromGit(versionStreamOverride, eventName, baseRef, sha string) (*workflowInputs, error) {
-	streams, err := deriveVersionStreams(versionStreamOverride, eventName, baseRef)
-	if err != nil {
-		return nil, err
-	}
-	if len(streams) == 0 {
-		return nil, nil
-	}
-
-	ocp, err := deriveOCPVersion()
-	if err != nil {
-		return nil, err
-	}
-	ocpTag := fmt.Sprintf("v%d-%d", ocp.Major(), ocp.Minor())
-	tag := fmt.Sprintf("ocp-%s-%s-fast", ocpTag, sha)
-	image := fmt.Sprintf("%s:%s", operatorIndexImage, tag)
-	logf("Derived OCP version: %s\nImage: %s", ocpTag, image)
-
-	return &workflowInputs{
-		versionStreams:     streams,
-		operatorIndexImage: image,
-		ocpVersion:         fmt.Sprintf("%d.%d", ocp.Major(), ocp.Minor()),
-	}, nil
-}
-
-// writeOutput writes a KEY=VALUE line in the GitHub Actions output format.
-// The caller appends stdout to $GITHUB_OUTPUT to expose values to subsequent steps.
-func writeOutput(key, value string) {
-	fmt.Printf("%s=%s\n", key, value)
-}
-
-// logf writes a diagnostic progress message to stderr so it appears in the GHA step log.
-// These are informational only; fatal errors go through fmt.Errorf.
-func logf(format string, args ...any) {
-	fmt.Fprintf(os.Stderr, format+"\n", args...)
-}
-
-// toJSONArray encodes a string slice as a JSON array string.
-func toJSONArray(items []string) (string, error) {
-	b, err := json.Marshal(items)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
+	// OCP version is unknown for user-provided images; the upgrade-test workflow treats "" as "use default".
+	return newWorkflowInputs(
+		[]*semver.Version{v},
+		[]ocpTarget{{OCPVersion: "", Image: imageOverride}},
+	), nil
 }
 
 // deriveVersionStreams returns deduplicated semver versions (one per unique MAJOR.MINOR)
@@ -217,9 +175,11 @@ func parseNewVersionStreams(diffOutput string) ([]*semver.Version, error) {
 	return streams, nil
 }
 
-// deriveOCPVersion reads .tekton/ to find the highest OCP version across all
-// build pipelines, e.g. "v4-22" from "operator-index-ocp-v4-22-build.yaml".
-func deriveOCPVersion() (*semver.Version, error) {
+// deriveOCPVersionRange reads .tekton/ to find the oldest and newest OCP versions
+// across all build pipelines, e.g. from "operator-index-ocp-v4-14-build.yaml" and
+// "operator-index-ocp-v4-22-build.yaml" it returns targets for OCP 4.14 and 4.22.
+// When min and max coincide, a single target is returned.
+func deriveOCPVersionRange(sha string) ([]ocpTarget, error) {
 	pattern := filepath.Join(tektonDir, "operator-index-ocp-v*-build.yaml")
 	matches, err := filepath.Glob(pattern)
 	if err != nil {
@@ -229,22 +189,56 @@ func deriveOCPVersion() (*semver.Version, error) {
 		return nil, fmt.Errorf("no files matching %s found", pattern)
 	}
 
-	var highest *semver.Version
+	var min, max *semver.Version
 	for _, f := range matches {
 		m := ocpVersionFromFilename.FindStringSubmatch(filepath.Base(f))
 		if m == nil {
 			continue
 		}
-		v, err := semver.NewVersion(fmt.Sprintf("%s.%s.0", m[1], m[2]))
-		if err != nil {
-			return nil, fmt.Errorf("parse OCP version from %s: %w", filepath.Base(f), err)
+		v, parseErr := semver.NewVersion(fmt.Sprintf("%s.%s.0", m[1], m[2]))
+		if parseErr != nil {
+			return nil, fmt.Errorf("parse OCP version from %s: %w", filepath.Base(f), parseErr)
 		}
-		if highest == nil || v.GreaterThan(highest) {
-			highest = v
+		if min == nil || v.LessThan(min) {
+			min = v
+		}
+		if max == nil || v.GreaterThan(max) {
+			max = v
 		}
 	}
-	if highest == nil {
+	if min == nil {
 		return nil, fmt.Errorf("could not parse OCP version from any file in %s", tektonDir)
 	}
-	return highest, nil
+
+	var targets []ocpTarget
+	if min.Equal(max) {
+		targets = []ocpTarget{newOCPTarget(min, sha)}
+	} else {
+		targets = []ocpTarget{newOCPTarget(min, sha), newOCPTarget(max, sha)}
+	}
+	for _, t := range targets {
+		logf("OCP %s image: %s", t.OCPVersion, t.Image)
+	}
+	return targets, nil
+}
+
+// writeOutput writes a KEY=VALUE line in the GitHub Actions output format.
+// The caller appends stdout to $GITHUB_OUTPUT to expose values to subsequent steps.
+func writeOutput(key, value string) {
+	fmt.Printf("%s=%s\n", key, value)
+}
+
+// logf writes a diagnostic progress message to stderr so it appears in the GHA step log.
+// These are informational only; fatal errors go through fmt.Errorf.
+func logf(format string, args ...any) {
+	fmt.Fprintf(os.Stderr, format+"\n", args...)
+}
+
+// toJSONArray encodes a string slice as a JSON array string.
+func toJSONArray(items []string) (string, error) {
+	b, err := json.Marshal(items)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }
