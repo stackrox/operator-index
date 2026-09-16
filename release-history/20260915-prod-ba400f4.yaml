@@ -1,0 +1,460 @@
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-12-20260915-220544-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-12
+    appstudio.openshift.io/component: operator-index-ocp-v4-12
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v4-12-20260915-220544-20260915-prod-ba40
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-12
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:87c529132f1f9e3303f04330a8231de50d205212611b8667315e0eadcff82f43
+      name: operator-index-ocp-v4-12
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-12-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-12
+  snapshot: acs-operator-index-ocp-v4-12-20260915-220544-20260915-prod-ba40
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-14-20260915-220544-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-14
+    appstudio.openshift.io/component: operator-index-ocp-v4-14
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v4-14-20260915-220544-20260915-prod-ba40
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-14
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:38e94cb7f51a305ece8fa4fdb8d4f725e9095881017a37a3045ffaec65268333
+      name: operator-index-ocp-v4-14
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-14-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-14
+  snapshot: acs-operator-index-ocp-v4-14-20260915-220544-20260915-prod-ba40
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-16-20260915-220543-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-16
+    appstudio.openshift.io/component: operator-index-ocp-v4-16
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v4-16-20260915-220543-20260915-prod-ba40
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-16
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:f0c4b0857333c3fdaa215ae487f9001e75d2f8d056734704fa817c746317b1f2
+      name: operator-index-ocp-v4-16
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-16-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-16
+  snapshot: acs-operator-index-ocp-v4-16-20260915-220543-20260915-prod-ba40
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-17-20260915-220544-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-17
+    appstudio.openshift.io/component: operator-index-ocp-v4-17
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v4-17-20260915-220544-20260915-prod-ba40
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-17
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:1aa2a4b3e58de4681ab748be179126ec172eecd7a83f25b48dc8c20c57e389b9
+      name: operator-index-ocp-v4-17
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-17-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-17
+  snapshot: acs-operator-index-ocp-v4-17-20260915-220544-20260915-prod-ba40
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-18-20260915-220544-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-18
+    appstudio.openshift.io/component: operator-index-ocp-v4-18
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v4-18-20260915-220544-20260915-prod-ba40
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-18
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:89fa8b1f115d02a3da1e8bdca2d21483840ba70f8025558245a2a05d644fccc9
+      name: operator-index-ocp-v4-18
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-18-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-18
+  snapshot: acs-operator-index-ocp-v4-18-20260915-220544-20260915-prod-ba40
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-19-20260915-220544-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-19
+    appstudio.openshift.io/component: operator-index-ocp-v4-19
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v4-19-20260915-220544-20260915-prod-ba40
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-19
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:7f3dd84a748ab1318458a37792d748cefcafb74ea9667e0dfed0a8a0a711ac81
+      name: operator-index-ocp-v4-19
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-19-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-19
+  snapshot: acs-operator-index-ocp-v4-19-20260915-220544-20260915-prod-ba40
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-20-20260915-220544-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-20
+    appstudio.openshift.io/component: operator-index-ocp-v4-20
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v4-20-20260915-220544-20260915-prod-ba40
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-20
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:a2450dcd5937db97350b60d21f7389cd455bd20f3296de15250ffbd6c21732c0
+      name: operator-index-ocp-v4-20
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-20-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-20
+  snapshot: acs-operator-index-ocp-v4-20-20260915-220544-20260915-prod-ba40
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-21-20260915-220544-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-21
+    appstudio.openshift.io/component: operator-index-ocp-v4-21
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v4-21-20260915-220544-20260915-prod-ba40
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-21
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:9b5f2d8415fe3e34e5c60d1593045d3ec5d5e9b6e8191d106af1355b447505b2
+      name: operator-index-ocp-v4-21
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-21-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-21
+  snapshot: acs-operator-index-ocp-v4-21-20260915-220544-20260915-prod-ba40
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v4-22-20260915-220545-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v4-22
+    appstudio.openshift.io/component: operator-index-ocp-v4-22
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v4-22-20260915-220545-20260915-prod-ba40
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v4-22
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:6974e5f1e0db4490c9e8fae78f2a912323c623767eae070b8f5554d76cbd5730
+      name: operator-index-ocp-v4-22
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v4-22-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v4-22
+  snapshot: acs-operator-index-ocp-v4-22-20260915-220545-20260915-prod-ba40
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Snapshot
+metadata:
+  annotations:
+    build.appstudio.redhat.com/pull_request_number: "467"
+    build.appstudio.redhat.com/target_branch: master
+    pac.test.appstudio.openshift.io/branch: master
+    pac.test.appstudio.openshift.io/sender: bradr5
+    pac.test.appstudio.openshift.io/sha-title: |-
+      Release 4.10.8 version (#467)
+
+      Updates the operator-bundle image reference to the released
+      registry.redhat.io image and rebuilds the FBC catalogs for the final
+      4.10.8 release.
+    pac.test.appstudio.openshift.io/sha-url: https://github.com/stackrox/operator-index/commit/ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+    pac.test.appstudio.openshift.io/source-branch: refs/heads/master
+    acs.redhat.com/original-snapshot-name: acs-operator-index-ocp-v5-0-20260915-220543-000
+  labels:
+    appstudio.openshift.io/application: acs-operator-index-ocp-v5-0
+    appstudio.openshift.io/component: operator-index-ocp-v5-0
+    pac.test.appstudio.openshift.io/event-type: push
+    pac.test.appstudio.openshift.io/sha: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+  name: acs-operator-index-ocp-v5-0-20260915-220543-20260915-prod-ba400
+  namespace: rh-acs-tenant
+spec:
+  application: acs-operator-index-ocp-v5-0
+  artifacts: {}
+  components:
+    - containerImage: quay.io/rhacs-eng/stackrox-operator-index@sha256:64a7046f2f1150a0224f59c470b56bec1cb3a484623c591e8b13b038f190c98f
+      name: operator-index-ocp-v5-0
+      source:
+        git:
+          context: ./
+          revision: ba400f45ab0c5cf320c1a6a7a360fbc1248c388d
+          url: https://github.com/stackrox/operator-index
+
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Release
+metadata:
+  name: acs-operator-index-ocp-v5-0-20260915-prod-ba400f4
+  namespace: rh-acs-tenant
+spec:
+  releasePlan: acs-operator-index-prod-ocp-v5-0
+  snapshot: acs-operator-index-ocp-v5-0-20260915-220543-20260915-prod-ba400
