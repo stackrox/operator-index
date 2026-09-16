@@ -2,7 +2,6 @@ package upgradetest
 
 import (
 	"fmt"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -12,7 +11,8 @@ import (
 //  1. Installs ACS Operator (oldest_supported_version from bundles.yaml) from official redhat-operators.
 //  2. Upgrades to OPERATOR_INDEX_IMAGE on the VERSION_STREAM channel.
 //  3. Verifies each CSV reaches Succeeded.
-func TestUpgradeOldest(t *testing.T) {
+func (s *UpgradeSuite) TestUpgradeOldest() {
+	t := s.T()
 	operatorIndexImage := requireEnv(t, "OPERATOR_INDEX_IMAGE")
 	versionStream := requireEnv(t, "VERSION_STREAM")
 

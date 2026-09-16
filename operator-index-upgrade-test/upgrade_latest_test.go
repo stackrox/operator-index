@@ -2,7 +2,6 @@ package upgradetest
 
 import (
 	"fmt"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -12,7 +11,8 @@ import (
 //  1. Installs ACS Operator from OPERATOR_INDEX_IMAGE on the VERSION_STREAM channel.
 //  2. If VERSION_STREAM minor < latest GA minor for the same major: upgrades to latest GA via redhat-operators.
 //  3. Verifies each CSV reaches Succeeded.
-func TestUpgradeLatest(t *testing.T) {
+func (s *UpgradeSuite) TestUpgradeLatest() {
+	t := s.T()
 	operatorIndexImage := requireEnv(t, "OPERATOR_INDEX_IMAGE")
 	versionStream := requireEnv(t, "VERSION_STREAM")
 

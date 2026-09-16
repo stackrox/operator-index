@@ -41,10 +41,10 @@ go-test:
 .PHONY: upgrade-test-oldest upgrade-test-latest upgrade-test
 
 upgrade-test-oldest:
-	$(GO) test -v -count=1 -run TestUpgradeOldest -timeout 45m ./operator-index-upgrade-test/
+	$(GO) test -v -count=1 -run 'TestUpgradeSuite/TestUpgradeOldest' -timeout 45m ./operator-index-upgrade-test/
 
 upgrade-test-latest:
-	$(GO) test -v -count=1 -run TestUpgradeLatest -timeout 30m ./operator-index-upgrade-test/
+	$(GO) test -v -count=1 -run 'TestUpgradeSuite/TestUpgradeLatest' -timeout 30m ./operator-index-upgrade-test/
 
 upgrade-test: upgrade-test-oldest upgrade-test-latest
 

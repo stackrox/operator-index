@@ -1,19 +1,25 @@
 package upgradetest
 
 import (
-	"fmt"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
-// TestMain resets any leftover operator state before running the suite.
-// This makes local re-runs on the same cluster safe without manual cleanup.
-func TestMain(m *testing.M) {
-	if err := ResetOperator(); err != nil {
-		fmt.Fprintf(os.Stderr, "pre-test reset failed: %v\n", err)
-		os.Exit(1)
-	}
-	os.Exit(m.Run())
+// UpgradeSuite groups the operator-index upgrade tests.
+// BeforeTest resets leftover operator state before each test so that local
+// re-runs on the same cluster are safe without manual cleanup.
+type UpgradeSuite struct {
+	suite.Suite
+}
+
+func (s *UpgradeSuite) BeforeTest(_, _ string) {
+	s.Require().NoError(ResetOperator(), "pre-test reset")
+}
+
+func TestUpgradeSuite(t *testing.T) {
+	suite.Run(t, new(UpgradeSuite))
 }
 
 func requireEnv(t *testing.T, name string) string {
