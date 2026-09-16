@@ -9,15 +9,15 @@ import (
 )
 
 // TestUpgradeLatest tests the install + optional upgrade to latest GA path:
-//  1. Installs ACS Operator from OPERATOR_INDEX_IMAGE on the ACS_VERSION channel.
-//  2. If ACS_VERSION minor < latest GA minor for the same major: upgrades to latest GA via redhat-operators.
+//  1. Installs ACS Operator from OPERATOR_INDEX_IMAGE on the VERSION_STREAM channel.
+//  2. If VERSION_STREAM minor < latest GA minor for the same major: upgrades to latest GA via redhat-operators.
 //  3. Verifies each CSV reaches Succeeded.
 func TestUpgradeLatest(t *testing.T) {
 	operatorIndexImage := requireEnv(t, "OPERATOR_INDEX_IMAGE")
-	acsVersion := requireEnv(t, "ACS_VERSION")
+	versionStream := requireEnv(t, "VERSION_STREAM")
 
-	major, minor, err := ParseACSVersion(acsVersion)
-	require.NoError(t, err, "parse ACS_VERSION")
+	major, minor, err := ParseVersionStream(versionStream)
+	require.NoError(t, err, "parse VERSION_STREAM")
 	channel := fmt.Sprintf("rhacs-%d.%d", major, minor)
 
 	t.Cleanup(func() { _ = ResetOperator() })

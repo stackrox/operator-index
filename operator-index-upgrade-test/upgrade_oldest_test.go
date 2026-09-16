@@ -2,30 +2,22 @@ package upgradetest
 
 import (
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 )
 
-func requireEnv(t *testing.T, name string) string {
-	t.Helper()
-	val := os.Getenv(name)
-	require.NotEmptyf(t, val, "%s env var must be set", name)
-	return val
-}
-
 // TestUpgradeOldest tests the upgrade path from the oldest supported version to the provided index:
 //  1. Installs ACS Operator (oldest_supported_version from bundles.yaml) from official redhat-operators.
-//  2. Upgrades to OPERATOR_INDEX_IMAGE on the ACS_VERSION channel.
+//  2. Upgrades to OPERATOR_INDEX_IMAGE on the VERSION_STREAM channel.
 //  3. Verifies each CSV reaches Succeeded.
 func TestUpgradeOldest(t *testing.T) {
 	operatorIndexImage := requireEnv(t, "OPERATOR_INDEX_IMAGE")
-	acsVersion := requireEnv(t, "ACS_VERSION")
+	versionStream := requireEnv(t, "VERSION_STREAM")
 
-	major, minor, err := ParseACSVersion(acsVersion)
-	require.NoError(t, err, "parse ACS_VERSION")
+	major, minor, err := ParseVersionStream(versionStream)
+	require.NoError(t, err, "parse VERSION_STREAM")
 	channel := fmt.Sprintf("rhacs-%d.%d", major, minor)
 
 	oldestMajor, oldestMinor, err := ReadOldestSupportedVersion()
