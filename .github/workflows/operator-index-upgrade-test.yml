@@ -1,17 +1,14 @@
 name: "Operator Index Upgrade Test"
 
 on:
-  # TODO: remove pull_request trigger before merging
-  pull_request:
-    branches: [master]
   workflow_dispatch:
     inputs:
       operator-index-image:
         description: 'ACS Operator index image (e.g., quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-...)'
         required: true
         type: string
-      acs-version:
-        description: 'ACS minor version under test (e.g. 4.10). Determines channel and Y-2 oldest.'
+      version-stream:
+        description: 'ACS version stream under test (e.g. 4.10). Determines channel and Y-2 oldest.'
         required: true
         type: string
       ocp-version:
@@ -30,7 +27,7 @@ on:
         description: 'ACS Operator index image'
         required: true
         type: string
-      acs-version:
+      version-stream:
         description: 'ACS minor version under test (e.g. 4.10). Determines channel and Y-2 oldest.'
         required: true
         type: string
@@ -57,11 +54,9 @@ defaults:
 
 env:
   CLUSTER_NAME: upgrade-test-${{ github.run_id }}-${{ github.run_attempt }}
-  GH_TOKEN: ${{ github.token }}
-  GH_NO_UPDATE_NOTIFIER: 1
 
 run-name: >-
-  ${{ format('Operator Index Upgrade Test v{0}', inputs.acs-version) }}
+  ${{ format('Operator Index Upgrade Test v{0}', inputs.version-stream) }}
 
 jobs:
   create-cluster:
@@ -73,7 +68,7 @@ jobs:
         env:
           OCP_VERSION: ${{ inputs.ocp-version }}
         run: |
-          if [ -n "$OCP_VERSION" ]; then
+          if [[ -n "$OCP_VERSION" ]]; then
             echo "infra-args=openshift-version=ocp/stable-${OCP_VERSION}" >> "$GITHUB_OUTPUT"
           else
             echo "infra-args=" >> "$GITHUB_OUTPUT"
@@ -85,7 +80,7 @@ jobs:
           token: ${{ secrets.INFRA_TOKEN }}
           flavor: openshift-4
           name: ${{ env.CLUSTER_NAME }}
-          lifespan: ${{ inputs.cluster-lifespan || '2h' }}
+          lifespan: ${{ inputs.cluster-lifespan }}
           wait: true
           args: ${{ steps.ocp.outputs.infra-args }}
 
@@ -93,8 +88,6 @@ jobs:
     name: Run operator-index upgrade tests
     needs: create-cluster
     runs-on: ubuntu-latest
-    env:
-      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
     container:
       image: quay.io/stackrox-io/apollo-ci:stackrox-test-stable
     steps:
@@ -107,22 +100,22 @@ jobs:
         uses: stackrox/actions/infra/install-infractl@v1
 
       - name: Download cluster kubeconfig
+        env:
+          INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
         run: |
           infractl artifacts --download-dir=./artifacts "$CLUSTER_NAME"
           echo "KUBECONFIG=${{ github.workspace }}/artifacts/kubeconfig" >> "$GITHUB_ENV"
 
       - name: "Test 1: upgrade oldest-supported → provided"
         env:
-          # TODO: remove fallback values before merging
-          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image || 'quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-80b73dc51ca36405af84bf6714257e741420c275-fast' }}
-          ACS_VERSION: ${{ inputs.acs-version || '4.10' }}
+          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image }}
+          VERSION_STREAM: ${{ inputs.version-stream }}
         run: make upgrade-test-oldest
 
       - name: "Test 2: install provided → optionally upgrade to latest GA"
         env:
-          # TODO: remove fallback values before merging
-          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image || 'quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-80b73dc51ca36405af84bf6714257e741420c275-fast' }}
-          ACS_VERSION: ${{ inputs.acs-version || '4.10' }}
+          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image }}
+          VERSION_STREAM: ${{ inputs.version-stream }}
         run: make upgrade-test-latest
 
   delete-test-cluster:
@@ -153,7 +146,7 @@ jobs:
           | Field | Value |
           |-------|-------|
           | **Operator image** | `${{ inputs.operator-index-image }}` |
-          | **ACS version** | `${{ inputs.acs-version }}` |
+          | **ACS version** | `${{ inputs.version-stream }}` |
           | **Cluster** | `${{ env.CLUSTER_NAME }}` |
           | **Create cluster** | ${{ needs.create-cluster.result }} |
           | **Upgrade tests** | ${{ needs.run-upgrade-tests.result }} |
