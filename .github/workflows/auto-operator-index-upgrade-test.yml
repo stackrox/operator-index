@@ -30,8 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version-streams: ${{ steps.derive.outputs.version-streams }}
-      operator-index-image: ${{ steps.derive.outputs.operator-index-image }}
-      ocp-version: ${{ steps.derive.outputs.ocp-version }}
+      ocp-targets: ${{ steps.derive.outputs.ocp-targets }}
     steps:
       - name: Check out code
         uses: actions/checkout@v7
@@ -49,11 +48,19 @@ jobs:
           SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: go run ./cmd/derive-inputs >> "$GITHUB_OUTPUT"
 
-      - name: Wait for operator-index image
+      - name: Wait for oldest-OCP operator-index image
         if: steps.derive.outputs.version-streams != ''
         uses: stackrox/actions/release/wait-for-image@v1
         with:
-          image: ${{ steps.derive.outputs.operator-index-image }}
+          image: ${{ fromJson(steps.derive.outputs.ocp-targets)[0].operator-index-image }}
+          interval: "60"
+          limit: "7200"
+
+      - name: Wait for newest-OCP operator-index image
+        if: steps.derive.outputs.version-streams != '' && fromJson(steps.derive.outputs.ocp-targets)[1] != null
+        uses: stackrox/actions/release/wait-for-image@v1
+        with:
+          image: ${{ fromJson(steps.derive.outputs.ocp-targets)[1].operator-index-image }}
           interval: "60"
           limit: "7200"
 
@@ -64,13 +71,14 @@ jobs:
     strategy:
       matrix:
         version-stream: ${{ fromJson(needs.derive-inputs.outputs.version-streams) }}
+        ocp-target: ${{ fromJson(needs.derive-inputs.outputs.ocp-targets) }}
       # if any matrix job fails, continue to run the rest of the jobs
       fail-fast: false
     uses: ./.github/workflows/operator-index-upgrade-test.yml
     with:
-      operator-index-image: ${{ needs.derive-inputs.outputs.operator-index-image }}
+      operator-index-image: ${{ matrix.ocp-target.operator-index-image }}
       version-stream: ${{ matrix.version-stream }}
-      ocp-version: ${{ needs.derive-inputs.outputs.ocp-version }}
+      ocp-version: ${{ matrix.ocp-target.ocp-version }}
       cluster-lifespan: 3h
     secrets:
       INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
