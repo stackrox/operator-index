@@ -3,6 +3,7 @@ package upgradetest
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -35,14 +36,16 @@ func ocRun(args ...string) error {
 }
 
 func ocOutput(args ...string) (string, error) {
-	var stderr bytes.Buffer
+	var stdout, stderr bytes.Buffer
 	cmd := exec.Command("oc", args...)
+	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
-	out, err := cmd.Output()
-	if err != nil && stderr.Len() > 0 {
-		return strings.TrimSpace(string(out)), fmt.Errorf("%w\nstderr: %s", err, strings.TrimSpace(stderr.String()))
+	err := cmd.Run()
+	if err != nil {
+		return "", fmt.Errorf("%w\nstdout: %s\nstderr: %s", err,
+			strings.TrimSpace(stdout.String()), strings.TrimSpace(stderr.String()))
 	}
-	return strings.TrimSpace(string(out)), err
+	return strings.TrimSpace(stdout.String()), nil
 }
 
 func ocApply(manifest string) error {
@@ -67,14 +70,14 @@ func ReadOldestSupportedVersion() (major, minor int, err error) {
 	if err := yaml.Unmarshal(data, &b); err != nil {
 		return 0, 0, fmt.Errorf("parsing bundles.yaml: %w", err)
 	}
-	return ParseACSVersion(b.OldestSupportedVersion)
+	return ParseVersionStream(b.OldestSupportedVersion)
 }
 
-// ParseACSVersion parses "4.10" or "4.10.3" or "4.10.0-rc.1" into (major=4, minor=10).
-func ParseACSVersion(ver string) (major, minor int, err error) {
+// ParseVersionStream parses "4.10" or "4.10.3" or "4.10.0-rc.1" into (major=4, minor=10).
+func ParseVersionStream(ver string) (major, minor int, err error) {
 	parts := strings.SplitN(ver, ".", 3)
 	if len(parts) < 2 {
-		return 0, 0, fmt.Errorf("ACS_VERSION must be MAJOR.MINOR (e.g. 4.10), got: %q", ver)
+		return 0, 0, fmt.Errorf("VERSION_STREAM must be MAJOR.MINOR (e.g. 4.10), got: %q", ver)
 	}
 	maj, err := strconv.Atoi(parts[0])
 	if err != nil {
@@ -344,16 +347,29 @@ func WaitForCSV(targetCSV string, timeout time.Duration) error {
 // ResetOperator removes the operator subscription, CSVs, and custom catalog between tests.
 func ResetOperator() error {
 	fmt.Println("  Resetting operator state...")
-	_ = ocRun("delete", "subscription", "rhacs-operator",
-		"-n", "openshift-operators", "--ignore-not-found")
-	out, _ := ocOutput("get", "csv", "-n", "openshift-operators", "--no-headers")
+	var errs []error
+	if err := ocRun("delete", "subscription", "rhacs-operator",
+		"-n", "openshift-operators", "--ignore-not-found"); err != nil {
+		errs = append(errs, fmt.Errorf("delete subscription: %w", err))
+	}
+	out, err := ocOutput("get", "csv", "-n", "openshift-operators", "--no-headers")
+	if err != nil {
+		errs = append(errs, fmt.Errorf("list CSVs: %w", err))
+	}
 	for _, line := range strings.Split(out, "\n") {
 		if fields := strings.Fields(line); len(fields) > 0 && strings.HasPrefix(fields[0], "rhacs-operator.") {
-			_ = ocRun("delete", "csv", fields[0],
-				"-n", "openshift-operators", "--ignore-not-found")
+			if err := ocRun("delete", "csv", fields[0],
+				"-n", "openshift-operators", "--ignore-not-found"); err != nil {
+				errs = append(errs, fmt.Errorf("delete csv %s: %w", fields[0], err))
+			}
 		}
 	}
-	_ = ocRun("delete", "catalogsource", "my-operator-catalog",
-		"-n", "openshift-marketplace", "--ignore-not-found")
-	return EnableDefaultSources()
+	if err := ocRun("delete", "catalogsource", "my-operator-catalog",
+		"-n", "openshift-marketplace", "--ignore-not-found"); err != nil {
+		errs = append(errs, fmt.Errorf("delete catalogsource: %w", err))
+	}
+	if err := EnableDefaultSources(); err != nil {
+		errs = append(errs, err)
+	}
+	return errors.Join(errs...)
 }
