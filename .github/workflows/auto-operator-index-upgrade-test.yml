@@ -1,0 +1,84 @@
+name: "Auto Operator Index Upgrade Test"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version-stream-override:
+        description: 'Override ACS stream version, skips bundles.yaml diff (e.g. "4.10")'
+        required: false
+        type: string
+      operator-index-image-override:
+        description: 'Override operator-index image (e.g. quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-...)'
+        required: false
+        type: string
+  push:
+    branches: [master]
+    paths: ['bundles.yaml']
+  pull_request:
+    paths: ['bundles.yaml']
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  derive-inputs:
+    name: Derive operator-index-upgrade test inputs
+    runs-on: ubuntu-latest
+    outputs:
+      version-streams: ${{ steps.derive.outputs.version-streams }}
+      ocp-targets: ${{ steps.derive.outputs.ocp-targets }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Derive upgrade test inputs
+        id: derive
+        env:
+          VERSION_STREAM_OVERRIDE: ${{ inputs.version-stream-override }}
+          OPERATOR_INDEX_IMAGE_OVERRIDE: ${{ inputs.operator-index-image-override }}
+          BASE_REF: ${{ github.base_ref }}
+          EVENT_NAME: ${{ github.event_name }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: go run ./cmd/derive-inputs >> "$GITHUB_OUTPUT"
+
+      - name: Wait for oldest-OCP operator-index image
+        if: steps.derive.outputs.version-streams != ''
+        uses: stackrox/actions/release/wait-for-image@v1
+        with:
+          image: ${{ fromJson(steps.derive.outputs.ocp-targets)[0].operator-index-image }}
+          interval: "60"
+          limit: "7200"
+
+      - name: Wait for newest-OCP operator-index image
+        if: steps.derive.outputs.version-streams != '' && fromJson(steps.derive.outputs.ocp-targets)[1] != null
+        uses: stackrox/actions/release/wait-for-image@v1
+        with:
+          image: ${{ fromJson(steps.derive.outputs.ocp-targets)[1].operator-index-image }}
+          interval: "60"
+          limit: "7200"
+
+  run-upgrade-tests:
+    name: Run operator-index upgrade tests
+    needs: derive-inputs
+    if: needs.derive-inputs.outputs.version-streams != ''
+    strategy:
+      matrix:
+        version-stream: ${{ fromJson(needs.derive-inputs.outputs.version-streams) }}
+        ocp-target: ${{ fromJson(needs.derive-inputs.outputs.ocp-targets) }}
+      # if any matrix job fails, continue to run the rest of the jobs
+      fail-fast: false
+    uses: ./.github/workflows/operator-index-upgrade-test.yml
+    with:
+      operator-index-image: ${{ matrix.ocp-target.operator-index-image }}
+      version-stream: ${{ matrix.version-stream }}
+      ocp-version: ${{ matrix.ocp-target.ocp-version }}
+      cluster-lifespan: 3h
+    secrets:
+      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
