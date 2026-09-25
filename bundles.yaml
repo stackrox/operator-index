@@ -1,6 +1,6 @@
 # Oldest supported version should be equal to the lowest supported version in the support policy document.
 # See: https://access.redhat.com/support/policy/updates/rhacs
-oldest_supported_version: 4.9.0
+oldest_supported_version: 4.10.0
 images:
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:6cdcf20771f9c46640b466f804190d00eaf2e59caee6d420436e78b283d177bf
     version: 3.62.0
@@ -296,6 +296,8 @@ images:
     version: 4.10.7
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:bb547b85647f5509f0436ba6f2a1f5cf4e06c82c008c9df790060ca1e9b3955b
     version: 4.10.8
+  - image: quay.io/rhacs-eng/release-operator-bundle@sha256:2bf87c3f586e727adfcfce77811d8ab1e2e439c5f86d8f85055a59cb9739d1ff
+    version: 4.10.9-rc.2
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:09da338721670816180c98f7c24f2fae79971487b82bcfeca750d49b369ca0a6
     version: 4.11.0
   - image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:2fe25a8ac9612f29a625969bb25d24938abb298e9a9e1e79fb3aa34c6a0e5f76
