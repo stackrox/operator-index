@@ -23,7 +23,7 @@ func (s *UpgradeSuite) TestUpgradeOldest() {
 	oldestMajor, oldestMinor, err := ReadOldestSupportedVersion()
 	require.NoError(t, err, "read oldest_supported_version from bundles.yaml")
 
-	t.Cleanup(func() { _ = ResetOperator() })
+	t.Cleanup(func() { require.NoError(t, ResetOperator()) })
 
 	t.Logf("Image:   %s", operatorIndexImage)
 	t.Logf("Version: %d.%d | Channel: %s", major, minor, channel)

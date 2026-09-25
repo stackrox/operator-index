@@ -20,7 +20,7 @@ func (s *UpgradeSuite) TestUpgradeLatest() {
 	require.NoError(t, err, "parse VERSION_STREAM")
 	channel := fmt.Sprintf("rhacs-%d.%d", major, minor)
 
-	t.Cleanup(func() { _ = ResetOperator() })
+	t.Cleanup(func() { require.NoError(t, ResetOperator()) })
 
 	t.Logf("Image:   %s", operatorIndexImage)
 	t.Logf("Version: %d.%d | Channel: %s", major, minor, channel)
