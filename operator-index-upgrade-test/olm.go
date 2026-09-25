@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 
+	semver "github.com/Masterminds/semver/v3"
 	yaml "github.com/goccy/go-yaml"
 )
 
@@ -61,42 +61,40 @@ type bundlesYAML struct {
 }
 
 // ReadOldestSupportedVersion parses oldest_supported_version from bundles.yaml.
-func ReadOldestSupportedVersion() (major, minor int, err error) {
+func ReadOldestSupportedVersion() (*semver.Version, error) {
 	data, err := os.ReadFile("../bundles.yaml")
 	if err != nil {
-		return 0, 0, fmt.Errorf("reading bundles.yaml: %w", err)
+		return nil, fmt.Errorf("reading bundles.yaml: %w", err)
 	}
 	var b bundlesYAML
 	if err := yaml.Unmarshal(data, &b); err != nil {
-		return 0, 0, fmt.Errorf("parsing bundles.yaml: %w", err)
+		return nil, fmt.Errorf("parsing bundles.yaml: %w", err)
 	}
-	return ParseVersionStream(b.OldestSupportedVersion)
+	v, err := semver.NewVersion(b.OldestSupportedVersion)
+	if err != nil {
+		return nil, fmt.Errorf("invalid oldest_supported_version %q: %w", b.OldestSupportedVersion, err)
+	}
+	return v, nil
 }
 
-// ParseVersionStream parses "4.10" or "4.10.3" or "4.10.0-rc.1" into (major=4, minor=10).
-func ParseVersionStream(ver string) (major, minor int, err error) {
-	parts := strings.SplitN(ver, ".", 3)
-	if len(parts) < 2 {
-		return 0, 0, fmt.Errorf("VERSION_STREAM must be MAJOR.MINOR (e.g. 4.10), got: %q", ver)
+// ParseVersionStream parses a MAJOR.MINOR version stream string (e.g. "4.10") into a semver.Version.
+func ParseVersionStream(ver string) (*semver.Version, error) {
+	if strings.Count(ver, ".") != 1 {
+		return nil, fmt.Errorf("version stream must be MAJOR.MINOR (e.g. 4.10), got: %q", ver)
 	}
-	maj, err := strconv.Atoi(parts[0])
+	v, err := semver.NewVersion(ver)
 	if err != nil {
-		return 0, 0, fmt.Errorf("invalid major in %q: %w", ver, err)
+		return nil, fmt.Errorf("invalid version stream %q: %w", ver, err)
 	}
-	min, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return 0, 0, fmt.Errorf("invalid minor in %q: %w", ver, err)
-	}
-	return maj, min, nil
+	return v, nil
 }
 
-// GetLatestOfficialMinor returns the highest available minor for the given major
-// from the official redhat-operators catalog, retrying until timeout because
+// GetLatestOfficialStream returns the highest available version stream across all rhacs-MAJOR.MINOR
+// channels in the official redhat-operators catalog, retrying until timeout because
 // packagemanifests can lag behind the catalog's READY state.
-func GetLatestOfficialMinor(major int, timeout time.Duration) (int, error) {
+func GetLatestOfficialStream(timeout time.Duration) (*semver.Version, error) {
 	deadline := time.Now().Add(timeout)
-	prefix := fmt.Sprintf("rhacs-%d.", major)
-	fmt.Printf("  Looking for latest rhacs-%d.* channel in redhat-operators (timeout: %v)...\n", major, timeout)
+	fmt.Printf("  Looking for latest rhacs-*.* channel in redhat-operators (timeout: %v)...\n", timeout)
 	for time.Now().Before(deadline) {
 		out, err := exec.Command("oc", "get", "packagemanifest",
 			"-n", "openshift-marketplace",
@@ -114,31 +112,31 @@ func GetLatestOfficialMinor(major int, timeout time.Duration) (int, error) {
 			time.Sleep(10 * time.Second)
 			continue
 		}
-		maxMinor := -1
+		var latest *semver.Version
 		for _, item := range list.Items {
 			if item.Metadata.Name != "rhacs-operator" {
 				continue
 			}
 			for _, ch := range item.Status.Channels {
-				if !strings.HasPrefix(ch.Name, prefix) {
+				if !strings.HasPrefix(ch.Name, "rhacs-") {
 					continue
 				}
-				n, err := strconv.Atoi(strings.TrimPrefix(ch.Name, prefix))
+				s, err := ParseVersionStream(strings.TrimPrefix(ch.Name, "rhacs-"))
 				if err != nil {
 					continue
 				}
-				if n > maxMinor {
-					maxMinor = n
+				if latest == nil || s.GreaterThan(latest) {
+					latest = s
 				}
 			}
 		}
-		if maxMinor >= 0 {
-			return maxMinor, nil
+		if latest != nil {
+			return latest, nil
 		}
-		fmt.Printf("  rhacs-%d.* channels not yet in packagemanifest, retrying in 10s...\n", major)
+		fmt.Println("  rhacs-*.* channels not yet in packagemanifest, retrying in 10s...")
 		time.Sleep(10 * time.Second)
 	}
-	return 0, fmt.Errorf("no rhacs-%d.* channels found in redhat-operators after %v", major, timeout)
+	return nil, fmt.Errorf("no rhacs-*.* channels found in redhat-operators after %v", timeout)
 }
 
 // DisableDefaultSources disables all default OperatorHub catalog sources.
@@ -239,9 +237,9 @@ func ResolveTargetCSV(catalogLabel, channel string, timeout time.Duration) (stri
 		channel, catalogLabel, timeout)
 }
 
-// InstallFromOfficial installs the ACS Operator from redhat-operators at channel rhacs-MAJOR.MINOR.
-func InstallFromOfficial(major, minor int) (targetCSV string, err error) {
-	channel := fmt.Sprintf("rhacs-%d.%d", major, minor)
+// InstallFromOfficial installs the ACS Operator from redhat-operators at the given stream's channel.
+func InstallFromOfficial(stream *semver.Version) (targetCSV string, err error) {
+	channel := fmt.Sprintf("rhacs-%d.%d", stream.Major(), stream.Minor())
 	fmt.Printf("  Installing ACS Operator from redhat-operators, channel %s...\n", channel)
 	if err := WaitForCatalog("redhat-operators", "openshift-marketplace", 2*time.Minute); err != nil {
 		return "", err
@@ -294,19 +292,15 @@ func UpgradeViaCustom(indexImage, channel string) (targetCSV string, err error) 
 	return csv, nil
 }
 
-// UpgradeToLatestOfficial upgrades to the latest GA via redhat-operators.
-func UpgradeToLatestOfficial(major int) (targetCSV string, err error) {
+// UpgradeToLatestOfficial upgrades to the given GA stream via redhat-operators.
+func UpgradeToLatestOfficial(target *semver.Version) (targetCSV string, err error) {
 	if err := EnableDefaultSources(); err != nil {
 		return "", err
 	}
 	if err := WaitForCatalog("redhat-operators", "openshift-marketplace", 3*time.Minute); err != nil {
 		return "", err
 	}
-	latestMinor, err := GetLatestOfficialMinor(major, 3*time.Minute)
-	if err != nil {
-		return "", err
-	}
-	channel := fmt.Sprintf("rhacs-%d.%d", major, latestMinor)
+	channel := fmt.Sprintf("rhacs-%d.%d", target.Major(), target.Minor())
 	fmt.Printf("  Upgrading to latest GA channel: %s...\n", channel)
 	csv, err := ResolveTargetCSV("redhat-operators", channel, 3*time.Minute)
 	if err != nil {
