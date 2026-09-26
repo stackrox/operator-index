@@ -2575,6 +2575,9 @@ entries:
   - name: rhacs-operator.v4.10.8
     replaces: rhacs-operator.v4.10.7
     skipRange: ">= 4.9.0 < 4.10.8"
+  - name: rhacs-operator.v4.10.9-rc.2
+    replaces: rhacs-operator.v4.10.8
+    skipRange: ">= 4.9.0 < 4.10.9-rc.2"
 - schema: olm.channel
   name: rhacs-4.11
   package: rhacs-operator
@@ -2881,8 +2884,11 @@ entries:
   - name: rhacs-operator.v4.10.8
     replaces: rhacs-operator.v4.10.7
     skipRange: ">= 4.9.0 < 4.10.8"
-  - name: rhacs-operator.v4.11.0
+  - name: rhacs-operator.v4.10.9-rc.2
     replaces: rhacs-operator.v4.10.8
+    skipRange: ">= 4.9.0 < 4.10.9-rc.2"
+  - name: rhacs-operator.v4.11.0
+    replaces: rhacs-operator.v4.10.9-rc.2
     skipRange: ">= 4.10.0 < 4.11.0"
   - name: rhacs-operator.v4.11.1
     replaces: rhacs-operator.v4.11.0
@@ -3202,8 +3208,11 @@ entries:
   - name: rhacs-operator.v4.10.8
     replaces: rhacs-operator.v4.10.7
     skipRange: ">= 4.9.0 < 4.10.8"
-  - name: rhacs-operator.v4.11.0
+  - name: rhacs-operator.v4.10.9-rc.2
     replaces: rhacs-operator.v4.10.8
+    skipRange: ">= 4.9.0 < 4.10.9-rc.2"
+  - name: rhacs-operator.v4.11.0
+    replaces: rhacs-operator.v4.10.9-rc.2
     skipRange: ">= 4.10.0 < 4.11.0"
   - name: rhacs-operator.v4.11.1
     replaces: rhacs-operator.v4.11.0
@@ -3311,6 +3320,10 @@ entries:
   - reference:
       schema: olm.channel
       name: rhacs-4.8
+    message: "This version is no longer supported. Switch to the `stable` channel or a channel for a more recent version that is still supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.channel
+      name: rhacs-4.9
     message: "This version is no longer supported. Switch to the `stable` channel or a channel for a more recent version that is still supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
   - reference:
       schema: olm.bundle
@@ -3816,6 +3829,54 @@ entries:
       schema: olm.bundle
       name: rhacs-operator.v4.8.11
     message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.0
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.1
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.2
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.3
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.4
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.5
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.6
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.7
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.8
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.9
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.10
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
+  - reference:
+      schema: olm.bundle
+      name: rhacs-operator.v4.9.11
+    message: "This Operator version is no longer supported. Use a more recent version that is supported. Find supported versions in the RHACS support policy document: https://access.redhat.com/support/policy/updates/rhacs"
 - schema: olm.bundle
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:6cdcf20771f9c46640b466f804190d00eaf2e59caee6d420436e78b283d177bf
 - schema: olm.bundle
@@ -4110,6 +4171,8 @@ entries:
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:18618fd708fc639eee0a60e61a662bb39aa2b8ee7caed5b3d7d89b3ff206a40d
 - schema: olm.bundle
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:bb547b85647f5509f0436ba6f2a1f5cf4e06c82c008c9df790060ca1e9b3955b
+- schema: olm.bundle
+  image: quay.io/rhacs-eng/release-operator-bundle@sha256:2bf87c3f586e727adfcfce77811d8ab1e2e439c5f86d8f85055a59cb9739d1ff
 - schema: olm.bundle
   image: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle@sha256:09da338721670816180c98f7c24f2fae79971487b82bcfeca750d49b369ca0a6
 - schema: olm.bundle
