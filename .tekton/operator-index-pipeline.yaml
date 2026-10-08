@@ -312,22 +312,6 @@ spec:
       operator: in
       values: ["false"]
 
-  - name: apply-tags
-    params:
-    - name: IMAGE_URL
-      value: $(tasks.build-image-index.results.IMAGE_URL)
-    - name: IMAGE_DIGEST
-      value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-    taskRef:
-      params:
-      - name: name
-        value: apply-tags
-      - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.3.1@sha256:c177fc2b2482b1299e713c51bf258eba4972c016ef260d9f45335c2550dc7b2b
-      - name: kind
-        value: task
-      resolver: bundles
-
   - name: validate-fbc
     params:
     - name: IMAGE_URL
