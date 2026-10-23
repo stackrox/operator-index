@@ -1,5 +1,5 @@
 // derive-inputs derives the inputs for the operator-index upgrade test workflow.
-// It merges two previously bash-based steps:
+// It does the following:
 //  1. Determine ACS version(s) from bundles.yaml git diff.
 //  2. Determine operator-index image from .tekton/ pipeline files.
 //

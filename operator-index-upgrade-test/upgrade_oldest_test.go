@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestUpgradeOldest tests the upgrade path from the oldest supported version to the provided index:
-//  1. Installs ACS Operator (oldest_supported_version from bundles.yaml) from official redhat-operators and verifies the CSV reaches Succeeded.
-//  2. Upgrades to OPERATOR_INDEX_IMAGE on the VERSION_STREAM channel and verifies the CSV reaches Succeeded.
+// TestUpgradeOldest tests the upgrade path from the oldest supported version to the provided index image:
+//  1. Installs ACS Operator (oldest_supported_version from bundles.yaml) from the official redhat-operators and verifies the CSV reaches Succeeded.
+//  2. Upgrades the ACS operator to the latest available version in the VERSION_STREAM channel in the OPERATOR_INDEX_IMAGE and verifies the CSV reaches Succeeded.
 func (s *UpgradeSuite) TestUpgradeOldest() {
 	t := s.T()
 	operatorIndexImage := requireEnv(t, "OPERATOR_INDEX_IMAGE")
@@ -26,7 +26,7 @@ func (s *UpgradeSuite) TestUpgradeOldest() {
 
 	t.Logf("Image:   %s", operatorIndexImage)
 	t.Logf("Version: %d.%d | Channel: %s", stream.Major(), stream.Minor(), channel)
-	t.Logf("Oldest:  %d.%d (from bundles.yaml)", oldest.Major(), oldest.Minor())
+	t.Logf("Oldest:  %d.%d.%d (from bundles.yaml)", oldest.Major(), oldest.Minor(), oldest.Path())
 
 	t.Logf("Step 1: Install ACS Operator %d.%d from redhat-operators", oldest.Major(), oldest.Minor())
 	targetCSV, err := InstallFromOfficial(oldest)

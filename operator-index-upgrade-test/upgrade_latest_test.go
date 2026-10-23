@@ -9,7 +9,7 @@ import (
 
 // TestUpgradeLatest tests the install + optional upgrade to latest GA path:
 //  1. Installs ACS Operator from OPERATOR_INDEX_IMAGE on the VERSION_STREAM channel and verifies the CSV reaches Succeeded.
-//  2. If VERSION_STREAM < latest GA minor: upgrades to latest GA via redhat-operators and verifies the CSV reaches Succeeded.
+//  2. If VERSION_STREAM < latest GA stream: upgrades to latest GA via official redhat-operators catalog and verifies the CSV reaches Succeeded.
 func (s *UpgradeSuite) TestUpgradeLatest() {
 	t := s.T()
 	operatorIndexImage := requireEnv(t, "OPERATOR_INDEX_IMAGE")
@@ -41,7 +41,7 @@ func (s *UpgradeSuite) TestUpgradeLatest() {
 		require.NoError(t, err)
 		require.NoError(t, WaitForCSV(targetCSV, 10*time.Minute))
 	} else {
-		t.Logf("%d.%d is already at or ahead of the latest GA %d.%d — no upgrade needed",
+		t.Logf("%d.%d is already at or ahead of the latest GA %d.%d — no upgrade test needed",
 			stream.Major(), stream.Minor(), latestStream.Major(), latestStream.Minor())
 	}
 }

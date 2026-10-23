@@ -147,10 +147,7 @@ jobs:
           |-------|-------|
           | **Operator image** | `${{ inputs.operator-index-image }}` |
           | **ACS version** | `${{ inputs.version-stream }}` |
-          | **Cluster** | `${{ env.CLUSTER_NAME }}` |
-          | **Create cluster** | ${{ needs.create-cluster.result }} |
           | **Upgrade tests** | ${{ needs.run-upgrade-tests.result }} |
-          | **Delete cluster** | ${{ needs.delete-test-cluster.result }} |
 
           ## Tests run:
           1. **Test 1** — install oldest supported ACS version, upgrade to the provided operator-index image
