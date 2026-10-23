@@ -12,9 +12,8 @@ on:
         required: true
         type: string
       ocp-version:
-        description: 'OCP version for the infra cluster (e.g. 4.22). Derived from operator-index-image tag if not set.'
-        required: false
-        default: ''
+        description: 'OCP version for the infra cluster (e.g. 4.22)'
+        required: true
         type: string
       cluster-lifespan:
         description: 'Cluster lifespan (e.g., 2h, 4h, 8h)'
@@ -32,9 +31,8 @@ on:
         required: true
         type: string
       ocp-version:
-        description: 'OCP version for the infra cluster (e.g. 4.22). Derived from operator-index-image tag if not set.'
-        required: false
-        default: ''
+        description: 'OCP version for the infra cluster (e.g. 4.22)'
+        required: true
         type: string
       cluster-lifespan:
         description: 'Cluster lifespan (e.g., 2h, 4h, 8h)'
@@ -68,11 +66,7 @@ jobs:
         env:
           OCP_VERSION: ${{ inputs.ocp-version }}
         run: |
-          if [[ -n "$OCP_VERSION" ]]; then
-            echo "infra-args=openshift-version=ocp/stable-${OCP_VERSION}" >> "$GITHUB_OUTPUT"
-          else
-            echo "infra-args=" >> "$GITHUB_OUTPUT"
-          fi
+          echo "infra-args=openshift-version=ocp/candidate-${OCP_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Create OpenShift cluster
         uses: stackrox/actions/infra/create-cluster@v1
