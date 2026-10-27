@@ -141,6 +141,7 @@ func GetLatestOfficialStream(timeout time.Duration) (*semver.Version, error) {
 
 // ApplyImageMirror applies ICSP to redirect registry.redhat.io images to quay.io/rhacs-eng.
 // This allows testing RC bundles that reference registry.redhat.io images not yet published.
+// Only includes operator images needed for upgrade testing (not Central/SecuredCluster components).
 func ApplyImageMirror() error {
 	fmt.Println("  Applying image mirror (ICSP) for RC testing...")
 	return ocApply(`apiVersion: operator.openshift.io/v1alpha1
@@ -157,40 +158,7 @@ spec:
     - quay.io/rhacs-eng/release-operator
   - source: registry.redhat.io/advanced-cluster-security/rhacs-rhel9-operator
     mirrors:
-    - quay.io/rhacs-eng/release-operator
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-main-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-main
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-scanner
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-slim-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-scanner-slim
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-db-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-scanner-db
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-db-slim-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-scanner-db-slim
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-collector-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-collector
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-roxctl-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-roxctl
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-central-db-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-central-db
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-db-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-scanner-v4-db
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/release-scanner-v4
-  - source: registry.redhat.io/advanced-cluster-security/rhacs-fact-rhel9
-    mirrors:
-    - quay.io/rhacs-eng/fact`)
+    - quay.io/rhacs-eng/release-operator`)
 }
 
 // RemoveImageMirror removes the ICSP created by ApplyImageMirror.
