@@ -50,10 +50,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  # Include version stream and OCP version for clarity and uniqueness in matrix
-  CLUSTER_NAME: upgrade-test-v${{ inputs.version-stream }}-ocp${{ inputs.ocp-version }}-${{ github.run_id }}-${{ github.run_attempt }}
-
 run-name: >-
   ${{ format('Operator Index Upgrade Test v{0}', inputs.version-stream) }}
 
@@ -61,7 +57,24 @@ jobs:
   create-cluster:
     name: Create OpenShift cluster
     runs-on: ubuntu-latest
+    outputs:
+      cluster-name: ${{ steps.cluster-name.outputs.name }}
     steps:
+      - name: Generate cluster name
+        id: cluster-name
+        env:
+          VERSION: ${{ inputs.version-stream }}
+          OCP: ${{ inputs.ocp-version }}
+          RUN_ID: ${{ github.run_id }}
+          ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          # Remove dots from version strings for cluster name (max 28 chars, must match ^[a-z][a-z0-9-]{1,26}[a-z0-9]$)
+          VERSION_NO_DOTS=$(echo "$VERSION" | tr -d '.')
+          OCP_NO_DOTS=$(echo "$OCP" | tr -d '.')
+          # Format: upg-v50-ocp412-RUNID-ATTEMPT (e.g., upg-v50-ocp50-12345-1)
+          CLUSTER_NAME="upg-v${VERSION_NO_DOTS}-ocp${OCP_NO_DOTS}-${RUN_ID}-${ATTEMPT}"
+          echo "name=$CLUSTER_NAME" >> "$GITHUB_OUTPUT"
+          echo "Generated cluster name: $CLUSTER_NAME"
       - name: Set cluster args
         id: ocp
         env:
@@ -74,7 +87,7 @@ jobs:
         with:
           token: ${{ secrets.INFRA_TOKEN }}
           flavor: openshift-4
-          name: ${{ env.CLUSTER_NAME }}
+          name: ${{ steps.cluster-name.outputs.name }}
           lifespan: ${{ inputs.cluster-lifespan }}
           wait: true
           args: ${{ steps.ocp.outputs.infra-args }}
@@ -97,6 +110,7 @@ jobs:
       - name: Download cluster kubeconfig
         env:
           INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
+          CLUSTER_NAME: ${{ needs.create-cluster.outputs.cluster-name }}
         run: |
           infractl artifacts --download-dir=./artifacts "$CLUSTER_NAME"
           echo "KUBECONFIG=${GITHUB_WORKSPACE}/artifacts/kubeconfig" >> "$GITHUB_ENV"
@@ -120,6 +134,7 @@ jobs:
     if: always() && needs.create-cluster.result != 'cancelled'
     env:
       INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
+      CLUSTER_NAME: ${{ needs.create-cluster.outputs.cluster-name }}
     steps:
       - name: Install infractl
         uses: stackrox/actions/infra/install-infractl@v1
