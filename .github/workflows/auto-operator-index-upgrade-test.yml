@@ -48,19 +48,35 @@ jobs:
           SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: go run ./cmd/derive-inputs >> "$GITHUB_OUTPUT"
 
+      - name: Prepare oldest-OCP image for waiting
+        if: steps.derive.outputs.version-streams != ''
+        id: oldest-image
+        run: |
+          FULL_IMAGE='${{ fromJson(steps.derive.outputs.ocp-targets)[0].operator-index-image }}'
+          IMAGE_WITHOUT_REGISTRY="${FULL_IMAGE#quay.io/}"
+          echo "image=$IMAGE_WITHOUT_REGISTRY" >> "$GITHUB_OUTPUT"
+
       - name: Wait for oldest-OCP operator-index image
         if: steps.derive.outputs.version-streams != ''
         uses: stackrox/actions/release/wait-for-image@v1
         with:
-          image: ${{ fromJson(steps.derive.outputs.ocp-targets)[0].operator-index-image }}
+          image: ${{ steps.oldest-image.outputs.image }}
           interval: "60"
           limit: "7200"
+
+      - name: Prepare newest-OCP image for waiting
+        if: steps.derive.outputs.version-streams != '' && fromJson(steps.derive.outputs.ocp-targets)[1] != null
+        id: newest-image
+        run: |
+          FULL_IMAGE='${{ fromJson(steps.derive.outputs.ocp-targets)[1].operator-index-image }}'
+          IMAGE_WITHOUT_REGISTRY="${FULL_IMAGE#quay.io/}"
+          echo "image=$IMAGE_WITHOUT_REGISTRY" >> "$GITHUB_OUTPUT"
 
       - name: Wait for newest-OCP operator-index image
         if: steps.derive.outputs.version-streams != '' && fromJson(steps.derive.outputs.ocp-targets)[1] != null
         uses: stackrox/actions/release/wait-for-image@v1
         with:
-          image: ${{ fromJson(steps.derive.outputs.ocp-targets)[1].operator-index-image }}
+          image: ${{ steps.newest-image.outputs.image }}
           interval: "60"
           limit: "7200"
 
