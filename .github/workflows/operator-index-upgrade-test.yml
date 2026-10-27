@@ -98,7 +98,7 @@ jobs:
           INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
         run: |
           infractl artifacts --download-dir=./artifacts "$CLUSTER_NAME"
-          echo "KUBECONFIG=${{ github.workspace }}/artifacts/kubeconfig" >> "$GITHUB_ENV"
+          echo "KUBECONFIG=${GITHUB_WORKSPACE}/artifacts/kubeconfig" >> "$GITHUB_ENV"
 
       - name: "Test 1: upgrade oldest-supported → provided"
         env:
