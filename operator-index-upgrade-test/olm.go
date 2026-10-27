@@ -139,6 +139,66 @@ func GetLatestOfficialStream(timeout time.Duration) (*semver.Version, error) {
 	return nil, fmt.Errorf("no rhacs-*.* channels found in redhat-operators after %v", timeout)
 }
 
+// ApplyImageMirror applies ICSP to redirect registry.redhat.io images to quay.io/rhacs-eng.
+// This allows testing RC bundles that reference registry.redhat.io images not yet published.
+func ApplyImageMirror() error {
+	fmt.Println("  Applying image mirror (ICSP) for RC testing...")
+	return ocApply(`apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: rhacs-rc-mirror
+spec:
+  repositoryDigestMirrors:
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-operator-bundle
+    mirrors:
+    - quay.io/rhacs-eng/release-operator-bundle
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-rhel8-operator
+    mirrors:
+    - quay.io/rhacs-eng/release-operator
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-rhel9-operator
+    mirrors:
+    - quay.io/rhacs-eng/release-operator
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-main-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-main
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-slim-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-slim
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-db-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-db
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-db-slim-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-db-slim
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-collector-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-collector
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-roxctl-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-roxctl
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-central-db-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-central-db
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-db-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-v4-db
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-scanner-v4-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/release-scanner-v4
+  - source: registry.redhat.io/advanced-cluster-security/rhacs-fact-rhel9
+    mirrors:
+    - quay.io/rhacs-eng/fact`)
+}
+
+// RemoveImageMirror removes the ICSP created by ApplyImageMirror.
+func RemoveImageMirror() error {
+	fmt.Println("  Removing image mirror (ICSP)...")
+	return ocRun("delete", "imagecontentsourcepolicy", "rhacs-rc-mirror", "--ignore-not-found")
+}
+
 // DisableDefaultSources disables all default OperatorHub catalog sources.
 func DisableDefaultSources() error {
 	fmt.Println("  Disabling default OperatorHub sources...")
@@ -256,6 +316,9 @@ func InstallFromOfficial(stream *semver.Version) (targetCSV string, err error) {
 
 // applyCustomCatalogAndSubscribe is the shared implementation for InstallFromCustom and UpgradeViaCustom.
 func applyCustomCatalogAndSubscribe(indexImage, channel string) (string, error) {
+	if err := ApplyImageMirror(); err != nil {
+		return "", err
+	}
 	if err := DisableDefaultSources(); err != nil {
 		return "", err
 	}
@@ -361,6 +424,9 @@ func ResetOperator() error {
 	if err := ocRun("delete", "catalogsource", "my-operator-catalog",
 		"-n", "openshift-marketplace", "--ignore-not-found"); err != nil {
 		errs = append(errs, fmt.Errorf("delete catalogsource: %w", err))
+	}
+	if err := RemoveImageMirror(); err != nil {
+		errs = append(errs, fmt.Errorf("remove image mirror: %w", err))
 	}
 	if err := EnableDefaultSources(); err != nil {
 		errs = append(errs, err)
