@@ -65,16 +65,22 @@ jobs:
         env:
           VERSION: ${{ inputs.version-stream }}
           OCP: ${{ inputs.ocp-version }}
-          RUN_ID: ${{ github.run_id }}
-          ATTEMPT: ${{ github.run_attempt }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
         run: |
           # Remove dots from version strings for cluster name (max 28 chars, must match ^[a-z][a-z0-9-]{1,26}[a-z0-9]$)
           VERSION_NO_DOTS=$(echo "$VERSION" | tr -d '.')
           OCP_NO_DOTS=$(echo "$OCP" | tr -d '.')
-          # Format: upg-v50-ocp412-RUNID-ATTEMPT (e.g., upg-v50-ocp50-12345-1)
-          CLUSTER_NAME="upg-v${VERSION_NO_DOTS}-ocp${OCP_NO_DOTS}-${RUN_ID}-${ATTEMPT}"
+          # Use PR number if available (e.g., pr493), otherwise use run attempt
+          if [[ -n "$PR_NUMBER" ]]; then
+            SUFFIX="pr${PR_NUMBER}"
+          else
+            SUFFIX="r${RUN_ATTEMPT}"
+          fi
+          # Format: upg-v410-ocp412-pr493 (typically <25 chars)
+          CLUSTER_NAME="upg-v${VERSION_NO_DOTS}-ocp${OCP_NO_DOTS}-${SUFFIX}"
           echo "name=$CLUSTER_NAME" >> "$GITHUB_OUTPUT"
-          echo "Generated cluster name: $CLUSTER_NAME"
+          echo "Generated cluster name: $CLUSTER_NAME (length: ${#CLUSTER_NAME})"
       - name: Set cluster args
         id: ocp
         env:
