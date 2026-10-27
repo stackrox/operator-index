@@ -26,7 +26,7 @@ func (s *UpgradeSuite) TestUpgradeOldest() {
 
 	t.Logf("Image:   %s", operatorIndexImage)
 	t.Logf("Version: %d.%d | Channel: %s", stream.Major(), stream.Minor(), channel)
-	t.Logf("Oldest:  %d.%d.%d (from bundles.yaml)", oldest.Major(), oldest.Minor(), oldest.Path())
+	t.Logf("Oldest:  %d.%d.%d (from bundles.yaml)", oldest.Major(), oldest.Minor(), oldest.Patch())
 
 	t.Logf("Step 1: Install ACS Operator %d.%d from redhat-operators", oldest.Major(), oldest.Minor())
 	targetCSV, err := InstallFromOfficial(oldest)
