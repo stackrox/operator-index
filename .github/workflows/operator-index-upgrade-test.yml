@@ -154,18 +154,50 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Write summary
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Read oldest supported version
+        id: oldest
         run: |
-          cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
-          # Operator Index Upgrade Test Results
+          OLDEST=$(grep -m1 "oldest_supported_version:" bundles.yaml | sed 's/.*: *//')
+          echo "version=$OLDEST" >> "$GITHUB_OUTPUT"
+
+      - name: Write summary
+        env:
+          TEST_RESULT: ${{ needs.run-upgrade-tests.result }}
+          OLDEST_VERSION: ${{ steps.oldest.outputs.version }}
+        run: |
+          # Set status emoji
+          if [[ "$TEST_RESULT" == "success" ]]; then
+            STATUS="✅ success"
+          elif [[ "$TEST_RESULT" == "failure" ]]; then
+            STATUS="❌ failure"
+          else
+            STATUS="⚠️ $TEST_RESULT"
+          fi
+
+          cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+          # Operator Index Upgrade Test Results (OCP ${{ inputs.ocp-version }})
 
           | Field | Value |
           |-------|-------|
-          | **Operator image** | `${{ inputs.operator-index-image }}` |
-          | **ACS version** | `${{ inputs.version-stream }}` |
-          | **Upgrade tests** | ${{ needs.run-upgrade-tests.result }} |
+          | **Test result** | $STATUS |
+          | **Target ACS version** | ${{ inputs.version-stream }} |
+          | **OCP version** | ${{ inputs.ocp-version }} |
+          | **Operator index image** | \`${{ inputs.operator-index-image }}\` |
 
-          ## Tests run:
-          1. **Test 1** — install oldest supported ACS version, upgrade to the provided operator-index image
-          2. **Test 2** — install provided operator-index image, upgrade to latest GA if provided ACS version is behind
+          ## Upgrade paths tested:
+
+          ### Test 1: Upgrade from oldest supported version
+          - **From:** ACS \`$OLDEST_VERSION\` (from redhat-operators)
+          - **To:** ACS \`${{ inputs.version-stream }}\` (from custom index)
+          - **Path:** Install oldest → Upgrade to provided index
+
+          ### Test 2: Upgrade to latest GA (if applicable)
+          - **From:** ACS \`${{ inputs.version-stream }}\` (from custom index)
+          - **To:** Latest GA in redhat-operators (if \`${{ inputs.version-stream }}\` is behind)
+          - **Path:** Install provided → Upgrade to latest GA
           EOF
