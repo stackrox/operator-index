@@ -51,7 +51,8 @@ defaults:
     shell: bash
 
 env:
-  CLUSTER_NAME: upgrade-test-${{ github.run_id }}-${{ github.run_attempt }}
+  # Include OCP version to ensure unique cluster names when called from matrix
+  CLUSTER_NAME: upgrade-test-${{ github.run_id }}-${{ github.run_attempt }}-ocp${{ inputs.ocp-version }}
 
 run-name: >-
   ${{ format('Operator Index Upgrade Test v{0}', inputs.version-stream) }}
