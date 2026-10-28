@@ -25,8 +25,8 @@ func (s *UpgradeSuite) TestUpgradeLatest() {
 	t.Logf("Version: %d.%d | Channel: %s", stream.Major(), stream.Minor(), channel)
 
 	// Query latest GA stream BEFORE disabling default sources (install_from_custom disables them).
-	require.NoError(t, WaitForCatalog("redhat-operators", "openshift-marketplace", 3*time.Minute))
-	latestStream, err := GetLatestOfficialStream(3 * time.Minute)
+	require.NoError(t, WaitForCatalog("redhat-operators", "openshift-marketplace", 5*time.Minute))
+	latestStream, err := GetLatestOfficialStream(5 * time.Minute)
 	require.NoError(t, err)
 	t.Logf("Latest GA in redhat-operators: %d.%d", latestStream.Major(), latestStream.Minor())
 
