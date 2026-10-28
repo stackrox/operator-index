@@ -65,19 +65,16 @@ jobs:
         env:
           VERSION: ${{ inputs.version-stream }}
           OCP: ${{ inputs.ocp-version }}
-          PR_NUMBER: ${{ github.event.pull_request.number || github.event.number }}
+          SHA: ${{ github.sha }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
         run: |
           # Remove dots from version strings for cluster name (max 28 chars, must match ^[a-z][a-z0-9-]{1,26}[a-z0-9]$)
           VERSION_NO_DOTS=$(echo "$VERSION" | tr -d '.')
           OCP_NO_DOTS=$(echo "$OCP" | tr -d '.')
-          # Include both PR number and run attempt for better tracking
-          if [[ -n "$PR_NUMBER" ]]; then
-            SUFFIX="pr${PR_NUMBER}-r${RUN_ATTEMPT}"
-          else
-            SUFFIX="r${RUN_ATTEMPT}"
-          fi
-          # Format: upg-v410-ocp412-pr496-r1 (max 28 chars: upg-v500-ocp500-pr999-r99)
+          # Use short git commit hash (7 chars) and run attempt
+          SHORT_SHA="${SHA:0:7}"
+          SUFFIX="${SHORT_SHA}-${RUN_ATTEMPT}"
+          # Format: upg-v410-ocp412-abc1234-1 (max 28 chars: upg-v500-ocp500-abc1234-99 = 26 chars)
           CLUSTER_NAME="upg-v${VERSION_NO_DOTS}-ocp${OCP_NO_DOTS}-${SUFFIX}"
           echo "name=$CLUSTER_NAME" >> "$GITHUB_OUTPUT"
           echo "Generated cluster name: $CLUSTER_NAME (length: ${#CLUSTER_NAME})"
