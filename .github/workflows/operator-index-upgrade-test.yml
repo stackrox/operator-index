@@ -188,6 +188,7 @@ jobs:
           OLDEST_VERSION: ${{ steps.oldest.outputs.version }}
           TARGET_VERSION: ${{ steps.target.outputs.version }}
           LATEST_GA_VERSION: ${{ steps.latest-ga.outputs.version }}
+          VERSION_STREAM: ${{ inputs.version-stream }}
         run: |
           # Set status emoji
           if [[ "$TEST_RESULT" == "success" ]]; then
@@ -196,6 +197,17 @@ jobs:
             STATUS="❌ failure"
           else
             STATUS="⚠️ $TEST_RESULT"
+          fi
+
+          # Extract major.minor from latest GA version
+          LATEST_GA_STREAM=$(echo "$LATEST_GA_VERSION" | grep -oE '^[0-9]+\.[0-9]+')
+
+          # Compare version streams to determine if upgrade to GA applies
+          # Use sort -V (version sort) to compare: if target sorts before latest, it's older
+          if [[ $(echo -e "${VERSION_STREAM}\n${LATEST_GA_STREAM}" | sort -V | head -1) == "${VERSION_STREAM}" ]] && [[ "${VERSION_STREAM}" != "${LATEST_GA_STREAM}" ]]; then
+            UPGRADE_TO_GA=true
+          else
+            UPGRADE_TO_GA=false
           fi
 
           cat <<EOF >> "$GITHUB_STEP_SUMMARY"
@@ -211,12 +223,19 @@ jobs:
           ## Upgrade paths tested:
 
           ### Test 1: Upgrade from oldest supported version
-          - **From:** ACS \`$OLDEST_VERSION\` (from redhat-operators)
-          - **To:** ACS \`$TARGET_VERSION\` (from custom index)
-          - **Path:** Install oldest → Upgrade to provided index
+          - **From:** \`$OLDEST_VERSION\`
+          - **To:** \`$TARGET_VERSION\`
 
-          ### Test 2: Upgrade to latest GA (if applicable)
-          - **From:** ACS \`$TARGET_VERSION\` (from custom index)
-          - **To:** ACS \`$LATEST_GA_VERSION\` (from redhat-operators, if \`$TARGET_VERSION\` is behind)
-          - **Path:** Install provided → Upgrade to latest GA
+          ### Test 2: Fresh install and optional upgrade to latest GA
+          - **Install:** \`$TARGET_VERSION\`
           EOF
+
+          if [[ "$UPGRADE_TO_GA" == "true" ]]; then
+            cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+          - **Then upgrade to:** \`$LATEST_GA_VERSION\`
+          EOF
+          else
+            cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+          - **No upgrade** (target is at or ahead of latest GA \`$LATEST_GA_VERSION\`)
+          EOF
+          fi
