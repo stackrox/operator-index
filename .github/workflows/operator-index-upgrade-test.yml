@@ -71,13 +71,13 @@ jobs:
           # Remove dots from version strings for cluster name (max 28 chars, must match ^[a-z][a-z0-9-]{1,26}[a-z0-9]$)
           VERSION_NO_DOTS=$(echo "$VERSION" | tr -d '.')
           OCP_NO_DOTS=$(echo "$OCP" | tr -d '.')
-          # Use PR number if available (e.g., pr493), otherwise use run attempt
+          # Include both PR number and run attempt for better tracking
           if [[ -n "$PR_NUMBER" ]]; then
-            SUFFIX="pr${PR_NUMBER}"
+            SUFFIX="pr${PR_NUMBER}-r${RUN_ATTEMPT}"
           else
             SUFFIX="r${RUN_ATTEMPT}"
           fi
-          # Format: upg-v410-ocp412-pr493 (typically <25 chars)
+          # Format: upg-v410-ocp412-pr496-r1 (max 28 chars: upg-v500-ocp500-pr999-r99)
           CLUSTER_NAME="upg-v${VERSION_NO_DOTS}-ocp${OCP_NO_DOTS}-${SUFFIX}"
           echo "name=$CLUSTER_NAME" >> "$GITHUB_OUTPUT"
           echo "Generated cluster name: $CLUSTER_NAME (length: ${#CLUSTER_NAME})"
@@ -165,10 +165,32 @@ jobs:
           OLDEST=$(grep -m1 "oldest_supported_version:" bundles.yaml | sed 's/.*: *//')
           echo "version=$OLDEST" >> "$GITHUB_OUTPUT"
 
+      - name: Extract target version from bundles.yaml
+        id: target
+        env:
+          VERSION_STREAM: ${{ inputs.version-stream }}
+        run: |
+          # Get the latest version in this stream from bundles.yaml
+          TARGET=$(grep -E "^\s+version:\s+${VERSION_STREAM}\." bundles.yaml | tail -1 | sed 's/.*: *//')
+          echo "version=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "Extracted target version: $TARGET"
+
+      - name: Extract latest GA version from bundles.yaml
+        id: latest-ga
+        env:
+          VERSION_STREAM: ${{ inputs.version-stream }}
+        run: |
+          # Get highest version that doesn't contain 'rc' (i.e., GA versions only)
+          LATEST_GA=$(grep -E "^\s+version:\s+[0-9]+\.[0-9]+\.[0-9]+$" bundles.yaml | sed 's/.*: *//' | sort -V | tail -1)
+          echo "version=$LATEST_GA" >> "$GITHUB_OUTPUT"
+          echo "Latest GA version: $LATEST_GA"
+
       - name: Write summary
         env:
           TEST_RESULT: ${{ needs.run-upgrade-tests.result }}
           OLDEST_VERSION: ${{ steps.oldest.outputs.version }}
+          TARGET_VERSION: ${{ steps.target.outputs.version }}
+          LATEST_GA_VERSION: ${{ steps.latest-ga.outputs.version }}
         run: |
           # Set status emoji
           if [[ "$TEST_RESULT" == "success" ]]; then
@@ -185,7 +207,7 @@ jobs:
           | Field | Value |
           |-------|-------|
           | **Test result** | $STATUS |
-          | **Target ACS version** | ${{ inputs.version-stream }} |
+          | **Target ACS version** | \`$TARGET_VERSION\` |
           | **OCP version** | ${{ inputs.ocp-version }} |
           | **Operator index image** | \`${{ inputs.operator-index-image }}\` |
 
@@ -193,11 +215,11 @@ jobs:
 
           ### Test 1: Upgrade from oldest supported version
           - **From:** ACS \`$OLDEST_VERSION\` (from redhat-operators)
-          - **To:** ACS \`${{ inputs.version-stream }}\` (from custom index)
+          - **To:** ACS \`$TARGET_VERSION\` (from custom index)
           - **Path:** Install oldest → Upgrade to provided index
 
           ### Test 2: Upgrade to latest GA (if applicable)
-          - **From:** ACS \`${{ inputs.version-stream }}\` (from custom index)
-          - **To:** Latest GA in redhat-operators (if \`${{ inputs.version-stream }}\` is behind)
+          - **From:** ACS \`$TARGET_VERSION\` (from custom index)
+          - **To:** ACS \`$LATEST_GA_VERSION\` (from redhat-operators, if \`$TARGET_VERSION\` is behind)
           - **Path:** Install provided → Upgrade to latest GA
           EOF
