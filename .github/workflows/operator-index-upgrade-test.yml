@@ -217,7 +217,7 @@ jobs:
           |-------|-------|
           | **Test result** | $STATUS |
           | **Target ACS version** | \`$TARGET_VERSION\` |
-          | **OCP version** | ${{ inputs.ocp-version }} |
+          | **OCP version** | \`${{ inputs.ocp-version }}\` |
           | **Operator index image** | \`${{ inputs.operator-index-image }}\` |
 
           ## Upgrade paths tested:
