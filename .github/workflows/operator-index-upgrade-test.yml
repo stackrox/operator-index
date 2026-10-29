@@ -1,0 +1,241 @@
+name: "Operator Index Upgrade Test"
+
+on:
+  workflow_dispatch:
+    inputs:
+      operator-index-image:
+        description: 'ACS Operator index image (e.g., quay.io/rhacs-eng/stackrox-operator-index:ocp-v4-22-...)'
+        required: true
+        type: string
+      version-stream:
+        description: 'ACS version stream under test (e.g. 4.10). Determines channel and Y-2 oldest.'
+        required: true
+        type: string
+      ocp-version:
+        description: 'OCP version for the infra cluster (e.g. 4.22)'
+        required: true
+        type: string
+      cluster-lifespan:
+        description: 'Cluster lifespan (e.g., 2h, 4h, 8h)'
+        required: false
+        default: '2h'
+        type: string
+  workflow_call:
+    inputs:
+      operator-index-image:
+        description: 'ACS Operator index image'
+        required: true
+        type: string
+      version-stream:
+        description: 'ACS minor version under test (e.g. 4.10). Determines channel and Y-2 oldest.'
+        required: true
+        type: string
+      ocp-version:
+        description: 'OCP version for the infra cluster (e.g. 4.22)'
+        required: true
+        type: string
+      cluster-lifespan:
+        description: 'Cluster lifespan (e.g., 2h, 4h, 8h)'
+        required: false
+        default: '2h'
+        type: string
+    secrets:
+      INFRA_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+run-name: >-
+  ${{ format('Operator Index Upgrade Test v{0}', inputs.version-stream) }}
+
+jobs:
+  create-cluster:
+    name: Create OpenShift cluster
+    runs-on: ubuntu-latest
+    outputs:
+      cluster-name: ${{ steps.cluster-name.outputs.name }}
+    steps:
+      - name: Generate cluster name
+        id: cluster-name
+        env:
+          VERSION: ${{ inputs.version-stream }}
+          OCP: ${{ inputs.ocp-version }}
+          SHA: ${{ github.sha }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          # Remove dots from version strings for cluster name (max 28 chars, must match ^[a-z][a-z0-9-]{1,26}[a-z0-9]$)
+          VERSION_NO_DOTS=$(echo "$VERSION" | tr -d '.')
+          OCP_NO_DOTS=$(echo "$OCP" | tr -d '.')
+          # Use short git commit hash (7 chars) and run attempt
+          SHORT_SHA="${SHA:0:7}"
+          SUFFIX="${SHORT_SHA}-${RUN_ATTEMPT}"
+          # Format: upg-v410-ocp412-abc1234-1 (max 28 chars: upg-v500-ocp500-abc1234-99 = 26 chars)
+          CLUSTER_NAME="upg-v${VERSION_NO_DOTS}-ocp${OCP_NO_DOTS}-${SUFFIX}"
+          echo "name=$CLUSTER_NAME" >> "$GITHUB_OUTPUT"
+          echo "Generated cluster name: $CLUSTER_NAME (length: ${#CLUSTER_NAME})"
+      - name: Set cluster args
+        id: ocp
+        env:
+          OCP_VERSION: ${{ inputs.ocp-version }}
+        run: |
+          echo "infra-args=openshift-version=ocp/candidate-${OCP_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Create OpenShift cluster
+        uses: stackrox/actions/infra/create-cluster@v1
+        with:
+          token: ${{ secrets.INFRA_TOKEN }}
+          flavor: openshift-4
+          name: ${{ steps.cluster-name.outputs.name }}
+          lifespan: ${{ inputs.cluster-lifespan }}
+          wait: true
+          args: ${{ steps.ocp.outputs.infra-args }}
+
+  run-upgrade-tests:
+    name: Run operator-index upgrade tests
+    needs: create-cluster
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/stackrox-io/apollo-ci:stackrox-test-stable
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install infractl
+        uses: stackrox/actions/infra/install-infractl@v1
+
+      - name: Download cluster kubeconfig
+        env:
+          INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
+          CLUSTER_NAME: ${{ needs.create-cluster.outputs.cluster-name }}
+        run: |
+          infractl artifacts --download-dir=./artifacts "$CLUSTER_NAME"
+          echo "KUBECONFIG=${GITHUB_WORKSPACE}/artifacts/kubeconfig" >> "$GITHUB_ENV"
+
+      - name: "Test 1: upgrade oldest-supported → provided"
+        env:
+          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image }}
+          VERSION_STREAM: ${{ inputs.version-stream }}
+        run: make upgrade-test-oldest
+
+      - name: "Test 2: install provided → optionally upgrade to latest GA"
+        env:
+          OPERATOR_INDEX_IMAGE: ${{ inputs.operator-index-image }}
+          VERSION_STREAM: ${{ inputs.version-stream }}
+        run: make upgrade-test-latest
+
+  delete-test-cluster:
+    name: Delete infra test cluster
+    needs: [create-cluster, run-upgrade-tests]
+    runs-on: ubuntu-latest
+    if: always() && needs.create-cluster.result != 'cancelled'
+    env:
+      INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
+      CLUSTER_NAME: ${{ needs.create-cluster.outputs.cluster-name }}
+    steps:
+      - name: Install infractl
+        uses: stackrox/actions/infra/install-infractl@v1
+
+      - name: Delete cluster
+        run: infractl delete "${CLUSTER_NAME}"
+
+  report-status:
+    name: Report test status
+    needs: [create-cluster, run-upgrade-tests, delete-test-cluster]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Read oldest supported version
+        id: oldest
+        run: |
+          OLDEST=$(grep -m1 "oldest_supported_version:" bundles.yaml | sed 's/.*: *//')
+          echo "version=$OLDEST" >> "$GITHUB_OUTPUT"
+
+      - name: Extract target version from bundles.yaml
+        id: target
+        env:
+          VERSION_STREAM: ${{ inputs.version-stream }}
+        run: |
+          # Get the latest version in this stream from bundles.yaml
+          TARGET=$(grep -E "^\s+version:\s+${VERSION_STREAM}\." bundles.yaml | tail -1 | sed 's/.*: *//')
+          echo "version=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "Extracted target version: $TARGET"
+
+      - name: Extract latest GA version from bundles.yaml
+        id: latest-ga
+        env:
+          VERSION_STREAM: ${{ inputs.version-stream }}
+        run: |
+          # Get highest version that doesn't contain 'rc' (i.e., GA versions only)
+          LATEST_GA=$(grep -E "^\s+version:\s+[0-9]+\.[0-9]+\.[0-9]+$" bundles.yaml | sed 's/.*: *//' | sort -V | tail -1)
+          echo "version=$LATEST_GA" >> "$GITHUB_OUTPUT"
+          echo "Latest GA version: $LATEST_GA"
+
+      - name: Write summary
+        env:
+          TEST_RESULT: ${{ needs.run-upgrade-tests.result }}
+          OLDEST_VERSION: ${{ steps.oldest.outputs.version }}
+          TARGET_VERSION: ${{ steps.target.outputs.version }}
+          LATEST_GA_VERSION: ${{ steps.latest-ga.outputs.version }}
+          VERSION_STREAM: ${{ inputs.version-stream }}
+        run: |
+          # Set status emoji
+          if [[ "$TEST_RESULT" == "success" ]]; then
+            STATUS="✅ success"
+          elif [[ "$TEST_RESULT" == "failure" ]]; then
+            STATUS="❌ failure"
+          else
+            STATUS="⚠️ $TEST_RESULT"
+          fi
+
+          # Extract major.minor from latest GA version
+          LATEST_GA_STREAM=$(echo "$LATEST_GA_VERSION" | grep -oE '^[0-9]+\.[0-9]+')
+
+          # Compare version streams to determine if upgrade to GA applies
+          # Use sort -V (version sort) to compare: if target sorts before latest, it's older
+          if [[ $(echo -e "${VERSION_STREAM}\n${LATEST_GA_STREAM}" | sort -V | head -1) == "${VERSION_STREAM}" ]] && [[ "${VERSION_STREAM}" != "${LATEST_GA_STREAM}" ]]; then
+            UPGRADE_TO_GA=true
+          else
+            UPGRADE_TO_GA=false
+          fi
+
+          cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+          # Operator Index Upgrade Test Results (OCP ${{ inputs.ocp-version }})
+
+          | Field | Value |
+          |-------|-------|
+          | **Test result** | $STATUS |
+          | **Target ACS version** | \`$TARGET_VERSION\` |
+          | **OCP version** | \`${{ inputs.ocp-version }}\` |
+          | **Operator index image** | \`${{ inputs.operator-index-image }}\` |
+
+          ## Upgrade paths tested:
+
+          ### Test 1: Upgrade from oldest supported version
+          - **From:** \`$OLDEST_VERSION\`
+          - **To:** \`$TARGET_VERSION\`
+
+          ### Test 2: Fresh install and optional upgrade to latest GA
+          - **Install:** \`$TARGET_VERSION\`
+          EOF
+
+          if [[ "$UPGRADE_TO_GA" == "true" ]]; then
+            cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+          - **Then upgrade to:** \`$LATEST_GA_VERSION\`
+          EOF
+          else
+            cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+          - **No upgrade** (target is at or ahead of latest GA \`$LATEST_GA_VERSION\`)
+          EOF
+          fi
