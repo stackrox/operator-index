@@ -26,7 +26,7 @@ spec:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
   - name: validate-pipeline-files
-    image: quay.io/konflux-ci/release-service-utils:latest@sha256:61c8b1869748a4a808bc8f5ed45dedc980a0a08a64834fd8ae8610ca9ee084c4
+    image: quay.io/konflux-ci/release-service-utils:latest@sha256:5e1df1469ab2200ddedc233c8de671d3900e9ada18c8973e3ea08ae78bebdac1
     imagePullPolicy: IfNotPresent
     workingDir: /var/workdir/source
     script: |
