@@ -77,7 +77,7 @@ spec:
         - name: name
           value: git-clone-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.2.6@sha256:b3c05f2aab54b5b6d7e9b5a95931b2c6602574604842a4c430fdb3fbc3fb9fcb
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.2.6@sha256:c3c1071a99310be07d5706ea3ef7b4311ebccb17b17b839e606180ee396497dc
         - name: kind
           value: task
         resolver: bundles
@@ -104,7 +104,7 @@ spec:
           - use
           - $(tasks.clone-repository.results.SOURCE_ARTIFACT)=/var/workdir/source
         - name: run-go-tests
-          image: registry.redhat.io/ubi9/go-toolset:latest@sha256:edb9452603fa48e9882063f001ecd7d322add20f1564a4f05f38f6683be5ea94
+          image: registry.redhat.io/ubi9/go-toolset:latest@sha256:c2bd0309bf78ae317024fdfc5602a31704e0dba9572f6d4b0bd4b681033dc965
           imagePullPolicy: IfNotPresent
           workingDir: /var/workdir/source
           script: time make go-test
@@ -142,7 +142,7 @@ spec:
           - use
           - $(tasks.clone-repository.results.SOURCE_ARTIFACT)=/var/workdir/source
         - name: check-catalog-file-size
-          image: registry.redhat.io/ubi9/ubi-minimal:latest@sha256:2d4c4551af6831dcd26bbf86108c4385de5183ec8fe6b5868f6f9640fe47f4ed
+          image: registry.redhat.io/ubi9/ubi-minimal:latest@sha256:4b79c93106c14ad1c234907f83441ff0e4f8d24e78426a36e159098e9f7e6fa5
           imagePullPolicy: IfNotPresent
           workingDir: /var/workdir/source
           script: |

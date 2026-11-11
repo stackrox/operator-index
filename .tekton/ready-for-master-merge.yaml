@@ -78,7 +78,7 @@ spec:
         - name: name
           value: git-clone-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.2.6@sha256:b3c05f2aab54b5b6d7e9b5a95931b2c6602574604842a4c430fdb3fbc3fb9fcb
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.2.6@sha256:c3c1071a99310be07d5706ea3ef7b4311ebccb17b17b839e606180ee396497dc
         - name: kind
           value: task
         resolver: bundles
@@ -104,7 +104,7 @@ spec:
           - use
           - $(tasks.clone-repository.results.SOURCE_ARTIFACT)=/var/workdir/source
         - name: check-bundle-images-in-catalog-template
-          image: quay.io/konflux-ci/release-service-utils:latest@sha256:61c8b1869748a4a808bc8f5ed45dedc980a0a08a64834fd8ae8610ca9ee084c4
+          image: quay.io/konflux-ci/release-service-utils:latest@sha256:8b308f11fda48b7d3e8065c6e23d23c623d8888d1a7d9b389b69552fea217d7c
           imagePullPolicy: IfNotPresent
           workingDir: /var/workdir/source
           script: |
