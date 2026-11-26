@@ -203,7 +203,7 @@ spec:
       - name: name
         value: fbc-inject-lifecycle-oci-ta
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-fbc-inject-lifecycle-oci-ta:0.1@sha256:2b5e5224095585235865383479e4b72cdc1e008c6355b9b4f78a788863e0a1f5
+        value: quay.io/konflux-ci/tekton-catalog/task-fbc-inject-lifecycle-oci-ta:0.1@sha256:8c9d713ed58610519c3eafde4ff4d80d79af9852bdb8a9b9b4f9661d15655e63
     params:
     - name: DOCKERFILE
       value: $(params.dockerfile)
@@ -318,12 +318,14 @@ spec:
       value: $(tasks.build-image-index.results.IMAGE_URL)
     - name: IMAGE_DIGEST
       value: $(tasks.build-image-index.results.IMAGE_DIGEST)
+    - name: SOURCE_ARTIFACT
+      value: $(tasks.fbc-inject-lifecycle.results.SOURCE_ARTIFACT)
     taskRef:
       params:
       - name: name
         value: validate-fbc
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-validate-fbc:0.3@sha256:16338801f37d99217798c05af125db06b9475a300044cea2f285655b526c7acc
+        value: quay.io/konflux-ci/tekton-catalog/task-validate-fbc:0.4@sha256:d34e609ce43773ce86a83ef1838ce9b843c831078d5c175599c1aed37da656b4
       - name: kind
         value: task
       resolver: bundles
